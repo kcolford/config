@@ -1,0 +1,9 @@
+[user]
+	name = Kieran Colford
+	email = kieran@kcolford.com
+[merge]
+	tool = emerge
+[url "git@github.com:"]
+	pushInsteadOf = "https://github.com/"
+[rerere]
+	enabled = true
