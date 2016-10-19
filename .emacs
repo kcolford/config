@@ -15,6 +15,7 @@
 (load-theme 'hc-zenburn t)
 (add-to-list 'default-frame-alist '(alpha . (85 . 50)))
 (global-set-key "\C-x\C-b" 'electric-buffer-list)
+(setq erc-nick "kcolford")
 
 ;; set up server for subjobs
 (setq server-name (format "autoserver-%d" (random)))
