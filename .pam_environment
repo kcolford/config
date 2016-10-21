@@ -1,0 +1,5 @@
+NAME DEFAULT="Kieran Colford"
+EMAIL DEFAULT="kieran@kcolford.com"
+EDITOR DEFAULT="emacs"
+DIFFPROG DEFAULT="emacs -f ediff-files-command"
+SSH_AUTH_SOCK DEFAULT="${XDG_RUNTIME_DIR}/gnupg/S.gpg-agent.ssh"
