@@ -42,3 +42,17 @@ load npm completion
 load pip completion --bash
 load thefuck --alias
 unset cache load
+
+# some functions for interactive use
+listpkgs() {
+    comm -13 <(pacman -Qqg base base-devel | sort -u) <(pacman -Qqe | sort -u)
+}
+ensurepip() {
+    python -m ensurepip --user --default-pip
+}
+mirrorlist() {
+    curl https://www.archlinux.org/mirrorlist/?country=CA | sed s/^#// | rankmirrors -
+}
+reload() {
+    . ~/.bashrc
+}

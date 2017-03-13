@@ -1,5 +1,0 @@
-#!/bin/bash
-# List all packages installed on an Arch Linux system without
-# including base anse base-devel (since those "should" be installed on
-# all systems)
-comm -13 <(pacman -Qqg base base-devel | sort -u) <(pacman -Qqe | sort -u)
