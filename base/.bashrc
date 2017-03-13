@@ -3,10 +3,9 @@
 # don't do anything on a non-interactive terminal
 [[ $- = *i* ]] || return
 
-# setup the home directory
+# setup the home directory making sure that pip is installed
 mkdir -p ~/{docs/personal,junk,projects,scratch}
-chattr +C junk
-which pip > /dev/null 2>&1 || python -m ensurepip --user --default-pip
+chattr +C ~/junk
 
 # personal aliases
 alias cp='cp --reflink=auto'

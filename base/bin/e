@@ -2,5 +2,6 @@
 # Run an editor that works.
 export TMPDIR=/tmp
 [ "$INSIDE_EMACS" ] && exec emacsclient -s "$EMACS_SERVER_NAME" "$@"
-[ -t 0 ] && windowarg=-nw
-exec emacsclient -a "" $windowarg "$@" || exec emacs "$@" || exec nano "$@"
+windowarg=-c
+[ "$TERM" != dumb ] && [ -t 0 ] && windowarg=-nw
+emacsclient -a "" $windowarg "$@" || emacs "$@" || nano "$@"

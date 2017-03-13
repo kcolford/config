@@ -35,19 +35,18 @@
 ;; keep stuff out of the way
 (setq inhibit-startup-screen t)
 (menu-bar-mode 0)
-;(scroll-bar-mode 0)
+(scroll-bar-mode 0)
 (tool-bar-mode 0)
 
 ;; better usability
 (load-theme 'hc-zenburn t)
 (setq default-frame-alist '((height . 24) (width . 80)))
 (setq display-buffer-alist '((".*" display-buffer-same-window (nil))))
-;(setq display-buffer-alist '(("\\*shell\\*" display-buffer-same-window (nil))))
-(setq make-backup-files nil)
-(setq-default Man-notify-method 'pushy)
 (setq password-cache-expiry 300)
-(setq-default tramp-default-method "ssh")
+(setq vc-follow-symlinks t)
 (setq view-read-only t)
+(setq-default Man-notify-method 'pushy)
+(setq-default tramp-default-method "ssh")
 
 ;; minor modes
 (android-mode)
@@ -59,6 +58,7 @@
 (ido-mode)
 (save-place-mode)
 (show-paren-mode)
+(windmove-default-keybindings)
 
 ;; interactive commands
 (defun clean-end-emacs ()
@@ -79,13 +79,21 @@
 	(set-frame-parameter nil 'alpha 100)
       (set-frame-parameter nil 'alpha 60))))
 
-;; better keybindings
+;; better keybindings (note that super isn't used by anything in emacs
+;; at all)
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "C-x C-c") 'clean-end-emacs)
 (global-set-key (kbd "s-b") 'eterm)
 (global-set-key (kbd "s-n") 'make-frame-command)
 (global-set-key (kbd "s-u") 'eshell)
 (global-set-key (kbd "s-y") 'toggle-transparent)
+(global-set-key (kbd "s-j") 'windmove-left)
+(global-set-key (kbd "s-k") 'windmove-down)
+(global-set-key (kbd "s-i") 'windmove-up)
+(global-set-key (kbd "s-l") 'windmove-right)
+(global-set-key (kbd "s-h") 'split-window-horizontally)
+(global-set-key (kbd "s-v") 'split-window-vertically)
+(global-set-key (kbd "s-;") 'kill-buffer-and-window)
 
 ;; mode settings
 (defun choose-mode (mode ext)
