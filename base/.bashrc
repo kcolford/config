@@ -57,3 +57,6 @@ mirrorlist() {
 reload() {
     . ~/.bashrc
 }
+pb() {
+    curl -F c=@- https://ptpb.pw/?u=1
+}
