@@ -9,6 +9,7 @@ chattr +C ~/junk
 
 # personal aliases
 alias cp='cp --reflink=auto'
+alias e='editor'
 alias ls='ls --color=auto -F'
 
 # terminal specific features

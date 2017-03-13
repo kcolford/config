@@ -22,5 +22,5 @@ MAKEFLAGS="-j$(nproc)" && export MAKEFLAGS
 
 # basic settings
 export BROWSER="chromium"
-export EDITOR="e"
-export TEXEDIT="e +%d %s"
+export EDITOR="editor"
+export TEXEDIT="editor +%d %s"
