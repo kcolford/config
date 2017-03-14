@@ -3,15 +3,6 @@
 # don't do anything on a non-interactive terminal
 [[ $- = *i* ]] || return
 
-# setup the home directory making sure that pip is installed
-mkdir -p ~/{docs/personal,junk,projects,scratch}
-chattr +C ~/junk
-
-# personal aliases
-alias cp='cp --reflink=auto'
-alias e='editor'
-alias ls='ls --color=auto -F'
-
 # terminal specific features
 case "$TERM" in
     dumb)
@@ -27,24 +18,10 @@ esac
 # colourize prompt according to exit code of last command
 PS1="$RED\${?/#0/$GREEN}$PS1$RESET"
 
-# roundabout way to load things from commands without a delay
-cache=~/.cache/bash
-mkdir -p $cache
-load() {
-    if [ -f $cache/"$*" ]; then
-	"$@" > $cache/"$*" & disown
-    else
-	"$@" > $cache/"$*"
-    fi
-    . $cache/"$*"
-}
-load hub alias -s
-load npm completion
-load pip completion --bash
-load thefuck --alias
-unset cache load
-
-# some functions for interactive use
+# personal commands
+alias cp='cp --reflink=auto'
+alias e='editor'
+alias ls='ls --color=auto -F'
 listpkgs() {
     comm -13 <(pacman -Qqg base base-devel | sort -u) <(pacman -Qqe | sort -u)
 }
@@ -52,11 +29,34 @@ ensurepip() {
     python -m ensurepip --user --default-pip
 }
 mirrorlist() {
-    curl https://www.archlinux.org/mirrorlist/?country=CA | sed s/^#// | rankmirrors -
+    local url=https://www.archlinux.org/mirrorlist
+    curl $url/?country="${1:-CA}" | sed s/^#// | rankmirrors -
 }
 reload() {
     . ~/.bashrc
 }
 pb() {
-    curl -F c=@- https://ptpb.pw/?u=1
+    curl -F "c=@${1:--}" https://ptpb.pw/?u=1
 }
+setup_home() {
+    mkdir -p ~/{docs/personal,junk,local/stow,projects,scratch}
+    chattr +C ~/junk
+    touch ~/local/stow/.stow
+}
+load() {
+    local cache=~/.cache/bash
+    mkdir -p $cache
+    if [ -f $cache/"$*" ]; then
+	"$@" > $cache/"$*" & disown
+    else
+	"$@" > $cache/"$*"
+    fi
+    . $cache/"$*"
+}
+
+# some final setup
+setup_home
+load hub alias -s
+load npm completion
+load pip completion --bash
+load thefuck --alias
