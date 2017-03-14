@@ -22,6 +22,12 @@ PS1="$RED\${?/#0/$GREEN}$PS1$RESET"
 alias cp='cp --reflink=auto'
 alias e='editor'
 alias ls='ls --color=auto -F'
+prefix() {
+    echo "$HOME"/local/stow/"$(basename "$PWD")"
+}
+configure() {
+    ./configure --prefix="$(prefix)" "$@"
+}
 listpkgs() {
     comm -13 <(pacman -Qqg base base-devel | sort -u) <(pacman -Qqe | sort -u)
 }

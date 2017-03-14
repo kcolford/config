@@ -7,7 +7,9 @@ PATH="$HOME/.local/bin:$PATH"
 PATH="$HOME/go/bin:$PATH"
 PATH="$HOME/.nodejs/bin:$PATH"
 rubyuserdir="$(ruby -e 'puts Gem.user_dir')" && PATH="$rubyuserdir/bin:$PATH"
-export PATH="$HOME/local/bin:$PATH"
+PATH="$HOME/local/bin:$PATH"
+PATH="$HOME/bin:$PATH"
+export PATH
 
 # perform user installs
 export PIP_USER=true NPM_CONFIG_PREFIX="$HOME/.nodejs"
