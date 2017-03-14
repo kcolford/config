@@ -59,6 +59,9 @@ load() {
     fi
     . $cache/"$*"
 }
+unitfiles() {
+    egrep '\.(service|socket|timer)$'
+}
 
 # some final setup
 setup_home
