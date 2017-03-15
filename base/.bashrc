@@ -22,7 +22,7 @@ PS1="$RED\${?/#0/$GREEN}$PS1$RESET"
 alias aria2c='aria2c -c'
 alias cp='cp --reflink=auto'
 alias e='editor'
-alias ls='ls --color=auto -F'
+alias ls='ls --color=auto -FC'
 configure() {
     ./configure --prefix="$HOME"/local "$@"
 }
@@ -43,7 +43,7 @@ pb() {
     curl -F "c=@${1:--}" https://ptpb.pw/?u=1
 }
 setup_home() {
-    mkdir -p ~/{docs/personal,junk,projects,scratch,src}
+    mkdir -p ~/{docs/personal,junk,projects,scratch}
     chattr +C ~/junk
 }
 load() {

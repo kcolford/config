@@ -1,21 +1,20 @@
 # ~/.profile
 
+# some environment paths
+export ANDROID_HOME="$HOME/android-sdk"
+export GOPATH="$HOME/.go"
+export NPM_CONFIG_PREFIX="$HOME/.nodejs"
+export PIP_USER=true
+
 # setup path
 PATH="/usr/lib/ccache/bin:$PATH"
 PATH="$HOME/.cabal/bin:$PATH"
 PATH="$HOME/.local/bin:$PATH"
-PATH="$HOME/go/bin:$PATH"
-PATH="$HOME/.nodejs/bin:$PATH"
+PATH="$GOPATH/bin:$PATH"
+PATH="$NPM_CONFIG_PREFIX/bin:$PATH"
 rubyuserdir="$(ruby -e 'puts Gem.user_dir')" && PATH="$rubyuserdir/bin:$PATH"
 PATH="$HOME/local/bin:$PATH"
-PATH="$HOME/bin:$PATH"
 export PATH
-
-# perform user installs
-export PIP_USER=true NPM_CONFIG_PREFIX="$HOME/.nodejs"
-
-# setup android
-export ANDROID_HOME="$HOME/android-sdk"
 
 # improve compilation time
 MAKEFLAGS="-j$(nproc)" && export MAKEFLAGS
