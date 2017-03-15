@@ -52,13 +52,12 @@
 (android-mode)
 (column-number-mode)
 (editorconfig-mode)
-(flyspell-mode)
 (global-auto-revert-mode)
-(global-flycheck-mode)
 (ido-mode)
 (save-place-mode)
 (show-paren-mode)
 (windmove-default-keybindings)
+(add-hook 'sh-mode 'flycheck-mode)
 
 ;; interactive commands
 (defun clean-end-emacs ()
