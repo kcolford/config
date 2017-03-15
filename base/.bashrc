@@ -19,14 +19,12 @@ esac
 PS1="$RED\${?/#0/$GREEN}$PS1$RESET"
 
 # personal commands
+alias aria2c='aria2c -c'
 alias cp='cp --reflink=auto'
 alias e='editor'
 alias ls='ls --color=auto -F'
-prefix() {
-    echo "$HOME"/local/stow/"$(basename "$PWD")"
-}
 configure() {
-    ./configure --prefix="$(prefix)" "$@"
+    ./configure --prefix="$HOME"/local "$@"
 }
 listpkgs() {
     comm -13 <(pacman -Qqg base base-devel | sort -u) <(pacman -Qqe | sort -u)
@@ -45,9 +43,8 @@ pb() {
     curl -F "c=@${1:--}" https://ptpb.pw/?u=1
 }
 setup_home() {
-    mkdir -p ~/{docs/personal,junk,local/stow,projects,scratch}
+    mkdir -p ~/{docs/personal,junk,projects,scratch,src}
     chattr +C ~/junk
-    touch ~/local/stow/.stow
 }
 load() {
     local cache=~/.cache/bash

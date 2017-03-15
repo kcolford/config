@@ -15,7 +15,7 @@ export PATH
 export PIP_USER=true NPM_CONFIG_PREFIX="$HOME/.nodejs"
 
 # setup android
-export ANDROID_HOME="$HOME/local/stow/android-sdk"
+export ANDROID_HOME="$HOME/android-sdk"
 
 # improve compilation time
 MAKEFLAGS="-j$(nproc)" && export MAKEFLAGS
