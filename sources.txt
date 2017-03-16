@@ -3,3 +3,4 @@ http://dl.suckless.org/st/st-0.7.tar.gz
 ftp://ftp.gnu.org/gnu/stow/stow-2.2.2.tar.gz
 ftp://ftp.gnu.org/gnu/macchanger/macchanger-1.6.0.tar.gz
 http://www.hwaci.com/sw/mkhdr/makeheaders.c
+https://github.com/jarun/googler/archive/v3.0.tar.gz
