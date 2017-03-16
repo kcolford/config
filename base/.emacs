@@ -19,6 +19,7 @@
 ;; make flycheck happy
 (require 'package)
 (require 'server)
+(require 'term/xterm)
 
 ;; make installing packages easier
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
@@ -57,7 +58,6 @@
 (save-place-mode)
 (show-paren-mode)
 (windmove-default-keybindings)
-(add-hook 'sh-mode 'flycheck-mode)
 
 ;; interactive commands
 (defun clean-end-emacs ()
@@ -77,6 +77,12 @@
     (if (and alpha (not (eq 100 alpha)))
 	(set-frame-parameter nil 'alpha 100)
       (set-frame-parameter nil 'alpha 60))))
+(defvar colors-initialized nil)
+(defun terminal-init-st-256color ()
+  "Initialize terminal colors just once."
+  (unless colors-initialized
+    (setq colors-initialized t)
+    (terminal-init-xterm)))
 
 ;; better keybindings (note that super isn't used by anything in emacs
 ;; at all)
@@ -101,6 +107,8 @@
     (add-to-list 'auto-mode-alist (cons (format "\\.%s\\'" (car ext)) mode))
     (choose-mode mode (cdr ext))))
 (choose-mode 'web-mode '(css htm html js json jsx php xml))
+(add-hook 'elisp-mode 'flycheck-mode)
+(add-hook 'sh-mode 'flycheck-mode)
 
 ;; if we're not called to start a daemon, start our own daemon
 (unless (daemonp)
