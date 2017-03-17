@@ -24,7 +24,7 @@ alias cp='cp --reflink=auto'
 alias e='editor'
 alias ls='ls --color=auto -FC'
 configure() {
-    ./configure --prefix="$HOME"/local "$@"
+    ./configure --prefix="$HOME"/.local "$@"
 }
 listpkgs() {
     comm -13 <(pacman -Qqg base base-devel | sort -u) <(pacman -Qqe | sort -u)
