@@ -4,3 +4,4 @@ ftp://ftp.gnu.org/gnu/stow/stow-2.2.2.tar.gz
 ftp://ftp.gnu.org/gnu/macchanger/macchanger-1.6.0.tar.gz
 http://www.hwaci.com/sw/mkhdr/makeheaders.c
 https://github.com/jarun/googler/archive/v3.0.tar.gz
+https://github.com/aria2/aria2/releases/download/release-1.31.0/aria2-1.31.0.tar.xz

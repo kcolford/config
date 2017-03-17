@@ -20,6 +20,7 @@
 (require 'package)
 (require 'server)
 (require 'term/xterm)
+(require 'windmove)
 
 ;; make installing packages easier
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
@@ -57,7 +58,12 @@
 (ido-mode)
 (save-place-mode)
 (show-paren-mode)
-(windmove-default-keybindings)
+
+;; if we're not called to start a daemon, start our own daemon
+(unless (daemonp)
+  (setq-default server-name (format "server-%s" (random)))
+  (server-start))
+(setenv "EMACS_SERVER_NAME" server-name)
 
 ;; interactive commands
 (defun clean-end-emacs ()
@@ -77,6 +83,8 @@
     (if (and alpha (not (eq 100 alpha)))
 	(set-frame-parameter nil 'alpha 100)
       (set-frame-parameter nil 'alpha 60))))
+
+;; modify hooks with the rest of the world
 (defvar colors-initialized nil)
 (defun terminal-init-st-256color ()
   "Initialize terminal colors just once."
@@ -86,12 +94,13 @@
 
 ;; better keybindings (note that super isn't used by anything in emacs
 ;; at all)
-(global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "C-x C-c") 'clean-end-emacs)
-(global-set-key (kbd "s-b") 'eterm)
-(global-set-key (kbd "s-n") 'make-frame-command)
+(global-set-key (kbd "s-n") 'eterm)
+(global-set-key (kbd "s-b") 'ibuffer)
 (global-set-key (kbd "s-y") 'term-paste)
 (global-set-key (kbd "s-u") 'toggle-transparent)
+;; the following bindings are for managing many buffers using a single
+;; emacs frame
 (global-set-key (kbd "s-j") 'windmove-left)
 (global-set-key (kbd "s-k") 'windmove-down)
 (global-set-key (kbd "s-i") 'windmove-up)
@@ -107,14 +116,10 @@
     (add-to-list 'auto-mode-alist (cons (format "\\.%s\\'" (car ext)) mode))
     (choose-mode mode (cdr ext))))
 (choose-mode 'web-mode '(css htm html js json jsx php xml))
+
+;; setup mode hooks
 (add-hook 'elisp-mode 'flycheck-mode)
 (add-hook 'sh-mode 'flycheck-mode)
-
-;; if we're not called to start a daemon, start our own daemon
-(unless (daemonp)
-  (setq-default server-name (format "server-%s" (random)))
-  (server-start))
-(setenv "EMACS_SERVER_NAME" server-name)
 
 (provide '.emacs)
 ;;; .emacs ends here

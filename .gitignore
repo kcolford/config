@@ -1,3 +1,5 @@
 /*.zip
-/*.tar.*
+/*.tar.gz
+/*.tar.xz
+/*.tar.bz2
 /makeheaders.c
