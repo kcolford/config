@@ -1,2 +1,0 @@
-ethereum/cpp-ethereum
-aria2/aria2

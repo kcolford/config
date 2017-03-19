@@ -1,0 +1,18 @@
+# -*- mode: sh -*-
+
+# installation prefix
+export PREFIX="$HOME/.local"
+
+# some environment paths
+export ANDROID_HOME="$HOME/android-sdk"
+export C_INCLUDE_PATH="$PREFIX/include"
+export GOPATH="$PREFIX"
+export LD_LIBRARY_PATH="$PREFIX/lib"
+export LIBRARY_PATH="$PREFIX/lib"
+export NPM_CONFIG_PREFIX="$PREFIX"
+export PIP_USER=true
+
+# basic settings
+export BROWSER="chromium"
+export EDITOR="emacsclient -nw" ALTERNATE_EDITOR=""
+export TEXEDIT="$EDITOR +%d %s"

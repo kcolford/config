@@ -18,8 +18,8 @@ esac
 # colourize prompt according to exit code of last command
 PS1="$RED\${?/#0/$GREEN}$PS1$RESET"
 
-# fix TEXEDIT
-export TEXEDIT="$EDITOR +%d %s"
+# import basic environment
+. ~/.environment
 
 # personal commands
 alias aria2c='aria2c -c'
@@ -29,8 +29,12 @@ alias ls='ls --color=auto -FC'
 configure() {
     ./configure --prefix="$PREFIX" "$@"
 }
+cmake() {
+    command cmake -DCMAKE_INSTALL_PREFIX="$PREFIX" "$@"
+}
 listpkgs() {
-    comm -13 <(pacman -Qqg base base-devel | sort -u) <(pacman -Qqe | sort -u)
+    local pkg_grps="base base-devel gnome"
+    comm -13 <(pacman -Qqeg $pkg_grps | sort -u) <(pacman -Qqe | sort -u)
 }
 ensurepip() {
     python -m ensurepip --user --default-pip

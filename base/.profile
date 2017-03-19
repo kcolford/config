@@ -1,11 +1,7 @@
 # ~/.profile
 
-# some environment paths
-export PREFIX="$HOME/.local"
-export ANDROID_HOME="$HOME/android-sdk"
-export GOPATH="$PREFIX"
-export NPM_CONFIG_PREFIX="$PREFIX"
-export PIP_USER=true
+# setup misc environment variables
+. ~/.environment
 
 # setup path
 PATH="/usr/lib/ccache/bin:$PATH"
