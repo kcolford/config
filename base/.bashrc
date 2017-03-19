@@ -18,13 +18,16 @@ esac
 # colourize prompt according to exit code of last command
 PS1="$RED\${?/#0/$GREEN}$PS1$RESET"
 
+# fix TEXEDIT
+export TEXEDIT="$EDITOR +%d %s"
+
 # personal commands
 alias aria2c='aria2c -c'
 alias cp='cp --reflink=auto'
-alias e='editor'
+alias e='$EDITOR'
 alias ls='ls --color=auto -FC'
 configure() {
-    ./configure --prefix="$HOME"/.local "$@"
+    ./configure --prefix="$PREFIX" "$@"
 }
 listpkgs() {
     comm -13 <(pacman -Qqg base base-devel | sort -u) <(pacman -Qqe | sort -u)
@@ -34,7 +37,7 @@ ensurepip() {
 }
 mirrorlist() {
     local url=https://www.archlinux.org/mirrorlist
-    curl $url/?country="${1:-CA}" | sed s/^#// | rankmirrors -
+    curl "$url"/?country="${1:-CA}" | sed s/^#// | rankmirrors -
 }
 reload() {
     . ~/.bashrc
