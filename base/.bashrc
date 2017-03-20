@@ -31,6 +31,8 @@ alias cp='cp --reflink=auto'
 alias diff='diff -aur'
 alias e='$EDITOR'
 alias ls='ls --color=auto -FC'
+alias nohup='nohup '
+alias sudo='sudo '
 alert() {
     "$@"
     local ret=$?
