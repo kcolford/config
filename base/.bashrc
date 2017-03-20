@@ -39,6 +39,9 @@ alert() {
     notify-send 'Terminal command finished' "$*"
     return $ret
 }
+fork() {
+    systemd-run "$@"
+}
 configure() {
     if [ -x ./configure ]; then
 	./configure --prefix="$PREFIX" "$@"
