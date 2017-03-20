@@ -15,6 +15,9 @@ case "$TERM" in
 	;;
 esac
 
+# enable some shell features
+shopt -s globstar
+
 # colourize prompt according to exit code of last command
 PS1="$RED\${?/#0/$GREEN}$PS1$RESET"
 
@@ -22,7 +25,7 @@ PS1="$RED\${?/#0/$GREEN}$PS1$RESET"
 . ~/.environment
 
 # personal commands
-alias aria2c='aria2c -c -d ~/junk -V'
+alias aria2c='mkdir -p ~/junk && aria2c -c -d ~/junk --bt-seed-unverified'
 alias alert='alert '
 alias cp='cp --reflink=auto'
 alias diff='diff -aur'
