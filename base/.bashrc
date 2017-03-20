@@ -26,21 +26,16 @@ PS1="$RED\${?/#0/$GREEN}$PS1$RESET"
 
 # personal commands
 alias aria2c='aria2c -c -d ~/junk --bt-seed-unverified'
-alias alert='alert '
 alias cp='cp --reflink=auto'
 alias diff='diff -aur'
 alias e='$EDITOR'
 alias ls='ls --color=auto -FC'
-alias nohup='nohup '
-alias sudo='sudo '
+alias run='systemd-run'
 alert() {
     "$@"
     local ret=$?
     notify-send 'Terminal command finished' "$*"
     return $ret
-}
-fork() {
-    systemd-run "$@"
 }
 configure() {
     if [ -x ./configure ]; then
@@ -50,6 +45,11 @@ configure() {
     else
 	false
     fi
+}
+subcommand() {
+    for i; do
+	alias "$i"="$i "
+    done
 }
 ensurepip() {
     python -m ensurepip --user --default-pip
@@ -92,3 +92,4 @@ load hub alias -s
 load npm completion
 load pip completion --bash
 load thefuck --alias
+subcommand alert nohup sudo systemd-run
