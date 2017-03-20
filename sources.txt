@@ -4,5 +4,6 @@ http://dl.suckless.org/st/st-0.7.tar.gz
 ftp://ftp.gnu.org/gnu/stow/stow-latest.tar.gz
 ftp://ftp.gnu.org/gnu/stow/stow-latest.tar.gz.sig
 ftp://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-latest.tar.gz
+ftp://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-latest.tar.gz.sig
 https://www.torproject.org/dist/torbrowser/6.5.1/tor-browser-linux64-6.5.1_en-US.tar.xz
 https://www.torproject.org/dist/torbrowser/6.5.1/tor-browser-linux64-6.5.1_en-US.tar.xz.asc
