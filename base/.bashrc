@@ -24,34 +24,24 @@ PS1="$RED\${?/#0/$GREEN}$PS1$RESET"
 # personal commands
 alias aria2c='aria2c -c'
 alias cp='cp --reflink=auto'
+alias diff='diff -aur'
 alias e='$EDITOR'
 alias ls='ls --color=auto -FC'
 configure() {
-    ./configure --prefix="$PREFIX" "$@"
-}
-cmake() {
-    command cmake -DCMAKE_INSTALL_PREFIX="$PREFIX" "$@"
-}
-listpkgs() {
-    local pkg_grps="base base-devel gnome"
-    comm -13 <(pacman -Qqeg $pkg_grps | sort -u) <(pacman -Qqe | sort -u)
+    if [ -x ./configure ]; then
+	./configure --prefix="$PREFIX" "$@"
+    elif [ -f ./CMakeLists.txt ] && which cmake; then
+	cmake -DCMAKE_INSTALL_PREFIX="$PREFIX" "$@"
+    else
+	false
+    fi
 }
 ensurepip() {
     python -m ensurepip --user --default-pip
 }
-mirrorlist() {
-    local url=https://www.archlinux.org/mirrorlist
-    curl "$url"/?country="${1:-CA}" | sed s/^#// | rankmirrors -
-}
-reload() {
-    . ~/.bashrc
-}
-pb() {
-    curl -F "c=@${1:--}" https://ptpb.pw/?u=1
-}
-setup_home() {
-    mkdir -p ~/{docs/personal,junk,projects,scratch}
-    chattr +C ~/junk
+listpkgs() {
+    local pkg_grps="base base-devel gnome"
+    comm -13 <(pacman -Qqeg $pkg_grps | sort -u) <(pacman -Qqe | sort -u)
 }
 load() {
     local cache=~/.cache/bash
@@ -62,6 +52,20 @@ load() {
 	"$@" > $cache/"$*"
     fi
     . $cache/"$*"
+}
+mirrorlist() {
+    local url=https://www.archlinux.org/mirrorlist
+    curl -s "$url"/?country="${1:-CA}" | sed s/^#// | rankmirrors - | tee ~/scratch/mirrorlist
+}
+pb() {
+    curl -F "c=@${1:--}" https://ptpb.pw/?u=1
+}
+reload() {
+    . ~/.bashrc
+}
+setup_home() {
+    mkdir -p ~/{docs/personal,junk,projects,scratch}
+    chattr +C ~/junk
 }
 unitfiles() {
     egrep '\.(service|socket|timer)$'

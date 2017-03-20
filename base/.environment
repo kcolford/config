@@ -6,6 +6,7 @@ export PREFIX="$HOME/.local"
 # some environment paths
 export ANDROID_HOME="$HOME/android-sdk"
 export C_INCLUDE_PATH="$PREFIX/include"
+export CPATH="$PREFIX/include"
 export GOPATH="$PREFIX"
 export LD_LIBRARY_PATH="$PREFIX/lib"
 export LIBRARY_PATH="$PREFIX/lib"

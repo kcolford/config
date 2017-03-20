@@ -3,3 +3,5 @@
 /*.tar.xz
 /*.tar.bz2
 /makeheaders.c
+/*.sig
+/*.asc
