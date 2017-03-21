@@ -82,6 +82,15 @@ setup_home() {
     mkdir -p ~/{docs/personal,junk,projects,scratch}
     chattr +C ~/junk
 }
+touch() {
+    for file in "$@"; do
+	case "$file" in
+	    -*) ;;
+	    */*) mkdir -p "$(dirname "$file")" ;;
+	esac
+    done
+    command touch "$@"
+}
 unitfiles() {
     egrep '\.(service|socket|timer)$'
 }
