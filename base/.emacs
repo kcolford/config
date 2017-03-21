@@ -22,6 +22,7 @@
 (package-initialize)
 (package-install-selected-packages)
 (package-autoremove)
+(require 'auto-package-update)
 (auto-package-update-maybe)
 
 ;; keep stuff out of the way
