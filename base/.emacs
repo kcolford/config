@@ -8,7 +8,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (auto-package-update company company-c-headers company-quickhelp company-shell company-web ac-c-headers auto-complete hc-zenburn-theme sass-mode dockerfile-mode magit android-mode flycheck go-mode pkgbuild-mode ggtags editorconfig yaml-mode web-mode systemd ssh-config-mode nginx-mode markdown-mode gitignore-mode gitconfig-mode))))
+    (auth-password-store password-store auto-package-update company company-c-headers company-quickhelp company-shell company-web ac-c-headers auto-complete hc-zenburn-theme sass-mode dockerfile-mode magit android-mode flycheck go-mode pkgbuild-mode ggtags editorconfig yaml-mode web-mode systemd ssh-config-mode nginx-mode markdown-mode gitignore-mode gitconfig-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
