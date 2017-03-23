@@ -17,4 +17,5 @@ export PIP_USER=true
 export BROWSER="chromium"
 export EDITOR="${EDITOR:-emacsclient -nw}" ALTERNATE_EDITOR=""
 export TEXEDIT="$EDITOR +%d %s"
+export LESS=FRSX
 [ -r ~/.environment_identity ] && . ~/.environment_identity
