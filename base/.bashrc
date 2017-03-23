@@ -26,13 +26,10 @@ PS1="$RED\${?/#0/$GREEN}$PS1$RESET"
 
 # personal commands
 alias aria2c='aria2c -c -d ~/junk --bt-seed-unverified'
-alias alert='alert '
 alias cp='cp --reflink=auto'
 alias diff='diff -aur'
 alias e='$EDITOR'
 alias ls='ls --color=auto -FC'
-alias nohup='nohup '
-alias sudo='sudo '
 alert() {
     "$@"
     local ret=$?
@@ -91,6 +88,12 @@ touch() {
     done
     command touch "$@"
 }
+subcommand() {
+    for i; do
+	# shellcheck disable=SC2139
+	alias "$i"="$i "
+    done
+}
 unitfiles() {
     egrep '\.(service|socket|timer)$'
 }
@@ -101,3 +104,4 @@ load hub alias -s
 load npm completion
 load pip completion --bash
 load thefuck --alias
+subcommand alert fork nohup sudo systemd-run
