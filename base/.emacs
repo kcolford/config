@@ -65,15 +65,6 @@
 	(set-frame-parameter nil 'alpha 100)
       (set-frame-parameter nil 'alpha 60))))
 
-;; modify hooks with the rest of the world
-(require 'term/xterm)
-(defvar colors-initialized nil)
-(defun terminal-init-st-256color ()
-  "Initialize terminal colors just once."
-  (unless colors-initialized
-    (setq colors-initialized t)
-    (terminal-init-xterm)))
-
 ;; better keybindings (note that super isn't used by anything in emacs
 ;; at all)
 (global-set-key (kbd "s-n") 'eterm)
@@ -109,13 +100,13 @@
   (server-start))
 (setenv "EDITOR" (format "emacsclient -s %s" server-name))
 (defun clean-end-emacs ()
-  "Cleanly terminate emacs."
+  "Cleanly terminate Emacs."
   (interactive)
   (if server-clients
       (if (server-edit)
 	  (delete-frame))
     (save-buffers-kill-terminal)))
-(global-set-key [?\C-x ?\C-c] 'clean-end-emacs)
+(global-set-key (kbd "C-x C-c") 'clean-end-emacs)
 
 (provide '.emacs)
 ;;; .emacs ends here
