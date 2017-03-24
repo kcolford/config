@@ -75,8 +75,8 @@ reload() {
     . ~/.bashrc
 }
 setup_home() {
-    mkdir -p ~/{docs/personal/{pics,tuns,vids},junk,projects,public,samples,scratch}
-    chattr +C ~/junk
+    mkdir -p ~/{projects,scratch}
+    chattr +C "$(xdg-user-dir DOWNLOAD)"
 }
 touch() {
     for file in "$@"; do
