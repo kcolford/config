@@ -30,15 +30,13 @@ alias cp='cp --reflink=auto'
 alias diff='diff -aur'
 alias e='$EDITOR'
 alias ls='ls --color=auto -FC'
-alias ssh='TERM=xterm ssh '
+alias systemctl='systemctl --user'
+alias systemd-run='systemd-run --user '
 alert() {
     "$@"
     local ret=$?
     notify-send 'Terminal command finished' "$*"
     return $ret
-}
-fork() {
-    systemd-run "$@"
 }
 configure() {
     if [ -x ./configure ]; then
@@ -77,7 +75,7 @@ reload() {
     . ~/.bashrc
 }
 setup_home() {
-    mkdir -p ~/{docs/personal,junk,projects,scratch}
+    mkdir -p ~/{docs/personal/{pics,tuns,vids},junk,projects,public,samples,scratch}
     chattr +C ~/junk
 }
 touch() {
@@ -105,4 +103,4 @@ load hub alias -s
 load npm completion
 load pip completion --bash
 load thefuck --alias
-subcommand alert fork nohup sudo systemd-run
+subcommand alert nohup
