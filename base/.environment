@@ -18,4 +18,7 @@ export BROWSER="chromium"
 export EDITOR="${EDITOR:-emacsclient -nw}" ALTERNATE_EDITOR=""
 export TEXEDIT="$EDITOR +%d %s"
 export LESS=FRSX
-[ -r ~/.environment_identity ] && . ~/.environment_identity
+
+# extract identity from git config (one central place to configure it)
+export NAME="$(git config --global user.name)"
+export EMAIL="$(git config --global user.email)"
