@@ -25,7 +25,7 @@ PS1="$RED\${?/#0/$GREEN}$PS1$RESET"
 . ~/.environment
 
 # personal commands
-alias aria2c='aria2c -c -d ~/junk --bt-seed-unverified'
+alias aria2c='aria2c -c -d ~/Downloads --bt-seed-unverified'
 alias cp='cp --reflink=auto'
 alias diff='diff -aur'
 alias e='$EDITOR'
@@ -52,6 +52,7 @@ ensurepip() {
 }
 listpkgs() {
     local pkg_grps="base base-devel gnome"
+    # shellcheck disable=SC2086
     comm -13 <(pacman -Qqeg $pkg_grps | sort -u) <(pacman -Qqe | sort -u)
 }
 load() {
@@ -76,7 +77,7 @@ reload() {
 }
 setup_home() {
     mkdir -p ~/{projects,scratch}
-    chattr +C "$(xdg-user-dir DOWNLOAD)"
+    chattr +C ~/Downloads
 }
 touch() {
     for file in "$@"; do
