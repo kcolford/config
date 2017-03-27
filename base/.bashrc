@@ -47,6 +47,11 @@ configure() {
 	false
     fi
 }
+subcommand() {
+    for i; do
+	alias "$i"="$i "
+    done
+}
 ensurepip() {
     python -m ensurepip --user --default-pip
 }
