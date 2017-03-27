@@ -1,6 +1,0 @@
-http://www.hwaci.com/sw/mkhdr/makeheaders.c
-ftp://ftp.gnu.org/gnu/stow/stow-latest.tar.gz
-ftp://ftp.gnu.org/gnu/stow/stow-latest.tar.gz.sig
-ftp://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-latest.tar.gz
-ftp://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-latest.tar.gz.sig
-http://dl.suckless.org/st/st-0.7.tar.gz

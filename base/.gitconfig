@@ -1,0 +1,4 @@
+[include]
+	path = ~/.gitcredential
+	path = ~/.gitidentity
+	path = ~/.gitsigning
