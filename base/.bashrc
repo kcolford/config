@@ -66,7 +66,7 @@ load() {
     if [ -f $cache/"$*" ]; then
 	"$@" > $cache/"$*" & disown
     else
-	"$@" > $cache/"$*"
+	"$@" > $cache/"$*" || rm -f $cache/"$*"
     fi
     . $cache/"$*"
 }
