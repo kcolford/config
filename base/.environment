@@ -19,6 +19,5 @@ export EDITOR="${EDITOR:-emacsclient -nw}" ALTERNATE_EDITOR=""
 export TEXEDIT="$EDITOR +%d %s"
 export LESS=FRSX
 
-# extract identity from git config (one central place to configure it)
-export NAME="$(git config --global user.name)"
-export EMAIL="$(git config --global user.email)"
+# XDG stuff
+. "${XDG_CONFIG_HOME:-$HOME/.config}"/user-dirs.dirs 2> /dev/null

@@ -16,7 +16,7 @@ case "$TERM" in
 esac
 
 # enable some shell features
-shopt -s globstar
+shopt -s autocd cdspell checkwinsize direxpand dirspell dotglob globstar nullglob
 
 # colourize prompt according to exit code of last command
 PS1="$RED\${?/#0/$GREEN}$PS1$RESET"
@@ -31,7 +31,7 @@ alias diff='diff -aur'
 alias e='$EDITOR'
 alias ls='ls --color=auto -FC'
 alias systemctl='systemctl --user'
-alias systemd-run='systemd-run --user '
+alias run='systemd-run --user '
 alert() {
     "$@"
     local ret=$?
@@ -61,14 +61,14 @@ listpkgs() {
     comm -13 <(pacman -Qqeg $pkg_grps | sort -u) <(pacman -Qqe | sort -u)
 }
 load() {
-    local cache=~/.cache/bash
-    mkdir -p $cache
-    if [ -f $cache/"$*" ]; then
-	"$@" > $cache/"$*" & disown
+    local cache="${XDG_CONFIG_CACHE:-$HOME/.cache}"/bash/"$*"
+    mkdir -p "$(dirname "$cache")"
+    if [ -f "$cache/$*" ]; then
+	"$@" > "$cache" & disown
     else
-	"$@" > $cache/"$*" || rm -f $cache/"$*"
+	"$@" > "$cache"
     fi
-    . $cache/"$*"
+    . "$cache"
 }
 mirrorlist() {
     local url=https://www.archlinux.org/mirrorlist
@@ -81,8 +81,9 @@ reload() {
     . ~/.bashrc
 }
 setup_home() {
+    xdg-user-dirs-update
     mkdir -p ~/{projects,scratch}
-    chattr +C ~/Downloads
+    chattr -R -f +C "$XDG_DOWNLOAD_DIR" "$PREFIX"/share
 }
 touch() {
     for file in "$@"; do
