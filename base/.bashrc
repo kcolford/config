@@ -22,6 +22,7 @@ shopt -s autocd cdspell checkwinsize direxpand dirspell dotglob globstar nullglo
 PS1="$RED\${?/#0/$GREEN}$PS1$RESET"
 
 # import basic environment
+# shellcheck disable=SC1090
 . ~/.environment
 
 # personal commands
@@ -47,11 +48,6 @@ configure() {
 	false
     fi
 }
-subcommand() {
-    for i; do
-	alias "$i"="$i "
-    done
-}
 ensurepip() {
     python -m ensurepip --user --default-pip
 }
@@ -63,11 +59,13 @@ listpkgs() {
 load() {
     local cache="${XDG_CONFIG_CACHE:-$HOME/.cache}"/bash/"$*"
     mkdir -p "$(dirname "$cache")"
-    if [ -f "$cache/$*" ]; then
-	"$@" > "$cache" & disown
+    if [ -f "$cache" ]; then
+	"$@" > "$cache" &
+	disown
     else
 	"$@" > "$cache"
     fi
+    # shellcheck disable=SC1090
     . "$cache"
 }
 mirrorlist() {
@@ -78,12 +76,13 @@ pb() {
     curl -F "c=@${1:--}" https://ptpb.pw/?u=1
 }
 reload() {
+    # shellcheck disable=SC1090
     . ~/.bashrc
 }
 setup_home() {
     xdg-user-dirs-update
     mkdir -p ~/{projects,scratch}
-    chattr -R -f +C "$XDG_DOWNLOAD_DIR" "$PREFIX"/share
+    chattr -R -f +C "$XDG_DOWNLOAD_DIR" "$PREFIX"/share/
 }
 touch() {
     for file in "$@"; do
