@@ -17,7 +17,7 @@ export PIP_USER=true
 export BROWSER="chromium"
 export EDITOR="${EDITOR:-emacsclient -nw}" ALTERNATE_EDITOR=""
 export TEXEDIT="$EDITOR +%d %s"
-export LESS=FRSX
+export LESS=FRSXi
 
 # XDG stuff
 . "${XDG_CONFIG_HOME:-$HOME/.config}"/user-dirs.dirs 2> /dev/null

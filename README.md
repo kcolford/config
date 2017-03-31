@@ -10,3 +10,6 @@ your home folder and run
 	cd config
 	stow base
 
+Note that there are a number of `.csv` files in the main directory
+that represent sources for various projects and things that are useful
+on the internet.

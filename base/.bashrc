@@ -28,11 +28,10 @@ PS1="$RED\${?/#0/$GREEN}$PS1$RESET"
 # personal commands
 alias aria2c='aria2c -c -d ~/Downloads --bt-seed-unverified'
 alias cp='cp --reflink=auto'
+alias curl='curl -s'
 alias diff='diff -aur'
 alias e='$EDITOR'
 alias ls='ls --color=auto -FC'
-alias systemctl='systemctl --user'
-alias run='systemd-run --user '
 alert() {
     "$@"
     local ret=$?
@@ -60,20 +59,23 @@ load() {
     local cache="${XDG_CONFIG_CACHE:-$HOME/.cache}"/bash/"$*"
     mkdir -p "$(dirname "$cache")"
     if [ -f "$cache" ]; then
-	"$@" > "$cache" &
+	("$@" > "$cache" || rm "$cache") &
 	disown
     else
-	"$@" > "$cache"
+	"$@" > "$cache" || rm "$cache"
     fi
     # shellcheck disable=SC1090
     . "$cache"
 }
 mirrorlist() {
-    local url=https://www.archlinux.org/mirrorlist
-    curl -s "$url"/?country="${1:-CA}" | sed s/^#// | rankmirrors - | tee ~/scratch/mirrorlist
+    local url="https://www.archlinux.org/mirrorlist"
+    curl -s "$url/?country=${1:-CA}" | sed s/^#// | rankmirrors - | tee ~/scratch/mirrorlist
 }
 pb() {
-    curl -F "c=@${1:--}" https://ptpb.pw/?u=1
+    curl -F "c=@${1:--}" "https://ptpb.pw/?u=1"
+}
+pbs() {
+    curl -F "c=${1:-@-}" "https://ptpb.pw/u?u=1"
 }
 reload() {
     # shellcheck disable=SC1090
@@ -109,4 +111,4 @@ load hub alias -s
 load npm completion
 load pip completion --bash
 load thefuck --alias
-subcommand alert nohup
+subcommand alert nohup systemd-run

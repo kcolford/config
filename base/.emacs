@@ -67,8 +67,8 @@
 
 ;; better keybindings (note that super isn't used by anything in emacs
 ;; at all)
-(global-set-key (kbd "s-n") 'eterm)
-(global-set-key (kbd "s-b") 'ibuffer)
+(global-set-key (kbd "s-b") 'eterm)
+(global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "s-y") 'term-paste)
 (global-set-key (kbd "s-u") 'toggle-transparent)
 ;; the following bindings are for managing many buffers using a single
@@ -77,9 +77,11 @@
 (global-set-key (kbd "s-k") 'windmove-down)
 (global-set-key (kbd "s-i") 'windmove-up)
 (global-set-key (kbd "s-l") 'windmove-right)
-(global-set-key (kbd "s-h") 'split-window-horizontally)
-(global-set-key (kbd "s-v") 'split-window-vertically)
-(global-set-key (kbd "s-;") 'kill-buffer-and-window)
+
+;; these are usually safe from desktop managers
+(global-set-key (kbd "s--") 'split-window-horizontally)
+(global-set-key (kbd "s-=") 'split-window-vertically)
+(global-set-key (kbd "s-\\") 'kill-buffer-and-window)
 
 ;; mode settings
 (defun choose-mode (mode ext)
@@ -87,11 +89,13 @@
   (when ext
     (add-to-list 'auto-mode-alist (cons (format "\\.%s\\'" (car ext)) mode))
     (choose-mode mode (cdr ext))))
-(choose-mode 'web-mode '(css htm html js json jsx php xml))
+(choose-mode 'web-mode '(css htm html json jsx php xml))
+(add-to-list 'auto-mode-alist '("README" . text-mode))
 
 ;; setup mode hooks
-(add-hook 'elisp-mode 'flycheck-mode)
-(add-hook 'sh-mode 'flycheck-mode)
+(add-hook 'prog-mode-hook 'flycheck-mode)
+(add-hook 'prog-mode-hook 'flyspell-prog-mode)
+(add-hook 'text-mode-hook 'flyspell-mode)
 
 ;; setup current emacs as editor
 (require 'server)
