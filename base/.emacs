@@ -8,7 +8,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (csv-mode auth-password-store password-store auto-package-update company company-c-headers company-quickhelp company-shell company-web ac-c-headers auto-complete hc-zenburn-theme sass-mode dockerfile-mode magit android-mode flycheck go-mode pkgbuild-mode ggtags editorconfig yaml-mode web-mode systemd ssh-config-mode nginx-mode markdown-mode gitignore-mode gitconfig-mode))))
+    (magit haskell-mode company-auctex company-ghc company-go company-jedi csv-mode auto-package-update company company-c-headers company-quickhelp company-shell company-web hc-zenburn-theme sass-mode dockerfile-mode android-mode flycheck go-mode pkgbuild-mode ggtags editorconfig yaml-mode web-mode systemd ssh-config-mode nginx-mode markdown-mode gitignore-mode gitconfig-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -22,8 +22,6 @@
 (package-initialize)
 (package-install-selected-packages)
 (package-autoremove)
-(require 'auto-package-update)
-(auto-package-update-maybe)
 
 ;; keep stuff out of the way
 (setq inhibit-startup-screen t)
@@ -43,8 +41,8 @@
 
 ;; minor modes
 (android-mode)
-(auto-complete-mode)
 (column-number-mode)
+(company-quickhelp-mode)
 (editorconfig-mode)
 (global-auto-revert-mode)
 (global-company-mode)
@@ -77,7 +75,6 @@
 (global-set-key (kbd "s-k") 'windmove-down)
 (global-set-key (kbd "s-i") 'windmove-up)
 (global-set-key (kbd "s-l") 'windmove-right)
-
 ;; these are usually safe from desktop managers
 (global-set-key (kbd "s--") 'split-window-horizontally)
 (global-set-key (kbd "s-=") 'split-window-vertically)
@@ -96,6 +93,8 @@
 (add-hook 'prog-mode-hook 'flycheck-mode)
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 (add-hook 'text-mode-hook 'flyspell-mode)
+(add-hook 'python-mode-hook (lambda () (add-to-list 'company-backends 'company-jedi)))
+(add-hook 'after-init-hook 'auto-package-update-maybe)
 
 ;; setup current emacs as editor
 (require 'server)

@@ -20,4 +20,5 @@ export TEXEDIT="$EDITOR +%d %s"
 export LESS=FRSXi
 
 # XDG stuff
+# shellcheck disable=SC1090
 . "${XDG_CONFIG_HOME:-$HOME/.config}"/user-dirs.dirs 2> /dev/null
