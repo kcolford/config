@@ -98,6 +98,7 @@ touch() {
 subcommand() {
     for i; do
 	# shellcheck disable=SC2139
+	# shellcheck disable=SC2140
 	alias "$i"="$i "
     done
 }

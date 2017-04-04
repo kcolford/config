@@ -18,6 +18,7 @@ export BROWSER="chromium"
 export EDITOR="${EDITOR:-emacsclient -nw}" ALTERNATE_EDITOR=""
 export TEXEDIT="$EDITOR +%d %s"
 export LESS=FRSXi
+export DIFFPROG="diff -aur"
 
 # XDG stuff
 # shellcheck disable=SC1090
