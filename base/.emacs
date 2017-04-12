@@ -8,7 +8,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (magit haskell-mode company-auctex company-ghc company-go company-jedi csv-mode auto-package-update company company-c-headers company-quickhelp company-shell company-web hc-zenburn-theme sass-mode dockerfile-mode android-mode flycheck go-mode pkgbuild-mode ggtags editorconfig yaml-mode web-mode systemd ssh-config-mode nginx-mode markdown-mode gitignore-mode gitconfig-mode))))
+    (yasnippit magit haskell-mode company-auctex company-ghc company-go company-jedi csv-mode auto-package-update company company-c-headers company-quickhelp company-shell company-web hc-zenburn-theme sass-mode dockerfile-mode android-mode flycheck go-mode pkgbuild-mode ggtags editorconfig yaml-mode web-mode systemd ssh-config-mode nginx-mode markdown-mode gitignore-mode gitconfig-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -87,11 +87,13 @@
     (add-to-list 'auto-mode-alist (cons (format "\\.%s\\'" (car ext)) mode))
     (choose-mode mode (cdr ext))))
 (choose-mode 'web-mode '(css htm html json jsx php xml))
+(choose-mode 'c++-mode '(h))
 (add-to-list 'auto-mode-alist '("README" . text-mode))
 
 ;; setup mode hooks
 (add-hook 'prog-mode-hook 'flycheck-mode)
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+(add-hook 'prog-mode-hook 'yas-minor-mode)
 (add-hook 'text-mode-hook 'flyspell-mode)
 (add-hook 'python-mode-hook (lambda () (add-to-list 'company-backends 'company-jedi)))
 (add-hook 'after-init-hook 'auto-package-update-maybe)
