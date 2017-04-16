@@ -29,6 +29,7 @@ PS1="$RED\${?/#0/$GREEN}$PS1$RESET"
 alias aria2c='aria2c -c -d ~/Downloads --bt-seed-unverified'
 alias cp='cp --reflink=auto'
 alias curl='curl -s'
+alias dc='cd ..'
 alias diff='diff -aur'
 alias e='$EDITOR'
 alias ls='ls --color=auto -FC'
@@ -37,6 +38,15 @@ alert() {
     local ret=$?
     notify-send 'Terminal command finished' "$*"
     return $ret
+}
+chroot() {
+    for d in dev proc sys tmp; do
+	sudo mount --rbind /$d "$1"/$d
+    done
+    command sudo chroot "$1" /bin/su -
+    for d in dev proc sys tmp; do
+	sudo umount -R "$1"/$d
+    done
 }
 configure() {
     if [ -x ./configure ]; then
@@ -47,8 +57,16 @@ configure() {
 	false
     fi
 }
+emacsquick() {
+    local args="-Q"
+    [ -t 0 ] && args="$args -nw"
+    exec emacs $args "$@"
+}
 ensurepip() {
     python -m ensurepip --user --default-pip
+}
+installbusybox() {
+    ln -srf ~/Downloads/busybox-x86_64 ~/.local/bin/busybox
 }
 listpkgs() {
     local pkg_grps="base base-devel gnome"
