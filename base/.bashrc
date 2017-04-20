@@ -25,14 +25,15 @@ PS1="$RED\${?/#0/$GREEN}$PS1$RESET"
 # shellcheck disable=SC1090
 . ~/.environment
 
+# import aliases
+# shellcheck disable=SC1090
+. ~/.bash_aliases
+
+# useful stuff
+# shellcheck disable=SC2034
+unitfile_regex='\.(service|socket|timer)$'
+
 # personal commands
-alias aria2c='aria2c -c -d ~/Downloads --bt-seed-unverified'
-alias cp='cp --reflink=auto'
-alias curl='curl -s'
-alias dc='cd ..'
-alias diff='diff -aur'
-alias e='$EDITOR'
-alias ls='ls --color=auto -FC'
 alert() {
     "$@"
     local ret=$?
@@ -48,25 +49,8 @@ chroot() {
 	sudo umount -R "$1"/$d
     done
 }
-configure() {
-    if [ -x ./configure ]; then
-	./configure --prefix="$PREFIX" "$@"
-    elif [ -f ./CMakeLists.txt ] && which cmake; then
-	cmake -DCMAKE_INSTALL_PREFIX="$PREFIX" "$@"
-    else
-	false
-    fi
-}
-emacsquick() {
-    local args="-Q"
-    [ -t 0 ] && args="$args -nw"
-    exec emacs $args "$@"
-}
-ensurepip() {
-    python -m ensurepip --user --default-pip
-}
 installbusybox() {
-    ln -srf ~/Downloads/busybox-x86_64 ~/.local/bin/busybox
+    install ~/Downloads/busybox-x86_64 ~/.local/bin/busybox
 }
 listpkgs() {
     local pkg_grps="base base-devel gnome"
@@ -113,16 +97,6 @@ touch() {
     done
     command touch "$@"
 }
-subcommand() {
-    for i; do
-	# shellcheck disable=SC2139
-	# shellcheck disable=SC2140
-	alias "$i"="$i "
-    done
-}
-unitfiles() {
-    egrep '\.(service|socket|timer)$'
-}
 
 # some final setup
 setup_home
@@ -130,4 +104,3 @@ load hub alias -s
 load npm completion
 load pip completion --bash
 load thefuck --alias
-subcommand alert nohup systemd-run
