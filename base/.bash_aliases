@@ -1,14 +1,26 @@
 # ~/.bash_aliases -*- mode:sh -*-
 
-alias aria2c='aria2c --continue --dir ~/Downloads --bt-seed-unverified'
+alias aria2c='aria2c --continue --dir "$XDG_DOWNLOAD_DIR" --bt-seed-unverified --auto-file-renaming=false --allow-overwrite --conditional-get --http-accept-gzip'
 alias cp='cp --reflink=auto'
-alias curl='curl --silent'
-alias dc='cd ..'
+alias curl='curl -s'
 alias diff='diff -aur'
 alias docker='sudo docker'
-alias 'docker-compose'='sudo -E docker-compose'
+alias docker-compose='sudo -E docker-compose'
 alias e='$EDITOR'
-alias em='emacs -Q'
-alias ensurepip='python -m ensurepip --user --default-pip'
+alias emacs='emacs --no-splash'
+alias emacsclient='emacsclient -a ""'
+alias gpg='gpg -a'
+alias gpgv='gpg --verify'
 alias ls='ls --color=auto -FC'
-alias modprobe='sudo modprobe'
+alias make='make -j$(nproc)'
+alias mkfs='mkfs -t btrfs'
+alias mount='sudo mount'
+alias sha256sum='sha256sum --ignore-missing'
+if [ "$UID" = 0 ]; then
+    alias sudo='env '
+else
+    alias sudo='sudo '
+fi
+alias tarx='tar -x -C ~/scratch/ -f'
+alias umount='sudo umount'
+alias unzip='unzip -d ~/scratch/'

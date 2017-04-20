@@ -40,18 +40,6 @@ alert() {
     notify-send 'Terminal command finished' "$*"
     return $ret
 }
-chroot() {
-    for d in dev proc sys tmp; do
-	sudo mount --rbind /$d "$1"/$d
-    done
-    command sudo chroot "$1" /bin/su -
-    for d in dev proc sys tmp; do
-	sudo umount -R "$1"/$d
-    done
-}
-installbusybox() {
-    install ~/Downloads/busybox-x86_64 ~/.local/bin/busybox
-}
 listpkgs() {
     local pkg_grps="base base-devel gnome"
     # shellcheck disable=SC2086
@@ -70,8 +58,7 @@ load() {
     . "$cache"
 }
 mirrorlist() {
-    local url="https://www.archlinux.org/mirrorlist"
-    curl -s "$url/?country=${1:-CA}" | sed s/^#// | rankmirrors - | tee ~/scratch/mirrorlist
+    curl -s "https://www.archlinux.org/mirrorlist/?country=${1:-CA}" | sed s/^#// | rankmirrors - | tee ~/scratch/mirrorlist
 }
 pb() {
     curl -F "c=@${1:--}" "https://ptpb.pw/?u=1"
@@ -83,11 +70,6 @@ reload() {
     # shellcheck disable=SC1090
     . ~/.bashrc
 }
-setup_home() {
-    xdg-user-dirs-update
-    mkdir -p ~/{projects,scratch}
-    chattr -R -f +C "$XDG_DOWNLOAD_DIR" "$PREFIX"/share/
-}
 touch() {
     for file in "$@"; do
 	case "$file" in
@@ -97,9 +79,18 @@ touch() {
     done
     command touch "$@"
 }
+update() {
+    xargs pip install -U < ~/config/pip
+    xargs go get -u < ~/config/go
+    xargs npm update -g < ~/config/npm
+    cabal update
+    xargs cabal install < ~/config/cabal
+    xargs gem install < ~/config/gem
+
+    sudo pacman -Syu
+}
 
 # some final setup
-setup_home
 load hub alias -s
 load npm completion
 load pip completion --bash

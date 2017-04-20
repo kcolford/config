@@ -109,8 +109,7 @@
   (setq-default server-name (format "server-%s" (emacs-pid)))
   (server-start))
 (setenv "EDITOR" (format "emacsclient -s %s" server-name))
-(global-set-key (kbd "C-x C-c") 'server-edit)
-(global-set-key (kbd "C-x C-z") 'save-buffers-kill-terminal)
+(global-set-key (kbd "C-x C-z") 'server-edit)
 
 (provide '.emacs)
 ;;; .emacs ends here
