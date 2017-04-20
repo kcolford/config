@@ -2,7 +2,6 @@ cython
 docker-compose
 fire
 ipython
-pass-git-helper
 pycrypto
 pylint
 sphinx

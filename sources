@@ -8,8 +8,8 @@ https://github.com/TheTorProject/gettorbrowser/releases/download/v6.5.1/tor-brow
 https://github.com/TheTorProject/gettorbrowser/releases/download/v6.5.1/tor-browser-linux64-6.5.1_en-US.tar.xz.asc
 https://www.archlinux.org/releng/releases/2017.04.01/torrent/
 https://www.archlinux.org/iso/2017.04.01/archlinux-2017.04.01-x86_64.iso.sig
+https://cdn.kernel.org/pub/linux/kernel/v4.x/sha256sums.asc
 https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-4.10.tar.xz
 https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-4.10.tar.sign
 https://cdn.kernel.org/pub/linux/kernel/v4.x/patch-4.10.11.xz
 https://cdn.kernel.org/pub/linux/kernel/v4.x/patch-4.10.11.sign
-https://cdn.kernel.org/pub/linux/kernel/v4.x/sha256sums.asc

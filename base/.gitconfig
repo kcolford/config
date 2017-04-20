@@ -1,4 +1,3 @@
-[include]
-	path = ~/.gitcredential
-	path = ~/.gitidentity
-	path = ~/.gitsigning
+[user]
+	name = Kieran Colford
+	email = kieran@kcolford.com
