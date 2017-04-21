@@ -14,5 +14,5 @@ export PATH
 # to be run before everything else but not all the time
 xdg-user-dirs-update
 mkdir -p ~/projects ~/scratch
-chattr -R -f +C "$XDG_DOWNLOAD_DIR" "$PREFIX"/share/
+chattr -R -f +C ${XDG_DOWNLOAD_DIR:+"$XDG_DOWNLOAD_DIR"} "$PREFIX"/share/
 python -m ensurepip --user --default-pip

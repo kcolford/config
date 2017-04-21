@@ -82,11 +82,10 @@ touch() {
 update() {
     xargs pip install -U < ~/config/pip
     xargs go get -u < ~/config/go
-    xargs npm update -g < ~/config/npm
+    xargs npm install -g < ~/config/npm
     cabal update
     xargs cabal install < ~/config/cabal
     xargs gem install < ~/config/gem
-
     sudo pacman -Syu
 }
 

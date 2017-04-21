@@ -15,6 +15,10 @@ export TEXEDIT="$EDITOR +%d %s"
 export LESS=FRSXi
 export DIFFPROG="diff -aur"
 
+# pass settings
+export PASSWORD_STORE_ENABLE_EXTENSIONS=true
+export PASSWORD_STORE_SIGNING_KEY=93E4FBCCC214002B778F1EC6917B6330BE515BF9
+
 # XDG stuff
 # shellcheck disable=SC1090
 . "${XDG_CONFIG_HOME:-$HOME/.config}"/user-dirs.dirs 2> /dev/null

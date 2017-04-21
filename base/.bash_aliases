@@ -15,6 +15,7 @@ alias ls='ls --color=auto -FC'
 alias make='make -j$(nproc)'
 alias mkfs='mkfs -t btrfs'
 alias mount='sudo mount'
+alias qrencode='qrencode -t ANSI'
 alias sha256sum='sha256sum --ignore-missing'
 if [ "$UID" = 0 ]; then
     alias sudo='env '
