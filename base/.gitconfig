@@ -1,12 +1,6 @@
 [user]
 	name = Kieran Colford
 	email = kieran@kcolford.com
-[tag]
-	forceSignAnnotated = true
 [push]
-	gpgSign = if-asked
 	recurseSubmodules = on-demand
 	followTags = true
-[commit]
-	#gpgSign = true
-	
