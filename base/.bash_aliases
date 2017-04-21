@@ -1,6 +1,6 @@
 # ~/.bash_aliases -*- mode:sh -*-
 
-alias aria2c='aria2c --continue --dir "$XDG_DOWNLOAD_DIR" --bt-seed-unverified --auto-file-renaming=false --allow-overwrite --conditional-get --http-accept-gzip'
+alias aria2c='aria2c --continue ${XDG_DOWNLOAD_DIR:+--dir "$XDG_DOWNLOAD_DIR"} --bt-seed-unverified --auto-file-renaming=false --allow-overwrite --conditional-get --http-accept-gzip'
 alias cp='cp --reflink=auto'
 alias curl='curl -sL'
 alias diff='diff -aur'
