@@ -14,3 +14,4 @@ text/mml=chromium.desktop;
 x-scheme-handler/https=chromium.desktop;
 application/octet-stream=emacs.desktop;
 application/pdf=chromium.desktop;
+application/x-shellscript=emacs.desktop;
