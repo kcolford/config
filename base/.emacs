@@ -8,7 +8,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (anaconda-mode company-anaconda company-dict kivy-mode yasnippit magit haskell-mode company-auctex company-ghc company-go company-jedi csv-mode auto-package-update company company-c-headers company-quickhelp company-shell company-web hc-zenburn-theme sass-mode dockerfile-mode android-mode flycheck go-mode pkgbuild-mode ggtags editorconfig yaml-mode web-mode systemd ssh-config-mode nginx-mode markdown-mode gitignore-mode gitconfig-mode))))
+    (anaconda-mode company-anaconda company-dict kivy-mode yasnippit magit haskell-mode company-auctex company-ghc company-go company-jedi csv-mode auto-package-update company company-c-headers company-quickhelp company-shell company-web hc-zenburn-theme sass-mode dockerfile-mode android-mode flycheck go-mode pkgbuild-mode ggtags editorconfig yaml-mode web-mode systemd ssh-config-mode nginx-mode markdown-mode gitignore-mode gitconfig-mode auctex))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -46,8 +46,8 @@
   "Start an Emacs based terminal emulator."
   (interactive)
   (ansi-term (getenv "SHELL")))
-(global-set-key [?\s-b] 'eterm)
-(add-hook 'term-mode-hook (lambda () (local-set-key [?\s-y] 'term-paste)))
+(global-set-key (kbd "s-b") 'eterm)
+(add-hook 'term-mode-hook (lambda () (local-set-key (kbd "s-y") 'term-paste)))
 
 ;; transparency
 (defun toggle-transparent ()
@@ -98,17 +98,14 @@
 
 ;; company setup
 (require 'company)
-(add-to-list 'company-backends 'company-yasnippet t)
 (add-to-list 'company-backends 'company-dict t)
-(add-to-list 'company-backends 'company-c-headers)
-(add-to-list 'company-backends 'company-anaconda)
 
 ;; setup current Emacs as editor
 (require 'server)
 (unless (daemonp)
-  (setq-default server-name (format "server-%s" (emacs-pid)))
-  (server-start))
-(setenv "EDITOR" (format "emacsclient -s %s" server-name))
+  (setenv "EMACS_SERVER" (format "server-%s" (emacs-pid)))
+  (add-hook 'after-init-hook 'server-start))
+(setq server-name (getenv "EMACS_SERVER"))
 (global-set-key (kbd "C-x C-z") 'server-edit)
 
 (provide '.emacs)
