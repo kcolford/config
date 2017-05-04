@@ -11,9 +11,11 @@ alert() {
 }
 
 listpkgs() {
-    local pkg_grps="base base-devel gnome"
+    local pkg_grps="base base-devel"
     # shellcheck disable=SC2086
-    comm -13 <(pacman -Qqeg $pkg_grps | sort -u) <(pacman -Qqe | sort -u)
+    comm -1 <(pacman -Qqet | sort -u) <(comm -13 <(pacman -Qqeg $pkg_grps | sort -u) <(pacman -Qqett | sort -u))
+    echo
+    pacman -Qqdtt | sort -u
 }
 
 mirrorlist() {
@@ -52,3 +54,12 @@ update() {
     xargs gem install < ~/config/gem
     sudo pacman -Syu
 }
+
+if [ "$INSIDE_EMACS" ]; then
+    man() {
+	emacsclient -e "(man \"$*\")"
+    }
+    info() {
+	emacsclient -e "(info \"$*\")"
+    }
+fi

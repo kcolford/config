@@ -4,3 +4,5 @@
 [push]
 	recurseSubmodules = on-demand
 	followTags = true
+[alias]
+	pushu = push -u origin HEAD
