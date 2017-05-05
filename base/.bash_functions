@@ -10,6 +10,14 @@ alert() {
     return $ret
 }
 
+emacsify() {
+    if [ "$INSIDE_EMACS" ] && [ "$#" = 2 ]; then
+	emacsclient -e "($1 \"$2\")"
+    else
+	"$@"
+    fi
+}
+
 listpkgs() {
     local pkg_grps="base base-devel"
     # shellcheck disable=SC2086
@@ -54,12 +62,3 @@ update() {
     xargs gem install < ~/config/gem
     sudo pacman -Syu
 }
-
-if [ "$INSIDE_EMACS" ]; then
-    man() {
-	emacsclient -e "(man \"$*\")"
-    }
-    info() {
-	emacsclient -e "(info \"$*\")"
-    }
-fi

@@ -3,6 +3,14 @@
 # don't do anything on a non-interactive terminal
 [[ $- = *i* ]] || return
 
+# import some stuff
+# shellcheck disable=SC1090
+[ -r ~/.environment ] && . ~/.environment
+# shellcheck disable=SC1090
+[ -r ~/.bash_aliases ] && . ~/.bash_aliases
+# shellcheck disable=SC1090
+[ -r ~/.bash_functions ] && . ~/.bash_functions
+
 # terminal specific features
 case "$TERM" in
     dumb)
@@ -20,12 +28,6 @@ shopt -s autocd cdspell checkwinsize direxpand dirspell dotglob globstar nullglo
 
 # colourize prompt according to exit code of last command
 PS1="$RED\${?/#0/$GREEN}$PS1$RESET"
-
-# import some stuff
-# shellcheck disable=SC1090
-[ -r ~/.environment ] && . ~/.environment
-[ -r ~/.bash_aliases ] && . ~/.bash_aliases
-[ -r ~/.bash_functions ] && . ~/.bash_functions
 
 # load some stuff
 load() {
