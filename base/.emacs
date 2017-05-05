@@ -49,6 +49,21 @@
 (global-set-key (kbd "s-b") 'eterm)
 (add-hook 'term-mode-hook (lambda () (local-set-key (kbd "s-y") 'term-paste)))
 
+;; my shell
+(defvar mshell-index 0 "Index of MShell.")
+(defun mshell ()
+  "Start a new MShell session.
+MShell is just like EShell but better."
+  (interactive)
+  (eshell (setq mshell-index (+ 1 mshell-index))))
+(global-set-key (kbd "s-m") 'mshell)
+
+;; some commands
+(defun ssh (dest)
+  "SSH into DEST."
+  (interactive)
+  (dired (format "/ssh:%s:" dest)))
+
 ;; transparency
 (defun toggle-transparent ()
   "Toggle the transparancy of the current frame."
