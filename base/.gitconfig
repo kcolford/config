@@ -6,3 +6,5 @@
 	followTags = true
 [alias]
 	pushu = push -u origin HEAD
+[url "git@github.com:kcolford/"]
+	pushInsteadOf = "https://github.com/kcolford/"
