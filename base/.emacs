@@ -23,10 +23,14 @@
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (package-initialize)
-(package-refresh-contents)
-(package-install-selected-packages)
-(package-autoremove)
-(add-hook 'after-init-hook 'auto-package-update-maybe)
+
+(defun initialize ()
+  "Initialize Emacs for the system."
+  (interactive)
+  (package-refresh-contents)
+  (package-install-selected-packages)
+  (package-autoremove)
+  (auto-package-update-maybe))
 
 ;; minimal UI
 (setq inhibit-startup-screen t)
@@ -45,22 +49,8 @@
 (setq-default tramp-default-method "ssh")
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 
-;; terminal usage
-(defun eterm ()
-  "Start an Emacs based terminal emulator."
-  (interactive)
-  (ansi-term (getenv "SHELL")))
-(global-set-key (kbd "s-b") 'eterm)
-(add-hook 'term-mode-hook (lambda () (local-set-key (kbd "s-y") 'term-paste)))
-
-;; my shell
-(defvar mshell-index 0 "Index of MShell.")
-(defun mshell ()
-  "Start a new MShell session.
-MShell is just like EShell but better."
-  (interactive)
-  (eshell (setq mshell-index (+ 1 mshell-index))))
-(global-set-key (kbd "s-m") 'mshell)
+;; some quick commands
+(defalias 'term 'ansi-term "Use the ansi-term by default.")
 
 ;; some commands
 (defun ssh (dest)
@@ -76,17 +66,9 @@ MShell is just like EShell but better."
     (if (and alpha (not (eq 100 alpha)))
 	(set-frame-parameter nil 'alpha 100)
       (set-frame-parameter nil 'alpha 60))))
-(global-set-key (kbd "s-u") 'toggle-transparent)
 
 ;; management of multiple windows/buffers
 (windmove-default-keybindings)
-(global-set-key (kbd "s-j") 'windmove-left)
-(global-set-key (kbd "s-k") 'windmove-down)
-(global-set-key (kbd "s-i") 'windmove-up)
-(global-set-key (kbd "s-l") 'windmove-right)
-(global-set-key (kbd "s--") 'split-window-horizontally)
-(global-set-key (kbd "s-=") 'split-window-vertically)
-(global-set-key (kbd "s-\\") 'kill-buffer-and-window)
 
 ;; mode settings
 (defun choose-mode (mode ext)
@@ -122,9 +104,11 @@ MShell is just like EShell but better."
 ;; setup current Emacs as editor
 (require 'server)
 (unless (daemonp)
-  (setenv "EMACS_SERVER" (format "server-%s" (emacs-pid)))
+  (setq server-name (format "server-%s" (emacs-pid)))
+  (setenv "EMACS_SERVER" server-name)
+  (setenv "EDITOR" (format "emacsclient -s %s" server-name))
+  (setenv "TEXEDIT" (format "emacsclient -s %s +%%d %%s" server-name))
   (add-hook 'after-init-hook 'server-start))
-(setq server-name (getenv "EMACS_SERVER"))
 (global-set-key (kbd "C-x C-z") 'server-edit)
 
 (provide '.emacs)

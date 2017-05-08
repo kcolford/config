@@ -10,9 +10,8 @@ export PIP_USER=true
 
 # basic settings
 export BROWSER="chromium"
-export EMACS_SERVER="${EMACS_SERVER:-server}" ALTERNATE_EDITOR=
-export EDITOR="emacsclient -s $EMACS_SERVER"
-export TEXEDIT="$EDITOR +%d %s"
+export ALTERNATE_EDITOR="" EDITOR="${EDITOR:-emacsclient}"
+export TEXEDIT="${TEXEDIT:-$EDITOR +%d %s}"
 export LESS=FRSXi
 export DIFFPROG="diff -aur"
 export PAGER=less
