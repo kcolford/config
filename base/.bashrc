@@ -7,9 +7,9 @@
 # shellcheck disable=SC1090
 [ -r ~/.environment ] && . ~/.environment
 # shellcheck disable=SC1090
-[ -r ~/.bash_aliases ] && . ~/.bash_aliases
+[ -r ~/.aliases ] && . ~/.aliases
 # shellcheck disable=SC1090
-[ -r ~/.bash_functions ] && . ~/.bash_functions
+[ -r ~/.functions ] && . ~/.functions
 
 # terminal specific features
 case "$TERM" in
@@ -24,7 +24,7 @@ case "$TERM" in
 esac
 
 # enable some shell features
-shopt -s autocd cdspell checkwinsize direxpand dirspell dotglob globstar nullglob
+shopt -s autocd cdspell checkwinsize direxpand dirspell dotglob globstar
 
 # colourize prompt according to exit code of last command
 PS1="$RED\${?/#0/$GREEN}$PS1$RESET"

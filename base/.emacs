@@ -6,12 +6,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(column-number-mode t)
  '(package-selected-packages
    (quote
     (anaconda-mode company-anaconda company-dict kivy-mode yasnippit magit haskell-mode company-auctex company-ghc company-go company-jedi csv-mode auto-package-update company company-c-headers company-quickhelp company-shell company-web hc-zenburn-theme sass-mode dockerfile-mode android-mode flycheck go-mode pkgbuild-mode ggtags editorconfig yaml-mode web-mode systemd ssh-config-mode nginx-mode markdown-mode gitignore-mode gitconfig-mode auctex)))
- '(show-paren-mode t)
- '(tool-bar-mode nil))
+ '(send-mail-function (quote sendmail-send-it)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -19,18 +17,26 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:family "xos4 Terminus" :foundry "xos4" :slant normal :weight normal :height 105 :width normal)))))
 
-;; make installing packages easier
+;; force load some stuff
+(require 'dired-aux)
+(require 'dired-x)
 (require 'package)
+(require 'server)
+
+;; make installing packages easier
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (package-initialize)
 
-(defun initialize ()
-  "Initialize Emacs for the system."
+(defun heavy-setup ()
+  "Heavy setup to only be done sometimes."
   (interactive)
   (package-refresh-contents)
   (package-install-selected-packages)
   (package-autoremove)
-  (auto-package-update-maybe))
+  (save-excursion
+    (list-packages)
+    (package-menu-mark-upgrades)
+    (package-menu-execute)))
 
 ;; minimal UI
 (setq inhibit-startup-screen t)
@@ -40,23 +46,13 @@
 
 ;; better usability
 (load-theme 'hc-zenburn t)
-(setq default-frame-alist '((height . 24) (width . 80)))
+(setq dired-listing-switches "-la")
 (setq display-buffer-alist '((".*" display-buffer-same-window (nil))))
 (setq password-cache-expiry 300)
 (setq vc-follow-symlinks t)
 (setq view-read-only t)
 (setq-default Man-notify-method 'pushy)
 (setq-default tramp-default-method "ssh")
-(global-set-key (kbd "C-x C-b") 'ibuffer)
-
-;; some quick commands
-(defalias 'term 'ansi-term "Use the ansi-term by default.")
-
-;; some commands
-(defun ssh (dest)
-  "SSH into DEST."
-  (interactive)
-  (dired (format "/ssh:%s:" dest)))
 
 ;; transparency
 (defun toggle-transparent ()
@@ -68,7 +64,6 @@
       (set-frame-parameter nil 'alpha 60))))
 
 ;; management of multiple windows/buffers
-(windmove-default-keybindings)
 
 ;; mode settings
 (defun choose-mode (mode ext)
@@ -85,30 +80,23 @@
 (add-hook 'prog-mode-hook 'flycheck-mode)
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 (add-hook 'prog-mode-hook 'yas-minor-mode)
-(add-hook 'prog-mode-hook 'company-mode)
-(add-hook 'after-init-hook 'editorconfig-mode)
-(add-hook 'company-mode-hook 'company-quickhelp-local-mode)
-(add-hook 'python-mode-hook 'anaconda-mode)
 (add-hook 'text-mode-hook 'flyspell-mode)
-(add-hook 'after-init-hook 'android-mode)
-(add-hook 'after-init-hook 'column-number-mode)
-(add-hook 'after-init-hook 'global-auto-revert-mode)
-(add-hook 'after-init-hook 'ido-mode)
-(add-hook 'after-init-hook 'save-place-mode)
-(add-hook 'after-init-hook 'show-paren-mode)
-
-;; company setup
-(require 'company)
-(add-to-list 'company-backends 'company-dict t)
+(column-number-mode)
+(editorconfig-mode)
+(global-auto-revert-mode)
+(ido-mode)
+(save-place-mode)
+(show-paren-mode)
+(windmove-default-keybindings)
 
 ;; setup current Emacs as editor
-(require 'server)
 (unless (daemonp)
   (setq server-name (format "server-%s" (emacs-pid)))
-  (setenv "EMACS_SERVER" server-name)
-  (setenv "EDITOR" (format "emacsclient -s %s" server-name))
-  (setenv "TEXEDIT" (format "emacsclient -s %s +%%d %%s" server-name))
   (add-hook 'after-init-hook 'server-start))
+(setenv "EMACS_SERVER" server-name)
+(setenv "EDITOR" (format "emacsclient -s %s" server-name))
+(setenv "VISUAL" (getenv "EDITOR"))
+(setenv "TEXEDIT" (format "emacsclient -s %s +%%d %%s" server-name))
 (global-set-key (kbd "C-x C-z") 'server-edit)
 
 (provide '.emacs)

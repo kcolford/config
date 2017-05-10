@@ -1,4 +1,4 @@
-# ~/.bash_functions -*- mode:sh -*-
+# ~/.functions -*- mode:sh -*-
 
 # shellcheck disable=SC2034
 unitfile_regex='\.(service|socket|timer)$'
@@ -11,8 +11,8 @@ alert() {
 }
 
 emacsify() {
-    if [ "$INSIDE_EMACS" ] && [ "$#" = 2 ]; then
-	emacsclient -e "($1 \"$2\")"
+    if [ "$EMACS_SERVER" ] && [ "$#" = 2 ]; then
+	emacsclient -s "$EMACS_SERVER" -e "($1 \"$2\")"
     else
 	"$@"
     fi

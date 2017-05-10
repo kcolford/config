@@ -1,4 +1,4 @@
-# ~/.bash_aliases -*- mode:sh -*-
+# ~/.aliases -*- mode:sh -*-
 
 alias aria2c='aria2c ${XDG_DOWNLOAD_DIR:+--dir "$XDG_DOWNLOAD_DIR"}'
 alias cp='cp --reflink=auto'
@@ -9,12 +9,13 @@ alias docker-compose='sudo -E docker-compose'
 alias e='$EDITOR'
 alias emacs='emacs --no-splash'
 alias gpgv='gpg --verify'
-alias info='emacsify info'
 alias ls='ls --color=auto -FC'
 alias make='make -j$(nproc)'
-alias man='emacsify man'
 alias mkfs='mkfs -t btrfs'
 alias qrencode='qrencode -t ANSI'
 alias sudo='sudo '
 alias tarx='tar -x -C ~/scratch/ -f'
 alias unzip='unzip -d ~/scratch/'
+
+alias info='emacsify info'
+alias man='emacsify man'
