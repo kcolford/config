@@ -1,5 +1,8 @@
 # -*- mode: sh -*-
 
+# umask for general use
+umask 002
+
 # installation prefix
 export PREFIX="$HOME/.local"
 
@@ -15,7 +18,3 @@ export TEXEDIT="${TEXEDIT:-$EDITOR +%d %s}"
 export LESS=FRSXi
 export DIFFPROG="diff -aur"
 export PAGER=less
-
-# XDG stuff
-# shellcheck disable=SC1090
-. "${XDG_CONFIG_HOME:-$HOME/.config}"/user-dirs.dirs > /dev/null 2>&1

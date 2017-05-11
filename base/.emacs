@@ -50,9 +50,7 @@
 (setq display-buffer-alist '((".*" display-buffer-same-window (nil))))
 (setq password-cache-expiry 300)
 (setq vc-follow-symlinks t)
-(setq view-read-only t)
 (setq-default Man-notify-method 'pushy)
-(setq-default tramp-default-method "ssh")
 
 ;; transparency
 (defun toggle-transparent ()
@@ -63,8 +61,6 @@
 	(set-frame-parameter nil 'alpha 100)
       (set-frame-parameter nil 'alpha 60))))
 
-;; management of multiple windows/buffers
-
 ;; mode settings
 (defun choose-mode (mode ext)
   "Assign MODE to be used for each extention listed in EXT."
@@ -74,15 +70,18 @@
 (choose-mode 'web-mode '(css htm html json jsx php xml))
 (choose-mode 'c++-mode '(h))
 (add-to-list 'auto-mode-alist '("README" . text-mode) t)
+(add-hook 'before-save-hook 'time-stamp)
 (define-minor-mode whitespace-cleanup-mode nil nil nil nil
   (add-hook 'before-save-hook 'whitespace-cleanup nil t))
 (add-hook 'prog-mode-hook 'whitespace-cleanup-mode)
-(add-hook 'prog-mode-hook 'flycheck-mode)
-(add-hook 'prog-mode-hook 'flyspell-prog-mode)
+;(add-hook 'prog-mode-hook 'editorconfig-mode)
+;(add-hook 'prog-mode-hook 'flycheck-mode)
+;(add-hook 'prog-mode-hook 'flyspell-prog-mode)
 (add-hook 'prog-mode-hook 'yas-minor-mode)
 (add-hook 'text-mode-hook 'flyspell-mode)
 (column-number-mode)
-(editorconfig-mode)
+(display-time-mode)
+(display-battery-mode)
 (global-auto-revert-mode)
 (ido-mode)
 (save-place-mode)

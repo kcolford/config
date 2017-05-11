@@ -14,7 +14,6 @@ export PATH
 
 # to be run before everything else but not all the time
 [ "$SSH_AUTH_SOCK" ] || eval "$(ssh-agent -s)"
-xdg-user-dirs-update > /dev/null 2>&1
-mkdir -p ~/projects ~/scratch
-chattr -R -f +C ${XDG_DOWNLOAD_DIR:+"$XDG_DOWNLOAD_DIR"} "$PREFIX"/share/
+mkdir -p ~/junk ~/projects ~/scratch
+chattr -R -f +C ~/junk "$PREFIX"/share/
 which pip > /dev/null 2>&1 || python -m ensurepip --user --default-pip

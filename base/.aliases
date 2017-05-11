@@ -1,6 +1,5 @@
 # ~/.aliases -*- mode:sh -*-
 
-alias aria2c='aria2c ${XDG_DOWNLOAD_DIR:+--dir "$XDG_DOWNLOAD_DIR"}'
 alias cp='cp --reflink=auto'
 alias curl='curl -sL'
 alias diff='diff -aur'
