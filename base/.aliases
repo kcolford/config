@@ -1,6 +1,6 @@
 # ~/.aliases -*- mode:sh -*-
 
-alias cp='cp --reflink=auto'
+alias cp='cp -a --reflink=auto'
 alias curl='curl -sL'
 alias diff='diff -aur'
 alias docker='sudo docker'
@@ -12,6 +12,7 @@ alias ls='ls --color=auto -FC'
 alias make='make -j$(nproc)'
 alias mkfs='mkfs -t btrfs'
 alias qrencode='qrencode -t ANSI'
+alias rsync='rsync -a --delete'
 alias sudo='sudo '
 alias tarx='tar -x -C ~/scratch/ -f'
 alias unzip='unzip -d ~/scratch/'
