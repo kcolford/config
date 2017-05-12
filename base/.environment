@@ -7,7 +7,7 @@ umask 002
 export PREFIX="$HOME/.local"
 
 # some environment paths
-export GOPATH="$PREFIX"
+export GOPATH="$HOME/go"
 export NPM_CONFIG_PREFIX="$PREFIX"
 export PIP_USER=true
 

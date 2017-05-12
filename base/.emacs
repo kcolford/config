@@ -8,7 +8,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (anaconda-mode company-anaconda company-dict kivy-mode yasnippit magit haskell-mode company-auctex company-ghc company-go company-jedi csv-mode auto-package-update company company-c-headers company-quickhelp company-shell company-web hc-zenburn-theme sass-mode dockerfile-mode android-mode flycheck go-mode pkgbuild-mode ggtags editorconfig yaml-mode web-mode systemd ssh-config-mode nginx-mode markdown-mode gitignore-mode gitconfig-mode auctex)))
+    (yasnippit haskell-mode csv-mode company hc-zenburn-theme dockerfile-mode android-mode go-mode pkgbuild-mode editorconfig yaml-mode web-mode systemd ssh-config-mode nginx-mode markdown-mode gitignore-mode gitconfig-mode auctex)))
  '(send-mail-function (quote sendmail-send-it)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -40,7 +40,7 @@
 
 ;; minimal UI
 (setq inhibit-startup-screen t)
-(menu-bar-mode 0)
+;(menu-bar-mode 0)
 (scroll-bar-mode 0)
 (tool-bar-mode 0)
 
@@ -61,6 +61,9 @@
 	(set-frame-parameter nil 'alpha 100)
       (set-frame-parameter nil 'alpha 60))))
 
+;; typos
+(define-key global-map [(remap 'list-directory)] 'dired)
+
 ;; mode settings
 (defun choose-mode (mode ext)
   "Assign MODE to be used for each extention listed in EXT."
@@ -74,19 +77,16 @@
 (define-minor-mode whitespace-cleanup-mode nil nil nil nil
   (add-hook 'before-save-hook 'whitespace-cleanup nil t))
 (add-hook 'prog-mode-hook 'whitespace-cleanup-mode)
-;(add-hook 'prog-mode-hook 'editorconfig-mode)
-;(add-hook 'prog-mode-hook 'flycheck-mode)
-;(add-hook 'prog-mode-hook 'flyspell-prog-mode)
-(add-hook 'prog-mode-hook 'yas-minor-mode)
 (add-hook 'text-mode-hook 'flyspell-mode)
-(column-number-mode)
-(display-time-mode)
-(display-battery-mode)
+(add-hook 'text-mode-hook 'auto-fill-mode)
+(editorconfig-mode)
 (global-auto-revert-mode)
+(global-company-mode)
 (ido-mode)
 (save-place-mode)
 (show-paren-mode)
 (windmove-default-keybindings)
+(yas-global-mode)
 
 ;; setup current Emacs as editor
 (unless (daemonp)
@@ -96,7 +96,7 @@
 (setenv "EDITOR" (format "emacsclient -s %s" server-name))
 (setenv "VISUAL" (getenv "EDITOR"))
 (setenv "TEXEDIT" (format "emacsclient -s %s +%%d %%s" server-name))
-(global-set-key (kbd "C-x C-z") 'server-edit)
+(define-key global-map (kbd "C-x C-z") 'server-edit)
 
 (provide '.emacs)
 ;;; .emacs ends here
