@@ -15,6 +15,7 @@ alias qrencode='qrencode -t ANSI'
 alias rsync='rsync -a --delete'
 alias sudo='sudo '
 alias tarx='tar -x -C ~/scratch/ -f'
+alias tcpdump='sudo tcpdump -Z $USER'
 alias unzip='unzip -d ~/scratch/'
 
 alias info='emacsify info'

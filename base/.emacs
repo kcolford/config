@@ -8,7 +8,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (yasnippit haskell-mode csv-mode company hc-zenburn-theme dockerfile-mode android-mode go-mode pkgbuild-mode editorconfig yaml-mode web-mode systemd ssh-config-mode nginx-mode markdown-mode gitignore-mode gitconfig-mode auctex)))
+    (yasnippet elf-mode pass auth-password-store password-store yasnippit haskell-mode csv-mode company hc-zenburn-theme dockerfile-mode android-mode go-mode pkgbuild-mode editorconfig yaml-mode web-mode systemd ssh-config-mode nginx-mode markdown-mode gitignore-mode gitconfig-mode auctex)))
  '(send-mail-function (quote sendmail-send-it)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -17,13 +17,11 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:family "xos4 Terminus" :foundry "xos4" :slant normal :weight normal :height 105 :width normal)))))
 
-;; force load some stuff
 (require 'dired-aux)
 (require 'dired-x)
 (require 'package)
 (require 'server)
 
-;; make installing packages easier
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (package-initialize)
 
@@ -33,18 +31,14 @@
   (package-refresh-contents)
   (package-install-selected-packages)
   (package-autoremove)
-  (save-excursion
-    (list-packages)
-    (package-menu-mark-upgrades)
-    (package-menu-execute)))
+  (list-packages)
+  (package-menu-mark-upgrades)
+  (package-menu-execute))
 
-;; minimal UI
 (setq inhibit-startup-screen t)
 ;(menu-bar-mode 0)
 (scroll-bar-mode 0)
 (tool-bar-mode 0)
-
-;; better usability
 (load-theme 'hc-zenburn t)
 (setq dired-listing-switches "-la")
 (setq display-buffer-alist '((".*" display-buffer-same-window (nil))))
@@ -52,7 +46,6 @@
 (setq vc-follow-symlinks t)
 (setq-default Man-notify-method 'pushy)
 
-;; transparency
 (defun toggle-transparent ()
   "Toggle the transparancy of the current frame."
   (interactive)
@@ -61,10 +54,6 @@
 	(set-frame-parameter nil 'alpha 100)
       (set-frame-parameter nil 'alpha 60))))
 
-;; typos
-(define-key global-map [(remap 'list-directory)] 'dired)
-
-;; mode settings
 (defun choose-mode (mode ext)
   "Assign MODE to be used for each extention listed in EXT."
   (when ext
@@ -73,12 +62,15 @@
 (choose-mode 'web-mode '(css htm html json jsx php xml))
 (choose-mode 'c++-mode '(h))
 (add-to-list 'auto-mode-alist '("README" . text-mode) t)
+
 (add-hook 'before-save-hook 'time-stamp)
 (define-minor-mode whitespace-cleanup-mode nil nil nil nil
   (add-hook 'before-save-hook 'whitespace-cleanup nil t))
 (add-hook 'prog-mode-hook 'whitespace-cleanup-mode)
 (add-hook 'text-mode-hook 'flyspell-mode)
 (add-hook 'text-mode-hook 'auto-fill-mode)
+
+(auth-pass-enable)
 (editorconfig-mode)
 (global-auto-revert-mode)
 (global-company-mode)
@@ -88,7 +80,11 @@
 (windmove-default-keybindings)
 (yas-global-mode)
 
-;; setup current Emacs as editor
+(define-key global-map [(remap 'ido-list-directory)] 'ido-dired)
+(define-key global-map [(remap 'list-directory)] 'dired)
+(define-key global-map [?\C-`] 'toggle-transparent)
+(define-key dired-mode-map [?b] 'browse-url-of-dired-file)
+
 (unless (daemonp)
   (setq server-name (format "server-%s" (emacs-pid)))
   (add-hook 'after-init-hook 'server-start))
