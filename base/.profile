@@ -1,27 +1,39 @@
 # ~/.profile
 
-# setup misc environment variables
-# shellcheck disable=SC1090
-. ~/.environment
+# system profile
+. /etc/profile
 
-# setup path
-PATH="/usr/lib/ccache/bin:$PATH"
-PATH="$HOME/.cabal/bin:$PATH"
-rubyuserdir="$(ruby -e 'puts Gem.user_dir')" && PATH="$rubyuserdir/bin:$PATH"
-PATH="$GOPATH/bin:$PATH"
-PATH="$PREFIX/bin:$PATH"
+# installation paths
+export PREFIX="$HOME/local"
+export NPM_CONFIG_PREFIX="$HOME/npm"
+export PIP_USER=true
+
+# path
+PATH="$HOME/.cabal/bin:$PATH"	# cabal
+rubyuserdir="$(ruby -e 'puts Gem.user_dir')" && PATH="$rubyuserdir/bin:$PATH" # ruby
+PATH="$HOME/perl5/bin:$PATH"	    # perl
+PATH="$HOME/npm/bin:$PATH"	    # npm
+PATH="$HOME/.local/bin:$PATH"	    # python
+PATH="$HOME/go/bin:$PATH"	    # go
+PATH="$HOME/local/bin:$PATH"	    # personal
 export PATH
 
 # cpan
-PATH="/home/kieran/perl5/bin${PATH:+:${PATH}}"; export PATH;
-PERL5LIB="/home/kieran/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
-PERL_LOCAL_LIB_ROOT="/home/kieran/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
-PERL_MB_OPT="--install_base \"/home/kieran/perl5\""; export PERL_MB_OPT;
-PERL_MM_OPT="INSTALL_BASE=/home/kieran/perl5"; export PERL_MM_OPT;
+PERL5LIB="$HOME/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
+PERL_LOCAL_LIB_ROOT="$HOME/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
+PERL_MB_OPT="--install_base \"$HOME/perl5\""; export PERL_MB_OPT;
+PERL_MM_OPT="INSTALL_BASE=$HOME/perl5"; export PERL_MM_OPT;
 
+# basic settings
+export BROWSER="chromium"
+export ALTERNATE_EDITOR="" EDITOR="${EDITOR:-emacsclient}"
+export TEXEDIT="${TEXEDIT:-$EDITOR +%d %s}"
+export LESS=FRSXi
+export DIFFPROG="diff -aur"
+export PAGER=less
 
-# to be run before everything else but not all the time
-[ "$SSH_AUTH_SOCK" ] || eval "$(ssh-agent -s)"
-mkdir -p ~/junk ~/projects ~/scratch
-chattr -R -f +C ~/junk "$PREFIX"/share/
-which pip > /dev/null 2>&1 || python -m ensurepip --user --default-pip
+touch ~/.netrc
+chmod 600 ~/.netrc
+if ! grep -q '^default' ~/.netrc; then
+    echo default login anonymous password password >> ~/.netrc
+fi
