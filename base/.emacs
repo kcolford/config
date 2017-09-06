@@ -8,7 +8,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (ido-yes-or-no ox-gfm auto-package-update go-snippets company-auctex company-c-headers company-dict company-quickhelp company-shell company-web company-go yasnippet yasnippit haskell-mode csv-mode company hc-zenburn-theme dockerfile-mode android-mode go-mode editorconfig yaml-mode web-mode systemd ssh-config-mode nginx-mode markdown-mode gitignore-mode gitconfig-mode auctex))))
+    (pydoc ido-yes-or-no ox-gfm auto-package-update go-snippets company-auctex company-c-headers company-dict company-quickhelp company-shell company-web company-go yasnippet yasnippit haskell-mode csv-mode company hc-zenburn-theme android-mode go-mode editorconfig yaml-mode web-mode systemd ssh-config-mode nginx-mode markdown-mode gitignore-mode gitconfig-mode auctex))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -24,10 +24,12 @@
 ;; package updates
 (when (getenv "EMACS_ASYNC_COMMAND_UPDATE")
   (package-install-selected-packages)
-  (package-autoremove)
   (auto-package-update-maybe)
   (kill-emacs))
-(start-process-shell-command "update" nil "EMACS_ASYNC_COMMAND_UPDATE=y emacs &")
+(setenv "EMACS_ASYNC_COMMAND_UPDATE" "y")
+(start-process "Update" (get-buffer-create "*update*")
+	       "emacs" "--batch" "--load" user-init-file)
+(setenv "EMACS_ASYNC_COMMAND_UPDATE")
 
 ;; initscript helpers
 (defun choose-mode (mode ext)
@@ -53,7 +55,12 @@
   (require 'dired-aux)
   (require 'dired-x)
   (define-key dired-mode-map (kbd "b") 'browse-url-of-dired-file))
-(setq dired-listing-switches "-lh")
+(setq dired-listing-switches "-lha")
+(defun dired-hide-dotfiles-in-home ()
+  "Hook to hide dot files when looking at the home directory."
+  (if (string-equal dired-directory "~/")
+      (dired-sort-other "-lh")))
+(add-hook 'dired-mode-hook 'dired-hide-dotfiles-in-home)
 (define-key global-map (kbd "C-x C-d") 'dired)
 
 ;; version control
@@ -115,6 +122,30 @@
 
 ;; c
 (mode-company 'c-mode-hook 'company-c-headers)
+
+;; terminal
+(with-eval-after-load "term"
+  (term-set-escape-char ?\C-x))
+
+;; email
+(setq rmail-file-name "~/.email"
+      message-send-mail-function 'smtpmail-send-it
+      send-mail-function 'smtpmail-send-it
+      smtpmail-smtp-server "smtp.gmail.com")
+(require 'auth-source)
+(defun fetchmail ()
+  "Run the fetchmail program for our email addresses."
+  (interactive)
+  (let* ((host "imap.gmail.com")
+	 (userlist (auth-source-search :host host :max 1 :require '(:user)))
+	 (user (plist-get (car userlist) ':user)))
+    (start-process "Fetch Mail" (get-buffer-create "*fetchmail*")
+		   "fetchmail" "-k" "--ssl" "-u" user host)))
+(with-eval-after-load "rmail"
+  (define-key rmail-mode-map (kbd "q") 'rmail-summary))
+(with-eval-after-load "rmailsum"
+  (define-key rmail-summary-mode-map (kbd "n") 'next-line)
+  (define-key rmail-summary-mode-map (kbd "p") 'previous-line))
 
 ;; company
 (company-auctex-init)

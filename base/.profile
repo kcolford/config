@@ -1,5 +1,9 @@
 # ~/.profile
 
+# who am i
+export NAME="Kieran Colford"
+export EMAIL="kieran@kcolford.com"
+
 # system profile
 . /etc/profile
 
@@ -32,6 +36,7 @@ export LESS=FRSXi
 export DIFFPROG="diff -aur"
 export PAGER=less
 
+# passwords
 touch ~/.netrc
 chmod 600 ~/.netrc
 if ! grep -q '^default' ~/.netrc; then
