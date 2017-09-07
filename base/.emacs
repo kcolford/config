@@ -8,7 +8,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (pydoc ido-yes-or-no ox-gfm auto-package-update go-snippets company-auctex company-c-headers company-dict company-quickhelp company-shell company-web company-go yasnippet yasnippit haskell-mode csv-mode company hc-zenburn-theme android-mode go-mode editorconfig yaml-mode web-mode systemd ssh-config-mode nginx-mode markdown-mode gitignore-mode gitconfig-mode auctex))))
+    (docker-compose-mode dockerfile-mode systemd pydoc ido-yes-or-no ox-gfm go-snippets company-auctex company-c-headers company-dict company-quickhelp company-shell company-web company-go yasnippet haskell-mode csv-mode company hc-zenburn-theme android-mode go-mode editorconfig yaml-mode web-mode ssh-config-mode nginx-mode markdown-mode gitignore-mode gitconfig-mode auctex))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -21,26 +21,42 @@
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (package-initialize)
 
-;; package updates
-(when (getenv "EMACS_ASYNC_COMMAND_UPDATE")
-  (package-install-selected-packages)
-  (auto-package-update-maybe)
-  (kill-emacs))
-(setenv "EMACS_ASYNC_COMMAND_UPDATE" "y")
-(start-process "Update" (get-buffer-create "*update*")
-	       "emacs" "--batch" "--load" user-init-file)
-(setenv "EMACS_ASYNC_COMMAND_UPDATE")
-
 ;; initscript helpers
 (defun choose-mode (mode ext)
   "Assign MODE to be used for each extention listed in EXT."
   (when (consp ext)
     (add-to-list 'auto-mode-alist (cons (format "\\.%s\\'" (car ext)) mode))
     (choose-mode mode (cdr ext))))
+
 (defmacro mode-company (hook fn)
   "Add FN to company-backends when HOOK is run."
   `(add-hook ,hook (lambda ()
 		     (add-to-list (make-local-variable 'company-backends) ,fn))))
+
+(defmacro run-in-async-process (name &rest body)
+  "Run BODY in an asynchronous process separate from the current emacs."
+  (declare (indent 1) (debug t))
+  `(let ((envname (upcase (concat "emacs_async_" ,name)))
+	 (buffer (get-buffer-create (concat "*" ,name "*"))))
+     (when (getenv envname)
+       ,@body
+       (kill-emacs))
+     (with-current-buffer buffer
+       (read-only-mode))
+     (setenv envname "y")
+     (start-process (capitalize ,name) buffer
+		    "emacs" "--batch" "--load" user-init-file)
+     (setenv envname)))
+
+;; update packages
+(run-in-async-process "update"
+  (package-refresh-contents)
+  (mapc (lambda (pkg) (package-install pkg)) package-selected-packages)
+  (package--mapc (lambda (pkg) (unless (or (not (package-installed-p pkg))
+					   (package--newest-p pkg))
+				 (package-reinstall pkg))))
+  (mapc (lambda (pkg) (package-delete (car (alist-get pkg package-alist))))
+	(package--removable-packages)))
 
 ;; appearance
 (setq inhibit-startup-screen t)
@@ -131,16 +147,25 @@
 (setq rmail-file-name "~/.email"
       message-send-mail-function 'smtpmail-send-it
       send-mail-function 'smtpmail-send-it
-      smtpmail-smtp-server "smtp.gmail.com")
+      smtpmail-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-service "submission"
+      smtpmail-stream-type 'starttls)
 (require 'auth-source)
-(defun fetchmail ()
+(defun fetchmail (&optional sync)
   "Run the fetchmail program for our email addresses."
   (interactive)
   (let* ((host "imap.gmail.com")
 	 (userlist (auth-source-search :host host :max 1 :require '(:user)))
-	 (user (plist-get (car userlist) ':user)))
-    (start-process "Fetch Mail" (get-buffer-create "*fetchmail*")
-		   "fetchmail" "-k" "--ssl" "-u" user host)))
+	 (user (plist-get (car userlist) ':user))
+	 (buffer (get-buffer-create "*fetchmail*"))
+	 (program "fetchmail")
+	 (args `("-k" "--ssl" "-u" ,user ,host)))
+    (with-current-buffer buffer
+      (read-only-mode))
+    (if sync
+	(apply 'call-process program nil buffer nil args)
+      (apply 'start-process "Fetch Mail" buffer program args))))
+(add-hook 'rmail-before-get-new-mail-hook (lambda () (fetchmail t)))
 (with-eval-after-load "rmail"
   (define-key rmail-mode-map (kbd "q") 'rmail-summary))
 (with-eval-after-load "rmailsum"
@@ -163,7 +188,7 @@
 (yas-global-mode)
 (add-hook 'before-save-hook 'time-stamp)
 (setq password-cache-expiry 300)
-(setq send-mail-function 'sendmail-send-it)
+(setq view-read-only t)
 
 ;; all edits in current emacs process
 (require 'server)
