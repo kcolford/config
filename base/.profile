@@ -1,8 +1,8 @@
 # ~/.profile
 
 # who am i
-export NAME="Kieran Colford"
-export EMAIL="kieran@kcolford.com"
+export NAME="git config user.name"
+export EMAIL="git config user.email"
 
 # system profile
 . /etc/profile
@@ -37,8 +37,14 @@ export DIFFPROG="diff -aur"
 export PAGER=less
 
 # passwords
-touch ~/.netrc
-chmod 600 ~/.netrc
 if ! grep -q '^default' ~/.netrc; then
+    touch ~/.netrc
+    chmod 600 ~/.netrc
     echo default login anonymous password password >> ~/.netrc
 fi
+
+# btrfs
+for i in ~/.config/chromium ~/.cache/chromium ~/junk ~/.mu ~/.ipfs ~/.cache/aria2; do
+    mkdir -p "$i"
+    chattr +C "$i"
+done

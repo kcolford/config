@@ -52,7 +52,7 @@ load() {
     local cache="${XDG_CONFIG_CACHE:-$HOME/.cache}"/bash/"$(echo "$*" | base64)"
     mkdir -p "$(dirname "$cache")"
     if [ -f "$cache" ]; then
-	("$@" > "$cache" || rm "$cache") &
+	(nice "$@" > "$cache" || rm "$cache") &
 	disown
     else
 	"$@" > "$cache" || rm "$cache"
@@ -100,7 +100,6 @@ alias mkfs='mkfs -t btrfs'
 alias qrencode='qrencode -t ANSI'
 alias rsync='rsync -a --delete'
 alias sudo='sudo '
-alias sudoedit='sudo emacs -Q -nw'
 alias tarx='tar -x -C ~/scratch/ -f'
 alias tcpdump='sudo tcpdump -Z $USER'
 #alias unzip='unzip -d ~/scratch/'

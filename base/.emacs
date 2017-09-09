@@ -1,6 +1,3 @@
-;;; .emacs -- personal init file
-;;; Commentary:
-;;; Code:
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -8,7 +5,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (docker-compose-mode dockerfile-mode systemd pydoc ido-yes-or-no ox-gfm go-snippets company-auctex company-c-headers company-dict company-quickhelp company-shell company-web company-go yasnippet haskell-mode csv-mode company hc-zenburn-theme android-mode go-mode editorconfig yaml-mode web-mode ssh-config-mode nginx-mode markdown-mode gitignore-mode gitconfig-mode auctex))))
+    (magit docker-compose-mode dockerfile-mode systemd pydoc ido-yes-or-no ox-gfm go-snippets company-auctex company-c-headers company-dict company-quickhelp company-shell company-web company-go yasnippet haskell-mode csv-mode company hc-zenburn-theme android-mode go-mode editorconfig yaml-mode web-mode ssh-config-mode nginx-mode markdown-mode gitignore-mode gitconfig-mode auctex))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -35,36 +32,44 @@
 
 (defmacro run-in-async-process (name &rest body)
   "Run BODY in an asynchronous process separate from the current emacs."
-  (declare (indent 1) (debug t))
+  (declare (indent 1))
   `(let ((envname (upcase (concat "emacs_async_" ,name)))
 	 (buffer (get-buffer-create (concat "*" ,name "*"))))
+     (with-current-buffer buffer
+       (view-mode))
      (when (getenv envname)
        ,@body
        (kill-emacs))
-     (with-current-buffer buffer
-       (read-only-mode))
      (setenv envname "y")
      (start-process (capitalize ,name) buffer
 		    "emacs" "--batch" "--load" user-init-file)
      (setenv envname)))
 
+(defmacro with-interactive (&rest body)
+  "Run BODY only when in an interactive environment."
+  (declare (indent 0))
+  `(unless noninteractive
+     ,@body))
+
 ;; update packages
-(run-in-async-process "update"
-  (package-refresh-contents)
-  (mapc (lambda (pkg) (package-install pkg)) package-selected-packages)
-  (package--mapc (lambda (pkg) (unless (or (not (package-installed-p pkg))
-					   (package--newest-p pkg))
-				 (package-reinstall pkg))))
-  (mapc (lambda (pkg) (package-delete (car (alist-get pkg package-alist))))
-	(package--removable-packages)))
+(with-interactive
+  (run-in-async-process "update"
+    (package-refresh-contents)
+    (mapc (lambda (pkg) (package-install pkg)) package-selected-packages)
+    (package--mapc (lambda (pkg) (unless (or (not (package-installed-p pkg))
+					     (package--newest-p pkg))
+				   (package-reinstall pkg))))
+    (mapc (lambda (pkg) (package-delete (car (alist-get pkg package-alist))))
+	  (package--removable-packages))))
 
 ;; appearance
-(setq inhibit-startup-screen t)
-;(menu-bar-mode 0)
-(scroll-bar-mode 0)
-(tool-bar-mode 0)
-(load-theme 'hc-zenburn t)
-(set-frame-font "-xos4-xos4 Terminus-normal-normal-normal-*-14-*-*-*-c-80-iso10646-1")
+(with-interactive
+  (setq inhibit-startup-screen t)
+  ;;(menu-bar-mode 0)
+  (scroll-bar-mode 0)
+  (tool-bar-mode 0)
+  (load-theme 'hc-zenburn t)
+  (set-frame-font "-xos4-xos4 Terminus-normal-normal-normal-*-14-*-*-*-c-80-iso10646-1"))
 
 ;; Directory navigation
 (with-eval-after-load "dired"
@@ -89,9 +94,6 @@
 (setq display-buffer-alist '((".*" display-buffer-same-window (nil))))
 (setq-default Man-notify-method 'pushy)
 
-;; org mode
-(setq-default org-export-backends '(ascii html latex md org))
-
 ;; gtags
 (setq gtags-suggested-key-mapping t)
 (autoload 'gtags-mode "gtags" "" t)
@@ -107,16 +109,13 @@
     (if (and alpha (not (eq 100 alpha)))
 	(set-frame-parameter nil 'alpha 100)
       (set-frame-parameter nil 'alpha 60))))
-(define-key global-map (kbd "C-`") 'toggle-transparent)
+(global-set-key (kbd "C-`") 'toggle-transparent)
 
 ;; web programming
 (choose-mode 'web-mode '(css htm html json jsx php xml))
 (mode-company 'web-mode-hook 'company-web-html)
 (mode-company 'web-mode-hook 'company-web-jade)
 (mode-company 'web-mode-hook 'company-web-slim)
-
-;; pkgbuild
-(add-to-list 'auto-mode-alist '("PKGBUILD" . sh-mode) t)
 
 ;; whitespace in programs
 ;(define-minor-mode whitespace-cleanup-mode nil nil nil nil
@@ -136,70 +135,79 @@
 (setq-default gofmt-show-errors nil)
 (setq-default gofmt-command "goimports")
 
-;; c
-(mode-company 'c-mode-hook 'company-c-headers)
+;; email
+(setq
+ ;; sending mail
+ message-send-mail-function 'smtpmail-send-it
+ smtpmail-smtp-server "smtp.gmail.com"
+ smtpmail-smtp-service "submission"
+ smtpmail-stream-type 'starttls
+ ;; recieving mail
+ mu4e-maildir "~/mail"
+ ;; mbsync
+ mu4e-get-mail-command "mbsync default"
+ mu4e-change-filenames-when-moving t
+ mu4e-update-interval 300
+ ;; handled by gmail
+ mu4e-sent-messages-behavior 'delete
+ ;; viewing preferences
+ mu4e-view-html-plaintext-ratio-heuristic most-positive-fixnum
+ mu4e-view-show-addresses t
+ ;; emacs wide settings
+ mail-user-agent 'mu4e-user-agent
+ read-mail-command 'mu4e)
+(add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
+(autoload 'mu4e "mu4e" "" t)
+(with-eval-after-load "mu4e"
+  (define-key mu4e-view-mode-map (kbd "<backspace>") 'scroll-down-command)
+  (define-key mu4e-view-mode-map (kbd "SPC") 'scroll-up-command))
+(global-set-key (kbd "C-=") 'mu4e)
+(defun email-password ()
+  "Print the password for my email account."
+  (require 'auth-source)
+  (let* ((host "imap.gmail.com")
+	 (user user-mail-address)
+	 (acc (auth-source-search :host host :user user :max 1 :require '(:secret)))
+	 (pass (plist-get (nth 0 acc) ':secret))
+	 (pass (if (functionp pass) (funcall pass) pass)))
+    (princ pass)
+    (princ "\n")))
 
-;; terminal
+;; company
+(with-interactive
+  (company-auctex-init)
+  (company-quickhelp-mode)
+  (global-company-mode))
+
+;; misc
+(with-interactive
+  ;;(editorconfig-mode)
+  (global-auto-revert-mode)
+  (icomplete-mode)
+  (ido-mode)
+  (save-place-mode)
+  (show-paren-mode)
+  (windmove-default-keybindings)
+  (yas-global-mode))
+(add-hook 'before-save-hook 'time-stamp)
+(add-to-list 'auto-mode-alist '("PKGBUILD" . sh-mode) t)
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+(global-set-key (kbd "C-x g") 'magit-status)
+(setq password-cache-expiry 300)
+(setq view-read-only t)
+(setq-default org-export-backends '(ascii html latex md org))
+(mode-company 'c-mode-hook 'company-c-headers)
 (with-eval-after-load "term"
   (term-set-escape-char ?\C-x))
 
-;; email
-(setq rmail-file-name "~/.email"
-      message-send-mail-function 'smtpmail-send-it
-      send-mail-function 'smtpmail-send-it
-      smtpmail-smtp-server "smtp.gmail.com"
-      smtpmail-smtp-service "submission"
-      smtpmail-stream-type 'starttls)
-(require 'auth-source)
-(defun fetchmail (&optional sync)
-  "Run the fetchmail program for our email addresses."
-  (interactive)
-  (let* ((host "imap.gmail.com")
-	 (userlist (auth-source-search :host host :max 1 :require '(:user)))
-	 (user (plist-get (car userlist) ':user))
-	 (buffer (get-buffer-create "*fetchmail*"))
-	 (program "fetchmail")
-	 (args `("-k" "--ssl" "-u" ,user ,host)))
-    (with-current-buffer buffer
-      (read-only-mode))
-    (if sync
-	(apply 'call-process program nil buffer nil args)
-      (apply 'start-process "Fetch Mail" buffer program args))))
-(add-hook 'rmail-before-get-new-mail-hook (lambda () (fetchmail t)))
-(with-eval-after-load "rmail"
-  (define-key rmail-mode-map (kbd "q") 'rmail-summary))
-(with-eval-after-load "rmailsum"
-  (define-key rmail-summary-mode-map (kbd "n") 'next-line)
-  (define-key rmail-summary-mode-map (kbd "p") 'previous-line))
-
-;; company
-(company-auctex-init)
-(company-quickhelp-mode)
-(global-company-mode)
-
-;; misc
-(editorconfig-mode)
-(global-auto-revert-mode)
-(icomplete-mode)
-(ido-mode)
-(save-place-mode)
-(show-paren-mode)
-(windmove-default-keybindings)
-(yas-global-mode)
-(add-hook 'before-save-hook 'time-stamp)
-(setq password-cache-expiry 300)
-(setq view-read-only t)
-
 ;; all edits in current emacs process
-(require 'server)
-(unless (daemonp)
-  (setq server-name (format "server-%s" (emacs-pid)))
-  (add-hook 'after-init-hook 'server-start))
-(setenv "EMACS_SERVER" server-name)
-(setenv "EDITOR" (format "emacsclient -s %s" server-name))
-(setenv "VISUAL" (getenv "EDITOR"))
-(setenv "TEXEDIT" (format "emacsclient -s %s +%%d %%s" server-name))
-(define-key global-map (kbd "C-x C-z") 'server-edit)
-
-(provide '.emacs)
-;;; .emacs ends here
+(with-interactive
+  (require 'server)
+  (unless (daemonp)
+    (setq server-name (format "server-%s" (emacs-pid)))
+    (add-hook 'after-init-hook 'server-start))
+  (setenv "EMACS_SERVER" server-name)
+  (setenv "EDITOR" (format "emacsclient -s %s" server-name))
+  (setenv "VISUAL" (getenv "EDITOR"))
+  (setenv "TEXEDIT" (format "emacsclient -s %s +%%d %%s" server-name))
+  (define-key global-map (kbd "C-x C-z") 'server-edit))
