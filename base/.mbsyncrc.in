@@ -1,0 +1,50 @@
+Create Both
+Expunge Both
+SyncState *
+
+IMAPAccount gmail
+Host imap.gmail.com
+User
+PassCmd "emacs --batch -l ~/.emacs -f email-password"
+SSLType IMAPS
+AuthMechs PLAIN
+
+IMAPStore gmail
+Account gmail
+
+MaildirStore local
+Path ~/mail/
+Inbox ~/mail/INBOX/
+
+Channel gmail-default
+Master :gmail:
+Slave :local:
+
+Channel gmail-archive
+Master :gmail:"[Google Mail]/All Mail"
+Slave :local:archive
+
+Channel gmail-drafts
+Master :gmail:"[Google Mail]/Drafts"
+Slave :local:drafts
+
+Channel gmail-sent
+Master :gmail:"[Google Mail]/Sent Mail"
+Slave :local:sent
+
+Channel gmail-spam
+Master :gmail:"[Google Mail]/Spam"
+Slave :local:spam
+
+Channel gmail-trash
+Master :gmail:"[Google Mail]/Bin"
+Slave :local:trash
+
+Group default
+Channel gmail-default
+Channel gmail-archive
+Channel gmail-drafts
+Channel gmail-sent
+Channel gmail-spam
+Channel gmail-trash
+

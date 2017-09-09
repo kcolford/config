@@ -33,17 +33,18 @@
 (defmacro run-in-async-process (name &rest body)
   "Run BODY in an asynchronous process separate from the current emacs."
   (declare (indent 1))
-  `(let ((envname (upcase (concat "emacs_async_" ,name)))
-	 (buffer (get-buffer-create (concat "*" ,name "*"))))
-     (with-current-buffer buffer
-       (view-mode))
+  `(let ((envname (upcase (concat "emacs_async_" ,name))))
      (when (getenv envname)
        ,@body
        (kill-emacs))
-     (setenv envname "y")
-     (start-process (capitalize ,name) buffer
-		    "emacs" "--batch" "--load" user-init-file)
-     (setenv envname)))
+     (with-interactive
+       (let ((buffer (get-buffer-create (concat "*" ,name "*"))))
+	 (with-current-buffer buffer
+	   (view-mode))
+	 (setenv envname "y")
+	 (start-process (capitalize ,name) buffer
+			"emacs" "--batch" "--load" user-init-file)
+	 (setenv envname)))))
 
 (defmacro with-interactive (&rest body)
   "Run BODY only when in an interactive environment."
@@ -52,19 +53,18 @@
      ,@body))
 
 ;; update packages
-(with-interactive
-  (run-in-async-process "update"
-    (package-refresh-contents)
-    (mapc (lambda (pkg) (package-install pkg)) package-selected-packages)
-    (package--mapc (lambda (pkg) (unless (or (not (package-installed-p pkg))
-					     (package--newest-p pkg))
-				   (package-reinstall pkg))))
-    (mapc (lambda (pkg) (package-delete (car (alist-get pkg package-alist))))
-	  (package--removable-packages))))
+(run-in-async-process "update"
+  (package-refresh-contents)
+  (mapc (lambda (pkg) (package-install pkg)) package-selected-packages)
+  (package--mapc (lambda (pkg) (unless (or (not (package-installed-p pkg))
+					   (package--newest-p pkg))
+				 (package-reinstall pkg))))
+  (mapc (lambda (pkg) (package-delete (car (alist-get pkg package-alist))))
+	(package--removable-packages)))
 
 ;; appearance
+(setq inhibit-startup-screen t)
 (with-interactive
-  (setq inhibit-startup-screen t)
   ;;(menu-bar-mode 0)
   (scroll-bar-mode 0)
   (tool-bar-mode 0)
@@ -136,12 +136,17 @@
 (setq-default gofmt-command "goimports")
 
 ;; email
+(add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
+(if noninteractive
+    (autoload 'mu4e "mu4e")
+  (require 'mu4e))
 (setq
  ;; sending mail
  message-send-mail-function 'smtpmail-send-it
  smtpmail-smtp-server "smtp.gmail.com"
  smtpmail-smtp-service "submission"
  smtpmail-stream-type 'starttls
+ imap-server "imap.gmail.com"
  ;; recieving mail
  mu4e-maildir "~/mail"
  ;; mbsync
@@ -153,22 +158,24 @@
  ;; viewing preferences
  mu4e-view-html-plaintext-ratio-heuristic most-positive-fixnum
  mu4e-view-show-addresses t
+ mu4e-headers-skip-duplicates t
  ;; emacs wide settings
  mail-user-agent 'mu4e-user-agent
  read-mail-command 'mu4e)
-(add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
-(autoload 'mu4e "mu4e" "" t)
 (with-eval-after-load "mu4e"
   (define-key mu4e-view-mode-map (kbd "<backspace>") 'scroll-down-command)
   (define-key mu4e-view-mode-map (kbd "SPC") 'scroll-up-command))
 (global-set-key (kbd "C-=") 'mu4e)
 (defun email-password ()
   "Print the password for my email account."
+  (print-auth-source ':secret))
+(defun email-user ()
+  "Print the user name for my email account."
+  (print-auth-source ':user))
+(defun print-auth-source (info &)
   (require 'auth-source)
-  (let* ((host "imap.gmail.com")
-	 (user user-mail-address)
-	 (acc (auth-source-search :host host :user user :max 1 :require '(:secret)))
-	 (pass (plist-get (nth 0 acc) ':secret))
+  (let* ((acc (auth-source-search :host imap-server :max 1 :require (list info)))
+	 (pass (plist-get (nth 0 acc) info))
 	 (pass (if (functionp pass) (funcall pass) pass)))
     (princ pass)
     (princ "\n")))

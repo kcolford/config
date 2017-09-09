@@ -1,8 +1,8 @@
 # ~/.profile
 
 # who am i
-export NAME="git config user.name"
-export EMAIL="git config user.email"
+export NAME="$(git config user.name)"
+export EMAIL="$(git config user.email)"
 
 # system profile
 . /etc/profile
@@ -48,3 +48,7 @@ for i in ~/.config/chromium ~/.cache/chromium ~/junk ~/.mu ~/.ipfs ~/.cache/aria
     mkdir -p "$i"
     chattr +C "$i"
 done
+
+if [ ~/.mbsyncrc.in -nt ~/.mbsyncrc ]; then
+    sed "s/^User .*/User $(emacs --batch -l ~/.emacs -f email-user)/" ~/.mbsyncrc.in > ~/.mbsyncrc
+fi
