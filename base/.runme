@@ -1,0 +1,27 @@
+# ~/.runme -*- mode:sh -*-
+
+# passwords
+if ! grep -q '^default' ~/.netrc; then
+    touch ~/.netrc
+    chmod 600 ~/.netrc
+    echo default login anonymous password password >> ~/.netrc
+fi
+
+# btrfs
+for i in ~/.ipfs ~/.config/chromium ~/.cache/chromium ~/junk ~/.mu \
+		 ~/.cache/aria2; do
+    mkdir -p "$i"
+    chattr +C "$i"
+done
+
+# mbsync
+if [ ~/.mbsyncrc.in -nt ~/.mbsyncrc ]; then
+    cat ~/.mbsyncrc.in \
+	| sed "s/%USER%/$(emacs --batch -l ~/.emacs -f email-user)/" \
+	      > ~/.mbsyncrc
+fi
+
+# git
+touch ~/.gitconfig
+git config --global user.name "$NAME"
+git config --global user.email "$EMAIL"

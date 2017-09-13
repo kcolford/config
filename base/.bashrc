@@ -4,7 +4,7 @@
 [[ $- = *i* ]] || return
 
 # universal stuff
-. ~/.profile
+. ~/.env
 
 # terminal specific features
 case "$TERM" in
@@ -57,7 +57,6 @@ load() {
     else
 	"$@" > "$cache" || rm "$cache"
     fi
-    # shellcheck disable=SC1090
     . "$cache"
 }
 alias load='load '
@@ -71,7 +70,6 @@ pbs() {
     curl -F "c=${1:-@-}" "https://ptpb.pw/u?u=1"
 }
 reload() {
-    # shellcheck disable=SC1090
     . ~/.bashrc
 }
 touch() {
@@ -106,15 +104,14 @@ alias tcpdump='sudo tcpdump -Z $USER'
 # for shells in emacs
 alias info='emacsify info'
 alias man='emacsify man'
-load thefuck --alias
 
 # completions
-load curl https://raw.githubusercontent.com/ipfs/go-ipfs/master/misc/completion/ipfs-completion.bash
-load curl https://raw.githubusercontent.com/docker/compose/master/contrib/completion/bash/docker-compose
-load hub alias -s
-load npm completion
-load pip completion --bash
-_bitcoin-cli() {
-    COMPREPLY=( $(compgen -W "$(bitcoin-cli help |& sed '/^=/d;/^$/d;s/\([a-zA-Z0-9]\+\).*/\1/')" -- "${COMP_WORDS[COMP_CWORD]}") )
-}
-complete -F _bitcoin-cli bitcoin-cli
+# load curl https://raw.githubusercontent.com/ipfs/go-ipfs/master/misc/completion/ipfs-completion.bash
+# load curl https://raw.githubusercontent.com/docker/compose/master/contrib/completion/bash/docker-compose
+# load hub alias -s
+# load npm completion
+# load pip completion --bash
+# _bitcoin-cli() {
+#     COMPREPLY=( $(compgen -W "$(bitcoin-cli help |& sed '/^=/d;/^$/d;s/\([a-zA-Z0-9]\+\).*/\1/')" -- "${COMP_WORDS[COMP_CWORD]}") )
+# }
+# complete -F _bitcoin-cli bitcoin-cli

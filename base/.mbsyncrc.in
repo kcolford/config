@@ -1,10 +1,12 @@
+# ~/.mbsyncrc.in
+
 Create Both
 Expunge Both
 SyncState *
 
 IMAPAccount gmail
 Host imap.gmail.com
-User
+User %USER%
 PassCmd "emacs --batch -l ~/.emacs -f email-password"
 SSLType IMAPS
 AuthMechs PLAIN

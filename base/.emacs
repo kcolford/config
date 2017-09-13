@@ -5,7 +5,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (magit docker-compose-mode dockerfile-mode systemd pydoc ido-yes-or-no ox-gfm go-snippets company-auctex company-c-headers company-dict company-quickhelp company-shell company-web company-go yasnippet haskell-mode csv-mode company hc-zenburn-theme android-mode go-mode editorconfig yaml-mode web-mode ssh-config-mode nginx-mode markdown-mode gitignore-mode gitconfig-mode auctex))))
+    (py-yapf python-x company-jedi magit docker-compose-mode dockerfile-mode systemd pydoc ido-yes-or-no ox-gfm go-snippets company-auctex company-c-headers company-dict company-quickhelp company-shell company-web company-go yasnippet haskell-mode csv-mode company hc-zenburn-theme android-mode go-mode editorconfig yaml-mode web-mode ssh-config-mode nginx-mode markdown-mode gitignore-mode gitconfig-mode auctex))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -62,6 +62,13 @@
   (mapc (lambda (pkg) (package-delete (car (alist-get pkg package-alist))))
 	(package--removable-packages)))
 
+;; company
+(with-interactive
+  (global-company-mode)
+  (company-auctex-init)
+  (company-quickhelp-mode))
+(require 'company)
+
 ;; appearance
 (setq inhibit-startup-screen t)
 (with-interactive
@@ -72,7 +79,7 @@
   (set-frame-font "-xos4-xos4 Terminus-normal-normal-normal-*-14-*-*-*-c-80-iso10646-1"))
 
 ;; Directory navigation
-(with-eval-after-load "dired"
+(with-eval-after-load 'dired
   (require 'dired-aux)
   (require 'dired-x)
   (define-key dired-mode-map (kbd "b") 'browse-url-of-dired-file))
@@ -86,13 +93,14 @@
 
 ;; version control
 (define-key global-map (kbd "C-x v s") 'vc-git-grep)
-(with-eval-after-load "vc-dir"
+(with-eval-after-load 'vc-dir
   (define-key vc-dir-mode-map (kbd "s") 'vc-git-grep))
 (setq vc-follow-symlinks t)
+(global-set-key (kbd "C-x g") 'magit-status)
 
 ;; don't pop up a new window all the time
 (setq display-buffer-alist '((".*" display-buffer-same-window (nil))))
-(setq-default Man-notify-method 'pushy)
+(setq Man-notify-method 'pushy)
 
 ;; gtags
 (setq gtags-suggested-key-mapping t)
@@ -113,9 +121,7 @@
 
 ;; web programming
 (choose-mode 'web-mode '(css htm html json jsx php xml))
-(mode-company 'web-mode-hook 'company-web-html)
-(mode-company 'web-mode-hook 'company-web-jade)
-(mode-company 'web-mode-hook 'company-web-slim)
+(add-to-list 'company-backends 'company-web-html)
 
 ;; whitespace in programs
 ;(define-minor-mode whitespace-cleanup-mode nil nil nil nil
@@ -123,17 +129,16 @@
 ;(add-hook 'prog-mode-hook 'whitespace-cleanup-mode)
 
 ;; plain text
-(setq-default flyspell-use-meta-tab nil)
 (add-hook 'text-mode-hook 'flyspell-mode)
 (add-hook 'text-mode-hook 'auto-fill-mode)
 (add-to-list 'auto-mode-alist '("README" . text-mode) t)
 
 ;; go
-(mode-company 'go-mode-hook 'company-go)
+(add-to-list 'company-backends 'company-go)
 (add-hook 'go-mode-hook
 	  (lambda () (add-hook 'before-save-hook 'gofmt-before-save nil t)))
-(setq-default gofmt-show-errors nil)
-(setq-default gofmt-command "goimports")
+(setq gofmt-show-errors nil)
+(setq gofmt-command "goimports")
 
 ;; email
 (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
@@ -162,34 +167,42 @@
  ;; emacs wide settings
  mail-user-agent 'mu4e-user-agent
  read-mail-command 'mu4e)
-(with-eval-after-load "mu4e"
+(with-eval-after-load 'mu4e
   (define-key mu4e-view-mode-map (kbd "<backspace>") 'scroll-down-command)
   (define-key mu4e-view-mode-map (kbd "SPC") 'scroll-up-command))
 (global-set-key (kbd "C-=") 'mu4e)
-(defun email-password ()
-  "Print the password for my email account."
-  (print-auth-source ':secret))
 (defun email-user ()
   "Print the user name for my email account."
-  (print-auth-source ':user))
-(defun print-auth-source (info &)
+  (email-password ':user))
+(defun email-password (&optional info)
+  "Print the password for my email account."
   (require 'auth-source)
-  (let* ((acc (auth-source-search :host imap-server :max 1 :require (list info)))
+  (let* ((info (or info ':secret))
+	 (acc (auth-source-search :host imap-server :require `(,info)))
 	 (pass (plist-get (nth 0 acc) info))
 	 (pass (if (functionp pass) (funcall pass) pass)))
     (princ pass)
     (princ "\n")))
 
-;; company
-(with-interactive
-  (company-auctex-init)
-  (company-quickhelp-mode)
-  (global-company-mode))
+;; python
+(add-to-list 'company-backends 'company-jedi)
+(with-eval-after-load 'pydoc
+  (define-key pydoc-mode-map (kbd "m") 'pydoc))
+(with-eval-after-load 'python
+  (python-x-setup)
+  (define-key inferior-python-mode-map (kbd "C-c C-z")
+    (lambda () (interactive) (switch-to-buffer python-shell--parent-buffer))))
+(add-hook 'python-mode-hook 'py-yapf-enable-on-save)
+(setq gud-pdb-command-name "python -m pdb")
+
 
 ;; misc
 (with-interactive
+  (require 'generic-x)
   ;;(editorconfig-mode)
+  (display-battery-mode)
   (global-auto-revert-mode)
+  (global-eldoc-mode)
   (icomplete-mode)
   (ido-mode)
   (save-place-mode)
@@ -199,12 +212,13 @@
 (add-hook 'before-save-hook 'time-stamp)
 (add-to-list 'auto-mode-alist '("PKGBUILD" . sh-mode) t)
 (global-set-key (kbd "C-x C-b") 'ibuffer)
-(global-set-key (kbd "C-x g") 'magit-status)
+(global-set-key (kbd "C-x C-o") 'other-window)
+(setq erc-prompt-for-password nil)
 (setq password-cache-expiry 300)
 (setq view-read-only t)
-(setq-default org-export-backends '(ascii html latex md org))
-(mode-company 'c-mode-hook 'company-c-headers)
-(with-eval-after-load "term"
+(setq org-export-backends '(ascii html latex md org))
+(add-to-list 'company-backends 'company-c-headers)
+(with-eval-after-load 'term
   (term-set-escape-char ?\C-x))
 
 ;; all edits in current emacs process
@@ -217,4 +231,5 @@
   (setenv "EDITOR" (format "emacsclient -s %s" server-name))
   (setenv "VISUAL" (getenv "EDITOR"))
   (setenv "TEXEDIT" (format "emacsclient -s %s +%%d %%s" server-name))
+  (setenv "PAGER" "cat")
   (define-key global-map (kbd "C-x C-z") 'server-edit))

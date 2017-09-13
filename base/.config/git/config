@@ -1,6 +1,3 @@
-[user]
-	name = Kieran Colford
-	email = kieran@kcolford.com
 [push]
 	recurseSubmodules = on-demand
 	followTags = true
