@@ -6,3 +6,5 @@
 	up = fetch --all
 [url "git@github.com:kcolford/"]
 	pushInsteadOf = "https://github.com/kcolford/"
+[url "git@gitlab.com:kcolford/"]
+	pushInsteadOf = "https://gitlab.com/kcolford/"

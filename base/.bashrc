@@ -92,18 +92,22 @@ alias docker-compose='sudo -E docker-compose'
 alias e='$EDITOR'
 alias emacs='emacs --no-splash'
 alias gpgv='gpg --verify'
+alias igrep='grep -i'
 alias ls='ls --color=auto -FC'
 alias make='make -j$(nproc)'
 alias mkfs='mkfs -t btrfs'
+alias pacaur='pacaur --rsort votes'
 alias qrencode='qrencode -t ANSI'
-alias rsync='rsync -a --delete'
+alias rsync='rsync -a'
 alias sudo='sudo '
 alias tarx='tar -x -C ~/scratch/ -f'
 alias tcpdump='sudo tcpdump -Z $USER'
+alias xclip='xclip -selection clipboard'
 #alias unzip='unzip -d ~/scratch/'
 # for shells in emacs
 alias info='emacsify info'
 alias man='emacsify man'
+which hub > /dev/null && alias git='hub'
 
 # completions
 # load curl https://raw.githubusercontent.com/ipfs/go-ipfs/master/misc/completion/ipfs-completion.bash
