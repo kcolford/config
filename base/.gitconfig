@@ -1,6 +1,5 @@
 [user]
 	name = Kieran Colford
-	email = kieran@kcolford.com
 [http]
 	cookiefile = /home/kieran/.gitcookies
 [filter "lfs"]
@@ -17,9 +16,9 @@
 	pwd = !pwd
 	stow = !stow
 	ls = !ls
-[url "git@github.com:kcolford/"]
-	pushInsteadOf = "https://github.com/kcolford/"
-[url "git@gitlab.com:kcolford/"]
-	pushInsteadOf = "https://gitlab.com/kcolford/"
+[url "git@github.com:"]
+	pushInsteadOf = "https://github.com/"
+[url "git@gitlab.com:"]
+	pushInsteadOf = "https://gitlab.com/"
 [url "aur@aur.archlinux.org:"]
 	pushInsteadOf = "https://aur.archlinux.org/"
