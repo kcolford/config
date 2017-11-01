@@ -1,9 +1,9 @@
 export NAME="Kieran Colford"
-export EMAIL="kieran\@kcolford.com"
+export EMAIL="kieran@kcolford.com"
 
 export PAGER=less
 export LESS=FRSXi
-export EDITOR="emacsclient -c"
+export EDITOR="emacsclient -t"
 export TEXEDIT="$EDITOR +%d %s"
 export ALTERNATE_EDITOR=""
 

@@ -29,7 +29,7 @@
 (scroll-bar-mode 0)
 (tool-bar-mode 0)
 (load-theme 'hc-zenburn t)
-(set-frame-font "-xos4-xos4 Terminus-normal-normal-normal-*-14-*-*-*-c-80-iso10646-1"))
+(set-frame-font "-xos4-xos4 Terminus-normal-normal-normal-*-14-*-*-*-c-80-iso10646-1")
 
 ;; Directory navigation
 (setq dired-listing-switches "-lha")
