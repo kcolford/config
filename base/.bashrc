@@ -16,7 +16,7 @@ PS1='\[$RED\]${?/#0/\[$GREEN\]}[\u@\h \W]\$ \[$RESET\]'
 unitfile_regex='\.(service|socket|timer)$'
 
 mirrorlist() {
-    curl -s "https://www.archlinux.org/mirrorlist/?country=${1:-CA}" | sed s/^#// | rankmirrors - | tee ~/scratch/mirrorlist
+    curl -s "https://www.archlinux.org/mirrorlist/?country=${1:-CA}" | sed s/^#// | rankmirrors - | tee mirrorlist
 }
 
 pb() {
