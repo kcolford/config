@@ -21,6 +21,15 @@ PS1='\[$PROMPT_COLOUR\]${?/#0}[${SECONDS}s \u@\h \W]\$ \[$RESET\]'
 # useful variables
 unitfile_regex='\.(service|socket|timer)$'
 
+config() {
+    pushd ~/config
+    git add .
+    git commit
+    git pull
+    git push
+    popd
+}
+
 mirrorlist() {
     curl -s "https://www.archlinux.org/mirrorlist/?country=${1:-CA}" | sed s/^#// | rankmirrors - | tee ~/scratch/mirrorlist
 }
