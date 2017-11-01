@@ -37,7 +37,7 @@ elif [ -r /etc/bash_completion ]; then
     . /etc/bash_completion
 else
     for i in /usr/share/bash-completion/completions/* /etc/bash_completion.d/*; do
-	. "$i"
+	. "$i" > /dev/null 2>&1 || true
     done
 fi
 
