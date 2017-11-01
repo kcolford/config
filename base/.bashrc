@@ -1,7 +1,8 @@
 # ~/.bashrc
 
-# don't do anything on a non-interactive terminal
-[[ $- = *i* ]] || return
+set -k
+. $ENV
+set +k
 
 # terminal specific features
 RED="$(tput setaf 1)"
