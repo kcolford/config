@@ -29,19 +29,13 @@ reload() {
     . ~/.bashrc
 }
 
-# completions
-if [ -r /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-elif [ -r /etc/bash_completion ]; then
-    . /etc/bash_completion
-else
-    for i in /usr/share/bash-completion/completions/* /etc/bash_completion.d/*; do
-	. "$i" > /dev/null 2>&1 || true
-    done
-fi
+s() {
+    "$@" > /dev/null 2>&1
+}
 
 # aliases
 alias config='git -C ~/config'
+s . /usr/share/bash-completion/completions/git
 eval "$(complete -p git | sed 's/git$/config/')"
 alias df='df -h'
 alias diff='diff -aur'
