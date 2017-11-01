@@ -1,9 +1,0 @@
-cython
-docker-compose
-fire
-ipython
-pycrypto
-pylint
-sphinx
-thefuck
-virtualenv

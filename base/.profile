@@ -1,4 +1,0 @@
-# ~/.profile
-
-. ~/.env
-. ~/.runme

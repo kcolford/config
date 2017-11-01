@@ -1,0 +1,22 @@
+[user]
+	name = Kieran Colford
+	email = kieran@kcolford.com
+[http]
+	cookiefile = /home/kieran/.gitcookies
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[push]
+	recurseSubmodules = on-demand
+	followTags = true
+[alias]
+	pushu = push -u origin HEAD
+	up = fetch --all
+[url "git@github.com:kcolford/"]
+	pushInsteadOf = "https://github.com/kcolford/"
+[url "git@gitlab.com:kcolford/"]
+	pushInsteadOf = "https://gitlab.com/kcolford/"
+[url "aur@aur.archlinux.org:"]
+	pushInsteadOf = "https://aur.archlinux.org/"
