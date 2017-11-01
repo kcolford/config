@@ -1,16 +1,12 @@
 # ~/.bashrc
 
-set -k
-. $ENV
-set +k
-
 # terminal specific features
 RED="$(tput setaf 1)"
 GREEN="$(tput setaf 2)"
 RESET="$(tput sgr0)"
 
 # shell features
-shopt -s cdspell checkwinsize dirspell dotglob globstar
+shopt -s cdspell checkwinsize dirspell dotglob globstar nullglob
 HISTCONTROL=ignoredups
 
 # modify prompt
@@ -39,6 +35,10 @@ if [ -r /usr/share/bash-completion/bash_completion ]; then
     . /usr/share/bash-completion/bash_completion
 elif [ -r /etc/bash_completion ]; then
     . /etc/bash_completion
+else
+    for i in /usr/share/bash-completion/completions/* /etc/bash_completion.d/*; do
+	. "$i"
+    done
 fi
 
 # aliases
