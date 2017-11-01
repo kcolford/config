@@ -10,10 +10,7 @@ shopt -s cdspell checkwinsize dirspell dotglob globstar nullglob
 HISTCONTROL=ignoredups
 
 # modify prompt
-PROMPT_COMMAND=''
-trap 'PROMPT_COLOUR="$GREEN";SECONDS=0' DEBUG
-trap 'PROMPT_COLOUR="$RED"' ERR
-PS1='\[$PROMPT_COLOUR\]${?/#0}[${SECONDS}s \u@\h \W]\$ \[$RESET\]'
+PS1='\[$RED\]${?/#0/\[$GREEN\]}[\u@\h \W]\$ \[$RESET\]'
 
 # useful variables
 unitfile_regex='\.(service|socket|timer)$'
@@ -27,6 +24,8 @@ pb() {
 }
 
 reload() {
+    PROMPT_COMMAND=
+    . /etc/bash.bashrc 
     . ~/.bashrc
 }
 
