@@ -21,15 +21,6 @@ PS1='\[$PROMPT_COLOUR\]${?/#0}[${SECONDS}s \u@\h \W]\$ \[$RESET\]'
 # useful variables
 unitfile_regex='\.(service|socket|timer)$'
 
-config() {
-    pushd ~/config
-    git add .
-    git commit
-    git pull
-    git push
-    popd
-}
-
 mirrorlist() {
     curl -s "https://www.archlinux.org/mirrorlist/?country=${1:-CA}" | sed s/^#// | rankmirrors - | tee ~/scratch/mirrorlist
 }
@@ -42,7 +33,16 @@ reload() {
     . ~/.bashrc
 }
 
+# completions
+if [ -r /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+elif [ -r /etc/bash_completion ]; then
+    . /etc/bash_completion
+fi
+
 # aliases
+alias config='git -C ~/config'
+eval "$(complete -p git | sed 's/git$/config/')"
 alias df='df -h'
 alias diff='diff -aur'
 alias docker='sudo docker'
