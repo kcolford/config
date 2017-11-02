@@ -99,7 +99,6 @@
 (setq password-cache-expiry 300)
 (setq vc-follow-symlinks t)
 (add-to-list 'auto-mode-alist '("\\.\\(css|htm|html|jsx|php|xml\\)\\'" . web-mode))
-(add-hook 'after-init-hook 'display-battery-mode)
 (add-hook 'after-init-hook 'editorconfig-mode)
 (add-hook 'after-init-hook 'global-auto-revert-mode)
 (add-hook 'after-init-hook 'global-eldoc-mode)
