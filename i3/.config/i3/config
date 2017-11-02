@@ -5,14 +5,18 @@ set $down k
 set $up l
 set $right semicolon
 
-# terminus is a nice font
+# start programs
+bindsym $mod+Return exec --no-startup-id st -f "xos4 Terminus:pixelsize=14"
+bindsym $mod+b exec chromium
+bindsym $mod+u exec emacs
+bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight +5
+bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -5
+
+# font
 font "pango:xos4 Terminus"
 
 # drag windows
 floating_modifier $mod
-
-# terminal
-bindsym $mod+Return exec st -f "xos4 Terminus:pixelsize=14"
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -109,10 +113,10 @@ mode "resize" {
         # Pressing right will grow the window’s width.
         # Pressing up will shrink the window’s height.
         # Pressing down will grow the window’s height.
-        bindsym j resize shrink width 10 px or 10 ppt
-        bindsym k resize grow height 10 px or 10 ppt
-        bindsym l resize shrink height 10 px or 10 ppt
-        bindsym semicolon resize grow width 10 px or 10 ppt
+        bindsym $left resize shrink width 10 px or 10 ppt
+        bindsym $down resize grow height 10 px or 10 ppt
+        bindsym $up resize shrink height 10 px or 10 ppt
+        bindsym $right resize grow width 10 px or 10 ppt
 
         # same bindings, but for the arrow keys
         bindsym Left resize shrink width 10 px or 10 ppt
