@@ -18,7 +18,6 @@
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (package-initialize)
 
-;; format when saving
 (defmacro define-save-minor-mode (fn)
   (let ((fnmode (intern (format "%s-mode" fn))))
     `(define-minor-mode ,fnmode
@@ -29,7 +28,7 @@
 (scroll-bar-mode 0)
 (tool-bar-mode 0)
 (load-theme 'hc-zenburn t)
-(set-frame-font "-xos4-xos4 Terminus-normal-normal-normal-*-14-*-*-*-c-80-iso10646-1")
+(set-frame-font "xos4 Terminus:pixelsize=14")
 
 ;; Directory navigation
 (setq dired-listing-switches "-lha")
@@ -62,22 +61,17 @@
 
 ;; go
 (define-save-minor-mode gofmt-before-save)
-(add-hook 'go-mode-hook 'gofmt-before-save-mode)
 (setq gofmt-show-errors nil)
 (setq gofmt-command "goimports")
+(add-hook 'go-mode-hook 'gofmt-before-save-mode)
 
 ;; python
-(setq elpy-rpc-timeout 10)
-(add-hook 'after-init-hook 'elpy-enable)
 (define-save-minor-mode elpy-format-code)
 (define-save-minor-mode elpy-importmagic-fixup)
+(setq elpy-rpc-timeout 10)
+(add-hook 'after-init-hook 'elpy-enable)
 (add-hook 'elpy-mode-hook 'elpy-format-code-mode)
 (add-hook 'elpy-mode-hook 'elpy-importmagic-fixup-mode)
-
-;; shells
-(with-eval-after-load 'term
-  (term-set-escape-char ?\C-x))
-(add-hook 'term-mode-hook (lambda () (local-set-key (kbd "C-V") 'term-paste)))
 
 ;; company
 (add-hook 'after-init-hook 'global-company-mode)
@@ -90,18 +84,21 @@
 
 ;; C/C++
 (define-save-minor-mode clang-format-buffer)
+(setq company-clang-arguments '("-std=c++11"))
 (add-hook 'c-mode-common-hook 'clang-format-buffer-mode)
 (add-hook 'c-mode-common-hook 'cwarn-mode)
-(setq company-clang-arguments '("-std=c++11"))
 
 ;; generic programing
-(define-save-minor-mode copyright-update)
-(add-hook 'prog-mode-hook 'copyright-update-mode)
-(add-hook 'before-save-hook 'time-stamp)
-
-(add-to-list 'auto-mode-alist '("\\.\\(css|htm|html|jsx|php|xml\\)\\'" . web-mode))
-(define-save-minor-mode whitespace-cleanup)
 (require 'generic-x)
+(define-save-minor-mode copyright-update)
+(define-save-minor-mode whitespace-cleanup)
+(define-save-minor-mode time-stamp)
+(setq Man-notify-method 'pushy)
+(setq erc-prompt-for-password nil)
+(setq org-export-backends '(ascii html latex md org))
+(setq password-cache-expiry 300)
+(setq vc-follow-symlinks t)
+(add-to-list 'auto-mode-alist '("\\.\\(css|htm|html|jsx|php|xml\\)\\'" . web-mode))
 (add-hook 'after-init-hook 'display-battery-mode)
 (add-hook 'after-init-hook 'editorconfig-mode)
 (add-hook 'after-init-hook 'global-auto-revert-mode)
@@ -111,14 +108,9 @@
 (add-hook 'after-init-hook 'save-place-mode)
 (add-hook 'after-init-hook 'show-paren-mode)
 (add-hook 'after-init-hook 'yas-global-mode)
-(setq Man-notify-method 'pushy)
-(setq erc-prompt-for-password nil)
-(setq org-export-backends '(ascii html latex md org))
-(setq password-cache-expiry 300)
-(setq vc-follow-symlinks t)
 
-(add-hook 'after-init-hook 'projectile-mode)
 (setq projectile-mode-line " Projectile")
+(add-hook 'after-init-hook 'projectile-mode)
 
 ;; tramp
 (setq tramp-default-method "ssh")
@@ -130,7 +122,6 @@
 (unless (daemonp)
   (setq server-name (format "server-%s" (emacs-pid)))
   (add-hook 'after-init-hook 'server-start))
-(setenv "EMACS_SERVER" server-name)
 (setenv "EDITOR" (format "emacsclient -s %s" server-name))
 (setenv "TEXEDIT" (format "emacsclient -s %s +%%d %%s" server-name))
 (setenv "PAGER" "cat")

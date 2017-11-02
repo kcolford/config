@@ -3,9 +3,9 @@ export EMAIL="kieran@kcolford.com"
 
 export PAGER=less
 export LESS=FRSXi
-export EDITOR="emacsclient -t"
+export EDITOR="emacsclient -nw"
 export TEXEDIT="$EDITOR +%d %s"
-export ALTERNATE_EDITOR=""
+export ALTERNATE_EDITOR="emacs -Q"
 
 export PREFIX="$HOME/local"
 export CPATH="$PREFIX/include${CPATH:+:$CPATH}"

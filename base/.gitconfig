@@ -11,9 +11,7 @@
 [alias]
 	pushu = push -u origin HEAD
 	up = fetch --all
-	pwd = !pwd
-	stow = !stow
-	ls = !ls
+	stow = !stow --no-folding
 [url "git@github.com:"]
 	pushInsteadOf = "https://github.com/"
 [url "git@gitlab.com:"]
