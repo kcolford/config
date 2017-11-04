@@ -5,7 +5,7 @@ export PAGER=less
 export LESS=FRSXi
 export EDITOR="emacsclient -nw"
 export TEXEDIT="$EDITOR +%d %s"
-export ALTERNATE_EDITOR="emacs -Q"
+export ALTERNATE_EDITOR="nano"
 
 export PREFIX="$HOME/local"
 export CPATH="$PREFIX/include${CPATH:+:$CPATH}"
@@ -17,3 +17,9 @@ export GOBIN="$PREFIX/bin"
 export NPM_CONFIG_PREFIX="$PREFIX"
 export PYTHONUSERBASE="$PREFIX"
 export XDG_DATA_HOME="$PREFIX/share"
+
+eval "$(ssh-agent)"
+
+if [ "$(tty)" = "/dev/tty1" ]; then
+    exec startx
+fi

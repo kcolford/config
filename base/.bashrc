@@ -16,27 +16,37 @@ PS1='\[$RED\]${?/#0/\[$GREEN\]}[\u@\h \W]\$ \[$RESET\]'
 unitfile_regex='\.(service|socket|timer)$'
 
 mirrorlist() {
-    curl -s "https://www.archlinux.org/mirrorlist/?country=${1:-CA}" | sed s/^#// | rankmirrors - | tee mirrorlist
+    local url="https://www.archlinux.org/mirrorlist/?country=${1:-CA}" 
+    curl -sL "$url" | sed s/^#// | rankmirrors - | tee mirrorlist
 }
 
-package-installed() {
-    local groups="$(pacman -Qge | cut -d ' ' -f 1 | sort -u)"
-    for group; do
-	groups="$(echo "$groups" | fgrep -xv "$group")" 
-    done
-    echo "$groups"
-    echo
-    comm -3 <(pacman -Qqe | sort -u) <(pacman -Qqge $groups | sort -u)
-}
-
-package-remove-unused() {
-    while yes | pacman -R $(pacman -Qqdt); do
-	:
-    done
-}
-
-package-remove() {
-    pacman -D --asdeps "$@"
+function pacman() {
+    case "$1" in
+	-i)
+	    shift
+	    local groups="$(command pacman -Qge | cut -d ' ' -f 1 | sort -u)"
+	    for group; do
+		groups="$(echo "$groups" | fgrep -xv "$group")" 
+	    done
+	    echo "$groups"
+	    echo
+	    comm -3 <(pacman -Qqe | sort -u) <(pacman -Qqge $groups | sort -u)
+	    ;;
+	-d)
+	    shift
+	    sudo pacman -D --asdeps "$@"
+	    while sudo pacman -R --noconfirm $(command pacman -Qqdt); do
+		:
+	    done
+	    ;;
+	*)
+	    if s which pacaur; then
+		pacaur "$@"
+	    else
+		sudo pacman "$@"
+	    fi
+	    ;;
+    esac
 }
 
 pb() {
@@ -64,11 +74,6 @@ alias lns='ln -sfr'
 alias ls='ls --color=auto -FC'
 alias make='make -j$(nproc)'
 alias pacaur='pacaur --rsort votes'
-if s which pacaur; then
-    alias pacman='pacaur'
-else
-    alias pacman='sudo pacman'
-fi
 alias qrencode='qrencode -t ANSI'
 alias rsync='rsync -a'
 alias sudo='sudo '

@@ -12,8 +12,11 @@
 	pushu = push -u origin HEAD
 	up = fetch --all
 	stow = !stow --no-folding
+[url "https://github.com/"]
+	insteadOf = "gh:"
 [url "git@github.com:"]
 	pushInsteadOf = "https://github.com/"
+	pushInsteadOf = "gh:"
 [url "git@gitlab.com:"]
 	pushInsteadOf = "https://gitlab.com/"
 [url "aur@aur.archlinux.org:"]

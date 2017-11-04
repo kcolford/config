@@ -25,6 +25,7 @@
 
 ;; appearance
 (setq inhibit-startup-screen t)
+(menu-bar-mode 0)
 (scroll-bar-mode 0)
 (tool-bar-mode 0)
 (load-theme 'hc-zenburn t)
@@ -70,6 +71,7 @@
 (define-save-minor-mode elpy-importmagic-fixup)
 (setq elpy-rpc-timeout 10)
 (add-hook 'after-init-hook 'elpy-enable)
+(add-hook 'elpy-mode-hook 'elpy-use-ipython)
 (add-hook 'elpy-mode-hook 'elpy-format-code-mode)
 (add-hook 'elpy-mode-hook 'elpy-importmagic-fixup-mode)
 
