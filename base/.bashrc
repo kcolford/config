@@ -1,5 +1,12 @@
 # ~/.bashrc
 
+case "$TERM" in
+    st-*)
+	export TERM="$(sed 's/^st-/xterm-/' <<< "$TERM")"
+	;;
+esac
+
+
 # terminal specific features
 RED="$(tput setaf 1)"
 GREEN="$(tput setaf 2)"
@@ -20,27 +27,27 @@ mirrorlist() {
     curl -sL "$url" | sed s/^#// | rankmirrors - | tee mirrorlist
 }
 
-function pacman() {
+package() {
     case "$1" in
 	-i)
 	    shift
 	    local groups="$(command pacman -Qge | cut -d ' ' -f 1 | sort -u)"
 	    for group; do
-		groups="$(echo "$groups" | fgrep -xv "$group")" 
+		groups="$(fgrep -xv "$group" <<< "$groups")" 
 	    done
 	    echo "$groups"
 	    echo
 	    comm -3 <(pacman -Qqe | sort -u) <(pacman -Qqge $groups | sort -u)
 	    ;;
-	-d)
+	-R)
 	    shift
 	    sudo pacman -D --asdeps "$@"
-	    while sudo pacman -R --noconfirm $(command pacman -Qqdt); do
+	    while sudo pacman -R --noconfirm $(pacman -Qqdt); do
 		:
 	    done
 	    ;;
 	*)
-	    if s which pacaur; then
+	    if s command -v pacaur; then
 		pacaur "$@"
 	    else
 		sudo pacman "$@"
@@ -55,6 +62,14 @@ pb() {
 
 s() {
     "$@" > /dev/null 2>&1
+}
+
+function sudo() {
+    if [ "$UID" = 0 ]; then
+	"$@"
+    else
+	command sudo "$@"
+    fi
 }
 
 # aliases

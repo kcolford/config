@@ -20,6 +20,4 @@ export XDG_DATA_HOME="$PREFIX/share"
 
 eval "$(ssh-agent)"
 
-if [ "$(tty)" = "/dev/tty1" ]; then
-    exec startx
-fi
+systemctl --user import-environment
