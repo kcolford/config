@@ -73,6 +73,7 @@ function sudo() {
 }
 
 # aliases
+alias cmake='cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON'
 alias config='git -C ~/config'
 alias cp='cp -a'
 alias df='df -h'

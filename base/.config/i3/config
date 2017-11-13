@@ -20,8 +20,8 @@ bindsym $mod+Return exec --no-startup-id st -f "xos4 Terminus:pixelsize=14"
 bindsym $mod+b exec chromium
 bindsym $mod+u exec emacs
 bindsym $mod+d exec dmenu_run
-bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight +5
-bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -5
+bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight +1
+bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -1
 exec rsibreak
 exec emacs --daemon
 
