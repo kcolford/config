@@ -24,6 +24,7 @@ bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight +3
 bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -3
 exec rsibreak
 exec emacs --daemon
+exec --no-startup-id synergys -a localhost
 
 bindsym $mod+h split h
 bindsym $mod+v split v

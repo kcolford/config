@@ -8,9 +8,11 @@ esac
 
 
 # terminal specific features
-RED="$(tput setaf 1)"
-GREEN="$(tput setaf 2)"
-RESET="$(tput sgr0)"
+if [ "$TERM" != "dumb" ]; then
+    RED="$(tput setaf 1)"
+    GREEN="$(tput setaf 2)"
+    RESET="$(tput sgr0)"
+fi
 
 # shell features
 shopt -s cdspell checkwinsize dirspell dotglob globstar nullglob
@@ -64,12 +66,20 @@ s() {
     "$@" > /dev/null 2>&1
 }
 
+steal-completions() {
+    . /usr/share/bash-completion/completions/"$1" && eval "$(complete -p "$1" | sed s/"$1"\$/"$2"/)"
+}
+
 function sudo() {
     if [ "$UID" = 0 ]; then
 	"$@"
     else
 	command sudo "$@"
     fi
+}
+
+synergy-connect() {
+    ssh -fnR localhost:24800:localhost:24800 "$1" DISPLAY=${2:-:0} synergyc -f localhost > /dev/null
 }
 
 # aliases
@@ -89,10 +99,10 @@ alias lns='ln -sfr'
 alias ls='ls --color=auto -FC'
 alias pacaur='pacaur --rsort votes'
 alias qrencode='qrencode -t ANSI'
+alias synergys='synergys -a localhost'
 alias tcpdump='sudo tcpdump -Z $USER'
 alias xclip='xclip -selection clipboard'
 
-# completions
-s . /usr/share/bash-completion/completions/git
-eval "$(complete -p git | sed 's/git$/config/')"
-s . /usr/share/cmake-*/completions/*
+steal-completions git config
+steal-completions pacman package
+steal-completions ssh synergy-connect
