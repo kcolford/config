@@ -67,7 +67,8 @@ s() {
 }
 
 steal-completions() {
-    s . /usr/share/bash-completion/completions/"$1" && eval "$(complete -p "$1" | sed s/"$1"\$/"$2"/)"
+    s . /usr/share/bash-completion/completions/"$1"
+    eval "$(complete -p "$1" | sed s/"$1"\$/"$2"/)"
 }
 
 function sudo() {
@@ -79,7 +80,7 @@ function sudo() {
 }
 
 synergy-connect() {
-    ssh -fnR localhost:24800:localhost:24800 "$1" DISPLAY=${2:-:0} synergyc -f localhost > /dev/null
+    ssh -nR localhost:24800:localhost:24800 "$1" DISPLAY=${2:-:0} synergyc -f localhost
 }
 
 # aliases
@@ -106,3 +107,4 @@ alias xclip='xclip -selection clipboard'
 steal-completions git config
 steal-completions pacman package
 steal-completions ssh synergy-connect
+
