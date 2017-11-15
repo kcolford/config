@@ -24,6 +24,11 @@ PS1='\[$RED\]${?/#0/\[$GREEN\]}[\u@\h \W]\$ \[$RESET\]'
 # useful variables
 unitfile_regex='\.(service|socket|timer)$'
 
+d() {
+    s "$@" &
+    disown
+}
+
 mirrorlist() {
     local url="https://www.archlinux.org/mirrorlist/?country=${1:-CA}" 
     curl -sL "$url" | sed s/^#// | rankmirrors - | tee mirrorlist
