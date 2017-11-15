@@ -17,7 +17,9 @@
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (package-initialize)
-(package-install-selected-packages)
+(if (fboundp 'package-install-selected-packages)
+    (package-install-selected-packages)
+  (mapc 'package-install package-selected-packages))
 
 ;; save hooks
 (defmacro define-save-minor-mode (fn &optional doc)
