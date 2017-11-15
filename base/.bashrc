@@ -75,7 +75,6 @@ function sudo() {
 # aliases
 alias cmake='cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON'
 alias config='git -C ~/config'
-alias cp='cp -a'
 alias df='df -h'
 alias diff='diff -aur'
 alias docker='sudo docker'
@@ -88,13 +87,12 @@ alias grep='grep --color=auto'
 alias igrep='grep -i'
 alias lns='ln -sfr'
 alias ls='ls --color=auto -FC'
-alias make='make -j$(nproc)'
 alias pacaur='pacaur --rsort votes'
 alias qrencode='qrencode -t ANSI'
-alias rsync='rsync -a'
-alias sudo='sudo '
 alias tcpdump='sudo tcpdump -Z $USER'
 alias xclip='xclip -selection clipboard'
 
+# completions
 s . /usr/share/bash-completion/completions/git
 eval "$(complete -p git | sed 's/git$/config/')"
+s . /usr/share/cmake-*/completions/*

@@ -19,9 +19,9 @@ bindsym $mod+i exec --no-startup-id i3lock && systemctl suspend
 bindsym $mod+Return exec --no-startup-id st -f "xos4 Terminus:pixelsize=14"
 bindsym $mod+b exec chromium
 bindsym $mod+u exec emacs
-bindsym $mod+d exec dmenu_run
-bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight +1
-bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -1
+bindsym $mod+n exec dmenu_run
+bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight +3
+bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -3
 exec rsibreak
 exec emacs --daemon
 
@@ -34,7 +34,7 @@ bindsym $mod+e layout toggle split
 bindsym $mod+Shift+space floating toggle
 bindsym $mod+space focus mode_toggle
 bindsym $mod+a focus parent
-#bindsym $mod+d focus child
+bindsym $mod+d focus child
 
 bindsym $mod+$left focus left
 bindsym $mod+$down focus down
