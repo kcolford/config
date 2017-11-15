@@ -19,5 +19,6 @@ export PYTHONUSERBASE="$PREFIX"
 export XDG_DATA_HOME="$PREFIX/share"
 
 eval "$(ssh-agent)"
+ssh-add
 
 which systemctl && systemctl --user import-environment || true

@@ -80,7 +80,7 @@ function sudo() {
 }
 
 synergy-connect() {
-    ssh -nR localhost:24800:localhost:24800 "$1" DISPLAY=${2:-:0} synergyc -f localhost
+    ssh -R localhost:24800:localhost:24800 "$1" DISPLAY=${2:-:0} synergyc -f localhost
 }
 
 # aliases
