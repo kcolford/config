@@ -20,4 +20,4 @@ export XDG_DATA_HOME="$PREFIX/share"
 
 eval "$(ssh-agent)"
 
-systemctl --user import-environment
+systemctl --user import-environment || true
