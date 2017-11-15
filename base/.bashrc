@@ -67,7 +67,7 @@ s() {
 }
 
 steal-completions() {
-    . /usr/share/bash-completion/completions/"$1" && eval "$(complete -p "$1" | sed s/"$1"\$/"$2"/)"
+    s . /usr/share/bash-completion/completions/"$1" && eval "$(complete -p "$1" | sed s/"$1"\$/"$2"/)"
 }
 
 function sudo() {
