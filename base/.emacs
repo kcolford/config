@@ -56,7 +56,8 @@
 (scroll-bar-mode 0)
 (tool-bar-mode 0)
 (load-theme 'hc-zenburn t)
-(set-frame-font "xos4 Terminus:pixelsize=14")
+(with-demoted-errors "Error: %s"
+  (set-frame-font "xos4 Terminus:pixelsize=14"))
 (setq inhibit-startup-screen t)
 
 ;; general usage improvements
