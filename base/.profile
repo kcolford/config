@@ -18,5 +18,7 @@ export NPM_CONFIG_PREFIX="$PREFIX"
 export PYTHONUSERBASE="$PREFIX"
 export XDG_DATA_HOME="$PREFIX/share"
 
-eval "$(ssh-agent)"
+if [ "x$SSH_AUTH_SOCK" = x ]; then
+    eval "$(ssh-agent)"
+fi
 ssh-add

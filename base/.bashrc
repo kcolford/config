@@ -24,11 +24,6 @@ PS1='\[$RED\]${?/#0/\[$GREEN\]}[\u@\h \W]\$ \[$RESET\]'
 # useful variables
 unitfile_regex='\.(service|socket|timer)$'
 
-d() {
-    s "$@" &
-    disown
-}
-
 mirrorlist() {
     local url="https://www.archlinux.org/mirrorlist/?country=${1:-CA}" 
     curl -sL "$url" | sed s/^#// | rankmirrors - | tee mirrorlist
@@ -54,7 +49,7 @@ package() {
 	    done
 	    ;;
 	*)
-	    if s command -v pacaur; then
+	    if command -v pacaur > /dev/null 2>&1; then
 		pacaur "$@"
 	    else
 		sudo pacman "$@"
@@ -67,13 +62,9 @@ pb() {
     curl -F "c=@${1:--}" "https://ptpb.pw/?u=1"
 }
 
-s() {
-    "$@" > /dev/null 2>&1
-}
-
 steal-completions() {
-    s . /usr/share/bash-completion/completions/"$1"
-    eval "$(complete -p "$1" | sed s/"$1"\$/"$2"/)"
+    . /usr/share/bash-completion/completions/"$1" > /dev/null 2>&1
+    eval "$(complete -p "$1" | sed s/"$1"\$/"$2"/)" > /dev/null 2>&1
 }
 
 function sudo() {
@@ -85,7 +76,7 @@ function sudo() {
 }
 
 synergy-connect() {
-    ssh -R localhost:24800:localhost:24800 "$1" DISPLAY=${2:-:0} synergyc -f localhost
+    ssh -fnR localhost:24800:localhost:24800 "$1" DISPLAY=${2:-:0} synergyc -f localhost > /dev/null 2>&1
 }
 
 # aliases
@@ -112,4 +103,3 @@ alias xclip='xclip -selection clipboard'
 steal-completions git config
 steal-completions pacman package
 steal-completions ssh synergy-connect
-

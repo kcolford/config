@@ -4,7 +4,7 @@ set $down k
 set $up l
 set $right semicolon
 
-font "pango:xos4 Terminus"
+#font "pango:xos4 Terminus"
 floating_modifier $mod
 bar {
         status_command i3status
@@ -20,11 +20,17 @@ bindsym $mod+Return exec --no-startup-id st -f "xos4 Terminus:pixelsize=14"
 bindsym $mod+b exec chromium
 bindsym $mod+u exec emacs
 bindsym $mod+n exec dmenu_run
+bindsym $mod+m exec transset-df -a -t
+bindsym $mod+comma exec transset-df -a --dec 0.1
+bindsym $mod+period exec transset-df -a --inc 0.1
 bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight +3
 bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -3
-exec rsibreak
-exec emacs --daemon
+exec --no-startup-id rsibreak
+exec --no-startup-id emacs --daemon
 exec --no-startup-id synergys -a localhost
+exec --no-startup-id ~/.fehbg
+exec --no-startup-id compton
+exec --no-startup-id redshift
 
 bindsym $mod+h split h
 bindsym $mod+v split v
