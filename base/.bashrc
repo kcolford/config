@@ -52,6 +52,7 @@ pb() {
 
 # aliases
 alias cmake='cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON'
+alias cower='cower --rsort=votes'
 alias df='df -h'
 alias diff='diff -aur'
 alias docker='sudo docker'
@@ -64,7 +65,7 @@ alias grep='grep --color=auto'
 alias igrep='grep -i'
 alias lns='ln -sfr'
 alias ls='ls --color=auto -FC'
-alias cower='cower --rsort=votes'
+alias pacaur='pacaur --rsort=votes'
 alias qrencode='qrencode -t ANSI'
 alias synergys='synergys -a localhost'
 alias tcpdump='sudo tcpdump -Z $USER'
