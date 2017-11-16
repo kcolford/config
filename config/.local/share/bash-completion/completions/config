@@ -1,6 +1,6 @@
 # -*- shell-script -*-
+_completion_loader git
 _config() {
-    _completion_loader git
     _git
 }
 complete -F _config config
