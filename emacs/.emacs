@@ -40,7 +40,7 @@
     (if (and alpha (not (eq 100 alpha)))
 	(set-frame-parameter nil 'alpha 100)
       (set-frame-parameter nil 'alpha 60))))
-(global-set-key "\C-`" 'toggle-transparent)
+(global-set-key (kbd "C-`") 'toggle-transparent)
 
 ;; bugfixes
 (setq xterm-extra-capabilities nil)
@@ -61,10 +61,10 @@
 (setq inhibit-startup-screen t)
 
 ;; general usage improvements
-(global-set-key "\C-\\" 'bury-buffer)
-(global-set-key "\C-x\C-b" 'ibuffer)
-(global-set-key "\C-=" 'caps-lock-mode)
-(global-set-key "\C-c\C-i" 'company-try-hard)
+(global-set-key (kbd "C-\\") 'bury-buffer)
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+(global-set-key (kbd "C-=") 'caps-lock-mode)
+(global-set-key (kbd "C-c C-i") 'company-try-hard)
 (icomplete-mode)
 (save-place-mode)
 (show-paren-mode)
@@ -89,7 +89,7 @@
 (unless (daemonp)
   (setq server-name (format "server-%s" (emacs-pid)))
   (server-start))
-(global-set-key "\C-x\C-z" 'server-edit)
+(global-set-key (kbd "C-x C-z") 'server-edit)
 (setenv "PAGER" "cat")
 (with-eval-after-load 'server
   (setenv "EDITOR" (format "emacsclient -s %s" server-name))
@@ -99,14 +99,14 @@
 (add-hook 'dired-mode-hook 'dired-omit-mode)
 (with-eval-after-load 'dired
   (require 'dired-x)
-  (define-key dired-mode-map "b" 'browse-url-of-dired-file))
+  (define-key dired-mode-map (kbd "b") 'browse-url-of-dired-file))
 
 ;; plain text
 (setq sentence-end-double-space nil)
 (add-to-list 'auto-mode-alist '("README" . text-mode) t)
 (add-hook 'text-mode-hook 'flyspell-mode)
 (with-eval-after-load 'flyspell
-  (define-key flyspell-mode-map "\C-\M-i" nil))
+  (define-key flyspell-mode-map (kbd "C-M-i") nil))
 (add-hook 'text-mode-hook 'auto-fill-mode)
 
 ;; go
@@ -131,7 +131,7 @@
 ;; elisp
 (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
 (with-eval-after-load 'elisp-mode
-  (define-key emacs-lisp-mode-map "\C-c\C-s" 'apropos))
+  (define-key emacs-lisp-mode-map (kbd "C-c C-s") 'apropos))
 
 ;; latex/tex
 (setq TeX-auto-save t)
@@ -173,11 +173,11 @@
 (define-save-minor-mode cmake-unscreamify-buffer)
 (add-hook 'cmake-mode-hook 'cmake-unscreamify-buffer-mode)
 (with-eval-after-load 'cmake-mode
-  (define-key cmake-mode-map "\C-c\C-d" 'cmake-help))
+  (define-key cmake-mode-map (kbd "C-c C-d") 'cmake-help))
 
 ;; org
-(global-set-key "\C-ca" 'org-agenda)
-(global-set-key "\C-cb" 'org-iswitchb)
-(global-set-key "\C-cc" 'org-capture)
-(global-set-key "\C-cl" 'org-store-link)
+(global-set-key (kbd "C-c a") 'org-agenda)
+(global-set-key (kbd "C-c b") 'org-iswitchb)
+(global-set-key (kbd "C-c c") 'org-capture)
+(global-set-key (kbd "C-c l") 'org-store-link)
   

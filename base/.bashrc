@@ -1,13 +1,6 @@
 # ~/.bashrc
 
-case "$TERM" in
-    st-*)
-	export TERM="$(sed 's/^st-/xterm-/' <<< "$TERM")"
-	;;
-esac
-
-
-# terminal specific features
+# colors
 if [ "$TERM" != "dumb" ]; then
     RED="$(tput setaf 1)"
     GREEN="$(tput setaf 2)"
@@ -15,7 +8,7 @@ if [ "$TERM" != "dumb" ]; then
 fi
 
 # shell features
-shopt -s cdspell checkwinsize dirspell dotglob globstar nullglob
+shopt -s cdspell checkwinsize dirspell globstar nullglob
 HISTCONTROL=ignoredups
 
 # modify prompt
@@ -23,11 +16,6 @@ PS1='\[$RED\]${?/#0/\[$GREEN\]}[\u@\h \W]\$ \[$RESET\]'
 
 # useful variables
 unitfile_regex='\.(service|socket|timer)$'
-
-mirrorlist() {
-    local url="https://www.archlinux.org/mirrorlist/?country=${1:-CA}" 
-    curl -sL "$url" | sed s/^#// | rankmirrors - | tee mirrorlist
-}
 
 package() {
     case "$1" in
@@ -62,26 +50,8 @@ pb() {
     curl -F "c=@${1:--}" "https://ptpb.pw/?u=1"
 }
 
-steal-completions() {
-    . /usr/share/bash-completion/completions/"$1" > /dev/null 2>&1
-    eval "$(complete -p "$1" 2> /dev/null | sed s/"$1"\$/"$2"/)"
-}
-
-function sudo() {
-    if [ "$UID" = 0 ]; then
-	"$@"
-    else
-	command sudo "$@"
-    fi
-}
-
-synergy-connect() {
-    ssh -fnR localhost:24800:localhost:24800 "$1" DISPLAY=${2:-:0} synergyc -f localhost > /dev/null 2>&1
-}
-
 # aliases
 alias cmake='cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON'
-alias config='git -C ~/config'
 alias df='df -h'
 alias diff='diff -aur'
 alias docker='sudo docker'
@@ -100,6 +70,3 @@ alias synergys='synergys -a localhost'
 alias tcpdump='sudo tcpdump -Z $USER'
 alias xclip='xclip -selection clipboard'
 
-steal-completions git config
-steal-completions pacman package
-steal-completions ssh synergy-connect

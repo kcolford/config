@@ -16,7 +16,7 @@ bindsym $mod+Shift+r restart
 bindsym $mod+Shift+e exit
 bindsym $mod+i exec --no-startup-id i3lock && systemctl suspend
 
-bindsym $mod+Return exec --no-startup-id st -f "xos4 Terminus:pixelsize=14"
+bindsym $mod+Return exec --no-startup-id st
 bindsym $mod+b exec chromium
 bindsym $mod+u exec emacs
 bindsym $mod+n exec dmenu_run
@@ -26,8 +26,6 @@ bindsym $mod+period exec transset-df -a --inc 0.1
 bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight +3
 bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -3
 exec --no-startup-id dex -a
-exec --no-startup-id emacs --daemon
-exec --no-startup-id synergys -a localhost
 exec --no-startup-id ~/.fehbg
 exec --no-startup-id compton
 

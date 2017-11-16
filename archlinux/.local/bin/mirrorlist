@@ -1,0 +1,3 @@
+#!/bin/bash
+url="https://www.archlinux.org/mirrorlist/?country=${1:-CA}" 
+curl -sL "$url" | sed s/^#// | rankmirrors - | tee mirrorlist
