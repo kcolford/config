@@ -1,1 +1,2 @@
+# -*- shell-script -*-
 complete -F _git config
