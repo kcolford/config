@@ -19,6 +19,8 @@
 	pushInsteadOf = "gh:"
 [url "git@gitlab.com:"]
 	pushInsteadOf = "https://gitlab.com/"
+[url "https://aur.archlinux.org/"]
+	insteadOf = "aur:"
 [url "aur@aur.archlinux.org:"]
 	pushInsteadOf = "https://aur.archlinux.org/"
 [merge]
