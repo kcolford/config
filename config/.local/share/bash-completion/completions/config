@@ -1,2 +1,6 @@
 # -*- shell-script -*-
-complete -F _git config
+_config() {
+    _completion_loader git
+    _git
+}
+complete -F _config config
