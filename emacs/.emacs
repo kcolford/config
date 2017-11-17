@@ -44,7 +44,6 @@
 
 ;; bugfixes
 (setq xterm-extra-capabilities nil)
-(setq projectile-mode-line "")
 
 ;; tramp
 (setq tramp-default-method "ssh")
@@ -64,14 +63,9 @@
 (global-set-key (kbd "C-\\") 'bury-buffer)
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "C-=") 'caps-lock-mode)
-(global-set-key (kbd "C-c C-i") 'company-try-hard)
 (icomplete-mode)
 (save-place-mode)
 (show-paren-mode)
-(winner-mode)
-(setq company-idle-delay 0.1)
-(setq company-minimum-prefix-length 2)
-(setq enable-recursive-minibuffers t)
 (setq make-backup-files nil)
 (setq vc-follow-symlinks t)
 (defalias 'yes-or-no-p 'y-or-n-p)
@@ -79,11 +73,14 @@
 ;; IDE
 (company-statistics-mode)
 (editorconfig-mode)
-(flycheck-mode)
 (global-auto-revert-mode)
 (global-company-mode)
 (global-eldoc-mode)
+
+;; project management
 (projectile-mode)
+(setq projectile-completion-system 'default)
+(setq projectile-mode-line "")
 
 ;; all edits in current emacs process
 (unless (daemonp)
@@ -143,6 +140,7 @@
   (company-auctex-init))
 
 ;; shell
+(add-hook 'sh-mode-hook 'flycheck-mode)
 (with-eval-after-load 'sh-script
   (add-to-list 'company-backends 'company-shell))
 
@@ -168,6 +166,20 @@
   (add-to-list 'company-clang-arguments "-std=c++11"))
 (with-eval-after-load 'company-irony
   (setq company-irony-ignore-case t))
+(defun irony-mode-setup-cmake ()
+  "Have cmake export compile commands for irony."
+  (interactive)
+  ;; the `compile' function allows us to review the command and change
+  ;; it if it's incorrect
+  (compile "cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ./build")
+  (irony-cdb-autosetup-compile-options))
+(defun irony-mode-setup-make ()
+  "Have make export compile commands for irony."
+  (interactive)
+  ;; the `compile' function allows us to review the command and change
+  ;; it if it's incorrect
+  (compile "bear make -B")
+  (irony-cdb-autosetup-compile-options))
 
 ;; cmake
 (define-save-minor-mode cmake-unscreamify-buffer)

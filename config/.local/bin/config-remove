@@ -1,0 +1,6 @@
+#!/bin/bash
+for file; do
+    realfile="$(readlink -f "$file")"
+    mv "$realfile" "$file"
+    rmdir -p --ignore-fail-on-non-empty "$(dirname "$realfile")"
+done

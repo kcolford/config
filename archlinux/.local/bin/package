@@ -1,0 +1,27 @@
+#!/bin/bash
+case "$1" in
+    -i)
+	shift
+	groups="$(pacman -Qge | cut -d ' ' -f 1 | sort -u)"
+	for group; do
+	    groups="$(grep -F -xv "$group" <<< "$groups")" 
+	done
+	echo "$groups"
+	echo
+	comm -3 <(pacman -Qqe | sort -u) <(pacman -Qqge $groups | sort -u)
+	;;
+    -R)
+	shift
+	sudo pacman -D --asdeps "$@"
+	while sudo pacman -R --noconfirm $(pacman -Qqdt); do
+	    :
+	done
+	;;
+    *)
+	if command -v pacaur > /dev/null 2>&1; then
+	    pacaur "$@"
+	else
+	    sudo pacman "$@"
+	fi
+	;;
+esac

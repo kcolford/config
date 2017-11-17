@@ -1,0 +1,11 @@
+#!/bin/sh
+stowdir="$HOME"/config/"$1"
+shift
+for file; do
+    realfile="$(realpath --relative-to ~ "$file")"
+    realdir="$(dirname "$realfile")"
+    mkdir -p "$stowdir"/"$realdir"
+    mv "$file" "$stowdir"/"$realfile"
+    ln -sr "$stowdir"/"$realfile" "$file"
+done
+

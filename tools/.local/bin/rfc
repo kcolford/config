@@ -1,0 +1,2 @@
+#!/bin/bash
+curl -s https://ietf.org/rfc/rfc"${1:--index}".txt | less 

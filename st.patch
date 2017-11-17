@@ -19,25 +19,3 @@ diff -aur a/config.h b/config.h
  
  /*
   * spaces per tab
-Only in b: pkg
-diff -aur a/PKGBUILD b/PKGBUILD
---- a/PKGBUILD	2016-10-31 09:48:24.000000000 -0400
-+++ b/PKGBUILD	2017-11-16 16:06:01.874320126 -0500
-@@ -3,7 +3,7 @@
- 
- pkgname=st
- pkgver=0.7
--pkgrel=1
-+pkgrel=2
- pkgdesc='A simple virtual terminal emulator for X.'
- arch=('i686' 'x86_64')
- license=('MIT')
-@@ -13,7 +13,7 @@
- source=(http://dl.suckless.org/st/$pkgname-$pkgver.tar.gz
-         config.h)
- md5sums=('29b2a599cf1511c8062ed8f025c84c63'
--         '9cb789e3912df36f296a219e1b9da850')
-+         '0889d49ec41b6196786400434c72e55c')
- 
- prepare() {
-   cd "$srcdir"/$pkgname-$pkgver
