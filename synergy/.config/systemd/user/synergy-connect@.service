@@ -1,0 +1,9 @@
+[Unit]
+Description=Use synergy to connect to the display on host %I
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/env synergy-connect %I
+
+[Install]
+WantedBy=default.target
