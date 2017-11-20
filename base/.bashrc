@@ -9,11 +9,11 @@ if [ "$TERM" != "dumb" ]; then
 fi
 
 # shell features
-shopt -s cdspell checkwinsize dirspell globstar nullglob
+shopt -s checkwinsize globstar
 HISTCONTROL=erasedups
 
 # modify prompt
-PS1="\$RED${?/#0/\$GREEN}$PS1\$RESET"
+PS1="\[$RED\]\${?/#0/\[$GREEN\]}$PS1\[$RESET\]"
 
 # aliases
 alias cower='cower --rsort=votes'

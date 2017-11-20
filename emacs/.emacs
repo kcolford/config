@@ -42,9 +42,6 @@
       (set-frame-parameter nil 'alpha 60))))
 (global-set-key (kbd "C-`") 'toggle-transparent)
 
-;; bugfixes
-(setq xterm-extra-capabilities nil)
-
 ;; tramp
 (setq tramp-default-method "ssh")
 (setq auto-revert-remote-files t)

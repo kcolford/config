@@ -16,7 +16,7 @@ bindsym $mod+Shift+r restart
 bindsym $mod+Shift+e exit
 bindsym $mod+i exec --no-startup-id i3lock && systemctl suspend
 
-bindsym $mod+Return exec --no-startup-id st
+bindsym $mod+Return exec xterm
 bindsym $mod+b exec chromium
 bindsym $mod+u exec emacs
 bindsym $mod+n exec dmenu_run
