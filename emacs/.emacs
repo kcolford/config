@@ -60,6 +60,7 @@
 (global-set-key (kbd "C-\\") 'bury-buffer)
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "C-=") 'caps-lock-mode)
+(global-set-key (kbd "M-]") 'ffap)
 (icomplete-mode)
 (save-place-mode)
 (show-paren-mode)
