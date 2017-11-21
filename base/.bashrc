@@ -17,6 +17,7 @@ PS1="\[$RED\]\${?/#0/\[$GREEN\]}$PS1\[$RESET\]"
 
 # aliases
 alias cower='cower --rsort=votes'
+alias curl='curl -L'
 alias diff='diff -aur'
 alias docker='sudo docker'
 alias docker-compose='sudo docker-compose'

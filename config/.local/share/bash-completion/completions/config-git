@@ -1,6 +1,0 @@
-# -*- sh -*-
-_completion_loader git
-_config-git() {
-    _git
-}
-complete -F _config-git config-git
