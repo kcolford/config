@@ -29,3 +29,9 @@ alias lns='ln -sfr'
 alias ls='ls --color=auto -CFH'
 alias tcpdump='sudo tcpdump -Z $USER'
 alias xclip='xclip -selection clipboard'
+
+for file in /{etc,usr{,/local}/share/bash-completion}/bash_completion; do
+    if [[ -f "$file" ]]; then
+	. "$file"
+    fi
+done
