@@ -6,4 +6,4 @@ XTerm.vt100.saveLines: 4096
 XTerm.vt100.background: black
 XTerm.vt100.foreground: white
 XTerm.vt100.reverseVideo: false
-XTerm.vt100.faceName: xos4 Terminus:pixelsize=14
+XTerm.vt100.faceName: Terminus:pixelsize=14
