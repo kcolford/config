@@ -3,5 +3,7 @@ XTerm.vt100.metaSendsEscape: true
 XTerm.vt100.backarrowKey: false
 XTerm.ttyModes: erase ^?
 XTerm.vt100.saveLines: 4096
-XTerm.vt100.reverseVideo: true
+XTerm.vt100.background: black
+XTerm.vt100.foreground: white
+XTerm.vt100.reverseVideo: false
 XTerm.vt100.faceName: xos4 Terminus:pixelsize=14
