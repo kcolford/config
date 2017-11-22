@@ -21,6 +21,7 @@ bindsym $mod+b exec chromium
 bindsym $mod+u exec emacs
 bindsym $mod+n exec dmenu_run
 bindsym $mod+m exec transset-df -a -t
+bindsym $mod+p exec passmenu
 bindsym $mod+comma exec transset-df -a --dec 0.1
 bindsym $mod+period exec transset-df -a --inc 0.1
 bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight +3
