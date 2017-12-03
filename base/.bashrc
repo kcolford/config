@@ -17,17 +17,14 @@ PS1="\[$RED\]\${?/#0/\[$GREEN\]}$PS1\[$RESET\]"
 
 # aliases
 alias cower='cower --rsort=votes'
-alias curl='curl -L'
+alias curl='curl -Ls'
 alias diff='diff -aur'
-alias docker='sudo docker'
-alias docker-compose='sudo docker-compose'
 alias e='$EDITOR'
 alias gpgv='gpg --verify'
 alias grep='grep --color=auto'
 alias igrep='grep -i'
 alias lns='ln -sfr'
 alias ls='ls --color=auto -CFH'
-alias tcpdump='sudo tcpdump -Z $USER'
 alias xclip='xclip -selection clipboard'
 
 for file in /{etc,usr{,/local}/share/bash-completion}/bash_completion; do
