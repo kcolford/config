@@ -5,7 +5,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (company-try-hard auctex caps-lock clang-format cmake-mode company company-auctex company-c-headers company-dict company-flx company-go company-irony company-irony-c-headers company-shell company-statistics company-web csv-mode docker-compose-mode dockerfile-mode dummy-h-mode editorconfig elpy flycheck-irony gitconfig-mode gitignore-mode go-mode google google-c-style haskell-mode hc-zenburn-theme irony irony-eldoc json-mode magit markdown-mode projectile ssh-config-mode systemd web-mode yaml-mode))))
+    (company-ghc yasnippet company-try-hard auctex caps-lock clang-format cmake-mode company company-auctex company-c-headers company-dict company-flx company-go company-irony company-irony-c-headers company-shell company-statistics company-web csv-mode docker-compose-mode dockerfile-mode dummy-h-mode editorconfig elpy flycheck-irony gitconfig-mode gitignore-mode go-mode google google-c-style haskell-mode hc-zenburn-theme irony irony-eldoc json-mode magit markdown-mode projectile ssh-config-mode systemd web-mode yaml-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -48,6 +48,8 @@
 (setq enable-remote-dir-locals t)
 
 ;; appearance
+(autoload 'zone-when-idle "zone")
+(zone-when-idle 300)
 (menu-bar-mode 0)
 (scroll-bar-mode 0)
 (tool-bar-mode 0)
@@ -76,6 +78,7 @@
 (global-auto-revert-mode)
 (global-company-mode)
 (global-eldoc-mode)
+(yas-global-mode)
 
 ;; project management
 (projectile-mode)
@@ -192,3 +195,7 @@
 (global-set-key (kbd "C-c b") 'org-iswitchb)
 (global-set-key (kbd "C-c c") 'org-capture)
 (global-set-key (kbd "C-c l") 'org-store-link)
+
+;; haskell
+(with-eval-after-load 'haskell-mode
+  (add-to-list 'company-backends 'company-haskell))

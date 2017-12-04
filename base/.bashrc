@@ -10,24 +10,23 @@ fi
 
 # shell features
 shopt -s checkwinsize globstar
-HISTCONTROL=erasedups
+HISTCONTROL=ignoreboth
 
 # modify prompt
 PS1="\[$RED\]\${?/#0/\[$GREEN\]}$PS1\[$RESET\]"
 
 # aliases
 alias cower='cower --rsort=votes'
-alias curl='curl -L'
-alias diff='diff -aur'
-alias docker='sudo docker'
-alias docker-compose='sudo docker-compose'
+alias curl='curl --location'
+alias diff='diff --text --unified --recursive'
 alias e='$EDITOR'
+alias ghc='ghc -dynamic'
+alias gpg='gpg --armor'
 alias gpgv='gpg --verify'
 alias grep='grep --color=auto'
-alias igrep='grep -i'
-alias lns='ln -sfr'
-alias ls='ls --color=auto -CFH'
-alias tcpdump='sudo tcpdump -Z $USER'
+alias igrep='grep --ignore-case'
+alias ls='ls --color=auto --classify --dereference-command-line'
+alias tcpdump='sudo tcpdump --relinquish-privileges $USER'
 alias xclip='xclip -selection clipboard'
 
 for file in /{etc,usr{,/local}/share/bash-completion}/bash_completion; do
