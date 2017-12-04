@@ -1,0 +1,5 @@
+[General]
+KeepClipboardContents=false
+MaxClipItems=1
+PreventEmptyClipboard=false
+Version=5.9.5
