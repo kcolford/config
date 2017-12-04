@@ -5,6 +5,7 @@ archlinux
 emacs
 git
 gnupg
+gpg-ssh-agent
 ssh
 xterm
 
