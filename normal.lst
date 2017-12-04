@@ -2,6 +2,7 @@ base
 tools
 
 archlinux
+emacs
 git
 gnupg
 ssh
