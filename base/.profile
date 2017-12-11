@@ -1,4 +1,3 @@
-export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-$(mktemp -d)}"
 export NAME="${NAME:-$(getent passwd "$USER" | cut -d : -f 5 | cut -d , -f 1)}"
 export EMAIL="${EMAIL:-${USER}@$(hostname --domain)}"
 
@@ -15,13 +14,14 @@ export TEXEDIT="$EDITOR +%d %s"
 export ALTERNATE_EDITOR="nano"
 
 export PATH=/usr/lib/ccache/bin:"$PATH"
-export CCACHE_PREFIX="distcc"
-export MAKEFLAGS="-j$(distcc -j || nproc)"
+if distcc -j > /dev/null 2>&1; then
+    export CCACHE_PREFIX="distcc"
+    export MAKEFLAGS="-j$(distcc -j)"
+else
+    export MAKEFLAGS="-j$(nproc)"
+fi
 
 export PREFIX_="$HOME"/.local
 . ~/.push_env
 
-# fail gracefully without systemd
-install -Dm755 "$(which true)" "$XDG_RUNTIME_DIR"/fake_bin/systemctl
-PATH="$PATH:$XDG_RUNTIME_DIR"/fake_bin systemctl --user import-environment PATH
-rm -r "$XDG_RUNTIME_DIR"/fake_bin
+systemctl --user import-environment
