@@ -1,0 +1,5 @@
+#!/bin/sh
+
+export ALTERNATE_EDITOR="$EDITOR"
+export EDITOR="emacsclient -nw"
+export TEXEDIT="$EDITOR +%d %s"

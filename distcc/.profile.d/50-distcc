@@ -1,0 +1,5 @@
+#!/bin/sh
+
+export CCACHE_PREFIX=distcc
+export PATH=/usr/lib/distcc:"$PATH"
+export MAKEFLAGS="-j$(distcc -j)"

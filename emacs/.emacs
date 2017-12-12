@@ -148,7 +148,7 @@
   (add-to-list 'company-backends 'company-shell))
 
 ;; web
-(add-to-list 'auto-mode-alist '("\\.\\(css|htm|html|jsx|php|xml\\)\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.\\(?:css|htm|html|jsx|php|xml\\)\\'" . web-mode))
 (with-eval-after-load 'web-mode
   (add-to-list 'company-backends 'company-web-html)
   (add-to-list 'company-backends 'company-web-jade)

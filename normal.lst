@@ -1,5 +1,7 @@
 base
 tools
+compile
+prefix
 
 archlinux
 emacs

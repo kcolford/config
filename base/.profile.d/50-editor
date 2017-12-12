@@ -1,0 +1,5 @@
+#!/bin/sh
+
+export PAGER=less
+export LESS=FRSXi
+export EDITOR=nano

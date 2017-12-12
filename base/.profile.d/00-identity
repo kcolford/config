@@ -1,0 +1,4 @@
+#!/bin/sh
+
+export NAME="${NAME:-$(getent passwd "$USER" | cut -d : -f 5 | cut -d , -f 1)}"
+export EMAIL="${EMAIL:-${USER}@$(hostname --domain)}"
