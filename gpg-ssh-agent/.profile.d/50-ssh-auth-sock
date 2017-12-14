@@ -1,3 +1,2 @@
 #!/bin/sh
 export SSH_AUTH_SOCK="${SSH_AUTH_SOCK:-$(gpgconf --list-dirs agent-ssh-socket)}"
-gpg-connect-agent updatestartuptty /bye
