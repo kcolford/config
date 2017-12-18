@@ -48,7 +48,7 @@
 (setq enable-remote-dir-locals t)
 
 ;; appearance
-(autoload 'zone-when-idle "zone")
+;(autoload 'zone-when-idle "zone")
 (zone-when-idle 300)
 (menu-bar-mode 0)
 (scroll-bar-mode 0)
