@@ -206,7 +206,12 @@
 
 (use-package web-mode
   :ensure t
-  :mode "\\.\\(?:css|htm|html|jsx|php|xml\\)\\'")
+  :mode "\\.css\\'"
+  :mode "\\.htm\\'"
+  :mode "\\.html\\'"
+  :mode "\\.jsx\\'"
+  :mode "\\.php\\'"
+  :mode "\\.xml\\'")
 
 (use-package company-web
   :ensure t
@@ -282,26 +287,27 @@
 (add-hook 'c-mode-common-hook 'clang-format-buffer-mode)
 
 ;; just install these and use their autoloads
-(setq use-package-always-defer t)
-(setq use-package-always-ensure t)
-(use-package auctex)
-(use-package clang-format)
-(use-package csv-mode)
-(use-package docker-compose-mode)
-(use-package dockerfile-mode)
-(use-package gitconfig-mode)
-(use-package gitconfig-mode)
-(use-package gitignore-mode)
-(use-package google)
-(use-package haskell-mode)
-(use-package hc-zenburn-theme :init (load-theme 'hc-zenburn t))
-(use-package json-mode)
-(use-package magit)
-(use-package markdown-mode)
-(use-package pkgbuild-mode)
-(use-package ssh-config-mode)
-(use-package systemd)
-(use-package yaml-mode)
+(defmacro install-package (pkgname &rest args)
+  "Invoke `use-package' with ``:defer' and `:ensure'."
+  `(use-package ,pkgname :defer t :ensure t ,@args))
+(install-package auctex)
+(install-package clang-format)
+(install-package csv-mode)
+(install-package docker-compose-mode)
+(install-package dockerfile-mode)
+(install-package gitconfig-mode)
+(install-package gitconfig-mode)
+(install-package gitignore-mode)
+(install-package google)
+(install-package haskell-mode)
+(install-package hc-zenburn-theme :init (load-theme 'hc-zenburn t))
+(install-package json-mode)
+(install-package magit)
+(install-package markdown-mode)
+(install-package pkgbuild-mode)
+(install-package ssh-config-mode)
+(install-package systemd)
+(install-package yaml-mode)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -310,13 +316,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (use-package-ensure-system-package use-package pkgbuild-mode company-ghc yasnippet company-try-hard auctex caps-lock clang-format cmake-mode company company-auctex company-c-headers company-dict company-flx company-go company-irony company-irony-c-headers company-shell company-statistics company-web csv-mode docker-compose-mode dockerfile-mode dummy-h-mode editorconfig elpy flycheck-irony gitconfig-mode gitignore-mode go-mode google google-c-style haskell-mode hc-zenburn-theme irony irony-eldoc json-mode magit markdown-mode projectile ssh-config-mode systemd web-mode yaml-mode)))
- '(safe-local-variable-values
-   (quote
-    ((eval add-hook
-	   (quote after-save-hook)
-	   (quote emacs-lisp-byte-compile)
-	   nil t)))))
+    (use-package-ensure-system-package use-package pkgbuild-mode company-ghc yasnippet company-try-hard auctex caps-lock clang-format cmake-mode company company-auctex company-c-headers company-dict company-flx company-go company-irony company-irony-c-headers company-shell company-statistics company-web csv-mode docker-compose-mode dockerfile-mode dummy-h-mode editorconfig elpy flycheck-irony gitconfig-mode gitignore-mode go-mode google google-c-style haskell-mode hc-zenburn-theme irony irony-eldoc json-mode magit markdown-mode projectile ssh-config-mode systemd web-mode yaml-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
