@@ -181,7 +181,6 @@
 
 (use-package elpy
   :ensure t
-  :after python
   :init
   (setq elpy-rpc-timeout 10)
   (define-save-minor-mode elpy-format-code)
