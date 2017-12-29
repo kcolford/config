@@ -33,7 +33,6 @@
       (set-frame-parameter nil 'alpha 60))))
 (global-set-key (kbd "C-`") 'toggle-transparent)
 
-;; save hooks
 (defmacro define-save-minor-mode (fn &optional doc)
   "Define a minor mode `fn-mode' that triggers FN every time a file is saved."
   (let ((mode (intern (format "%s-mode" fn))))
@@ -44,12 +43,13 @@
 	   (remove-hook 'before-save-hook (quote ,fn) t)))
        (add-to-list 'safe-local-eval-forms '(,mode 0)))))
 
-(use-package use-package
-  :ensure t)
+(define-save-minor-mode whitespace-cleanup)
+
+(install-package use-package)
 
 (use-package use-package-ensure-system-package
   :ensure t)
-
+ 
 (use-package server
   :bind ("C-x C-z" . server-edit)
   :demand t
@@ -164,9 +164,7 @@
   :mode "\\.go\\'"
   :commands gofmt-before-save
   :ensure-system-package (goimports . "go get golang.org/x/tools/cmd/goimports")
-  :defines gofmt-command
-  :defines gofmt-show-errors
-  :init
+  :init 
   (setq gofmt-show-errors nil)
   (setq gofmt-command "goimports")
   (add-hook 'go-mode-hook (lambda ()
@@ -177,6 +175,7 @@
   :ensure t
   :after go-mode
   :after company
+  :ensure-system-package (gocode . "go get github.com/nsf/gocode")
   :config (add-to-list 'company-backends 'company-go))
 
 (use-package elpy
@@ -301,6 +300,8 @@
 (install-package haskell-mode)
 (install-package hc-zenburn-theme :init (load-theme 'hc-zenburn t))
 (install-package json-mode)
+(define-save-minor-mode json-mode-beautify)
+(add-hook 'json-mode-hook 'json-mode-beautify-mode)
 (install-package magit)
 (install-package markdown-mode)
 (install-package pkgbuild-mode)
