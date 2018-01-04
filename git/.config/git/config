@@ -22,5 +22,6 @@
 	insteadOf = "aur:"
 [url "aur@aur.archlinux.org:"]
 	pushInsteadOf = "https://aur.archlinux.org/"
+	pushInsteadof = "aur:"
 [merge]
 	tool = emerge

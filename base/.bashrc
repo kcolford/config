@@ -3,7 +3,6 @@
 # colors
 if [ "$TERM" != "dumb" ]; then
     RED="$(tput setaf 1)"
-    # shellcheck disable=SC2034
     GREEN="$(tput setaf 2)"
     RESET="$(tput sgr0)"
 fi
@@ -13,7 +12,7 @@ shopt -s checkwinsize globstar
 HISTCONTROL=ignoreboth
 
 # modify prompt
-PS1="\[$RED\]\${?/#0/\[$GREEN\]}$PS1\[$RESET\]"
+PS1="\\[$RED\\]\${?/#0/\\[$GREEN\\]}$PS1\\[$RESET\\]"
 
 # aliases
 alias cower='cower --rsort=votes'
@@ -33,6 +32,7 @@ alias xclip='xclip -selection clipboard'
 
 for file in /{etc,usr{,/local}/share/bash-completion}/bash_completion; do
     if [[ -f "$file" ]]; then
+	# shellcheck disable=SC1090
 	. "$file"
     fi
 done

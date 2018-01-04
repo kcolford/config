@@ -1,0 +1,2 @@
+#!/bin/sh
+"${TERMINAL:-xterm}" > /dev/null 2>&1 &
