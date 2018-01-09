@@ -16,7 +16,7 @@ PS1="\\[$RED\\]\${?/#0/\\[$GREEN\\]}$PS1\\[$RESET\\]"
 
 # aliases
 alias cower='cower --rsort=votes'
-alias curl='curl --location'
+alias curl='curl --location --cookie ~/.cookies.txt --cookie-jar ~/.cookies.txt'
 alias diff='diff --text --unified --recursive'
 alias e='$EDITOR'
 alias ghc='ghc -dynamic'
