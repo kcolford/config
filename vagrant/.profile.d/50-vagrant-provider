@@ -3,4 +3,4 @@
 if which vagrant > /dev/null 2>&1; then
     vagrant plugin install vagrant-libvirt > /dev/null 2>&1 &
 fi
-export VAGRANT_DEFAULT_PROVIDER=libvirt
+
