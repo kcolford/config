@@ -1,5 +1,6 @@
 #!/bin/sh
-
-cd "$(dirname "$0")" || exit
-ln -sf ~ .homelink
+set -e
+cd "$(dirname "$0")"
+git pull
+ln -sfn ~ .homelink
 xargs stow < normal.lst
