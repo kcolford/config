@@ -97,7 +97,7 @@
 (use-package dired
   :bind (:map dired-mode-map
 	      ("b" . browse-url-of-dired-file)))
-
+ 
 (use-package dired-x
   :after dired
   :hook (dired-mode . dired-omit-mode))
@@ -203,9 +203,6 @@
 
 (use-package web-mode
   :ensure t
-  :mode "\\.css\\'"
-  :mode "\\.htm\\'"
-  :mode "\\.html\\'"
   :mode "\\.jsx\\'"
   :mode "\\.php\\'"
   :mode "\\.xml\\'")
