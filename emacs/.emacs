@@ -204,9 +204,6 @@
 
 (use-package web-mode
   :ensure t
-  :mode "\\.css\\'"
-  :mode "\\.htm\\'"
-  :mode "\\.html\\'"
   :mode "\\.jsx\\'"
   :mode "\\.php\\'"
   :mode "\\.xml\\'")
