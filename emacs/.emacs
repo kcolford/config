@@ -55,6 +55,17 @@
 (use-package use-package-ensure-system-package
   :ensure t)
 
+(use-package prettier-js
+  :ensure t
+  :hook ((js2-mode . prettier-js-mode)
+	 (js-mode . prettier-js-mode)
+	 (web-mode . prettier-js-mode)
+	 (html-mode . prettier-js-mode)
+	 (markdown-mode . prettier-js-mode)
+	 (css-mode . prettier-js-mode)
+	 (less-css-mode . prettier-js-mode)
+	 (json-mode . prettier-js-mode)))
+
 (use-package server
   :bind ("C-x C-z" . server-edit)
   :demand t
@@ -301,14 +312,14 @@
 (install-package haskell-mode)
 (install-package hc-zenburn-theme :init (load-theme 'hc-zenburn t))
 (install-package json-mode)
-(define-save-minor-mode json-mode-beautify)
-(add-hook 'json-mode-hook 'json-mode-beautify-mode)
 (install-package magit)
 (install-package markdown-mode)
 (install-package pkgbuild-mode)
 (install-package ssh-config-mode)
 (install-package systemd)
 (install-package yaml-mode)
+
+(install-package js2-mode :mode "\\.js\\'")
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -317,7 +328,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (less-css-mode flycheck use-package-ensure-system-package use-package pkgbuild-mode company-ghc yasnippet company-try-hard auctex caps-lock clang-format cmake-mode company company-auctex company-c-headers company-dict company-flx company-go company-irony company-irony-c-headers company-shell company-statistics company-web csv-mode docker-compose-mode dockerfile-mode dummy-h-mode editorconfig elpy flycheck-irony gitconfig-mode gitignore-mode go-mode google google-c-style haskell-mode hc-zenburn-theme irony irony-eldoc json-mode magit markdown-mode projectile ssh-config-mode systemd web-mode yaml-mode))))
+    (js2-mode prettier-js less-css-mode flycheck use-package-ensure-system-package use-package pkgbuild-mode company-ghc yasnippet company-try-hard auctex caps-lock clang-format cmake-mode company company-auctex company-c-headers company-dict company-flx company-go company-irony company-irony-c-headers company-shell company-statistics company-web csv-mode docker-compose-mode dockerfile-mode dummy-h-mode editorconfig elpy flycheck-irony gitconfig-mode gitignore-mode go-mode google google-c-style haskell-mode hc-zenburn-theme irony irony-eldoc json-mode magit markdown-mode projectile ssh-config-mode systemd web-mode yaml-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
