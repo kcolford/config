@@ -57,6 +57,7 @@
 
 (use-package prettier-js
   :ensure t
+  :ensure-system-package (prettier . "npm install -g prettier-js")
   :hook ((js2-mode . prettier-js-mode)
 	 (js-mode . prettier-js-mode)
 	 (web-mode . prettier-js-mode)
