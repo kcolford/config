@@ -4,7 +4,7 @@
 (require 'use-package)
 (add-to-list 'safe-local-eval-forms
 	     '(add-hook 'after-save-hook 'emacs-lisp-byte-compile nil t))
-(menu-bar-mode 0) 
+(menu-bar-mode 0)
 (scroll-bar-mode 0)
 (tool-bar-mode 0)
 (ignore-errors (set-frame-font "Terminus:pixelsize=14"))
@@ -22,6 +22,12 @@
 (setq TeX-auto-save t)
 (setq TeX-parse-self t)
 (setq-default TeX-master 'dwim)
+
+(add-hook 'emacs-lisp-mode-hook 'whitespace-cleanup-mode)
+
+(defmacro install-package (pkgname &rest args)
+  "Invoke `use-package' with ``:defer' and `:ensure'."
+  `(use-package ,pkgname :defer t :ensure t ,@args))
 
 (defun toggle-transparent ()
   "Toggle the transparancy of the current frame."
@@ -48,7 +54,7 @@
 
 (use-package use-package-ensure-system-package
   :ensure t)
- 
+
 (use-package server
   :bind ("C-x C-z" . server-edit)
   :demand t
@@ -97,7 +103,9 @@
 (use-package dired
   :bind (:map dired-mode-map
 	      ("b" . browse-url-of-dired-file)))
- 
+
+(install-package less-css-mode)
+
 (use-package dired-x
   :after dired
   :hook (dired-mode . dired-omit-mode))
@@ -163,7 +171,7 @@
   :mode "\\.go\\'"
   :commands gofmt-before-save
   :ensure-system-package (goimports . "go get golang.org/x/tools/cmd/goimports")
-  :init 
+  :init
   (setq gofmt-show-errors nil)
   (setq gofmt-command "goimports")
   (add-hook 'go-mode-hook (lambda ()
@@ -281,9 +289,6 @@
 (add-hook 'c-mode-common-hook 'clang-format-buffer-mode)
 
 ;; just install these and use their autoloads
-(defmacro install-package (pkgname &rest args)
-  "Invoke `use-package' with ``:defer' and `:ensure'."
-  `(use-package ,pkgname :defer t :ensure t ,@args))
 (install-package auctex)
 (install-package clang-format)
 (install-package csv-mode)
@@ -312,7 +317,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (flycheck use-package-ensure-system-package use-package pkgbuild-mode company-ghc yasnippet company-try-hard auctex caps-lock clang-format cmake-mode company company-auctex company-c-headers company-dict company-flx company-go company-irony company-irony-c-headers company-shell company-statistics company-web csv-mode docker-compose-mode dockerfile-mode dummy-h-mode editorconfig elpy flycheck-irony gitconfig-mode gitignore-mode go-mode google google-c-style haskell-mode hc-zenburn-theme irony irony-eldoc json-mode magit markdown-mode projectile ssh-config-mode systemd web-mode yaml-mode))))
+    (less-css-mode flycheck use-package-ensure-system-package use-package pkgbuild-mode company-ghc yasnippet company-try-hard auctex caps-lock clang-format cmake-mode company company-auctex company-c-headers company-dict company-flx company-go company-irony company-irony-c-headers company-shell company-statistics company-web csv-mode docker-compose-mode dockerfile-mode dummy-h-mode editorconfig elpy flycheck-irony gitconfig-mode gitignore-mode go-mode google google-c-style haskell-mode hc-zenburn-theme irony irony-eldoc json-mode magit markdown-mode projectile ssh-config-mode systemd web-mode yaml-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -323,5 +328,3 @@
 ;; Local Variables:
 ;; eval: (add-hook 'after-save-hook 'emacs-lisp-byte-compile nil t)
 ;; End:
-
-
