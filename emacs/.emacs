@@ -61,7 +61,6 @@
   :hook ((js2-mode . prettier-js-mode)
 	 (js-mode . prettier-js-mode)
 	 (web-mode . prettier-js-mode)
-	 (html-mode . prettier-js-mode)
 	 (markdown-mode . prettier-js-mode)
 	 (css-mode . prettier-js-mode)
 	 (less-css-mode . prettier-js-mode)
