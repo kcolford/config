@@ -196,6 +196,14 @@
   :ensure-system-package (gocode . "go get github.com/nsf/gocode")
   :config (add-to-list 'company-backends 'company-go))
 
+(use-package python
+  :defer t
+  :init
+  (setq python-shell-interpreter "ipython")
+  (setq python-shell-interpreter-args "-i --simple-prompt")
+  :ensure-system-package (ipython . "pip install --user ipython"))
+
+
 (use-package elpy
   :ensure t
   :init
@@ -205,8 +213,7 @@
   (define-save-minor-mode elpy-importmagic-fixup)
   (add-hook 'elpy-mode-hook 'elpy-importmagic-fixup-mode)
   :config
-  (elpy-enable)
-  (elpy-use-ipython))
+  (elpy-enable))
 
 (use-package company-auctex
   :ensure t
