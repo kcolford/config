@@ -29,6 +29,8 @@ bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -3
 exec --no-startup-id dex -a
 exec --no-startup-id ~/.fehbg
 exec --no-startup-id compton
+exec --no-startup-id sleep 3 && xrandr --output Virtual-1 --auto
+exec --no-startup-id lxsession
 
 bindsym $mod+h split h
 bindsym $mod+v split v
