@@ -31,6 +31,7 @@ exec --no-startup-id ~/.fehbg
 exec --no-startup-id compton
 exec --no-startup-id sleep 3 && xrandr --output Virtual-1 --auto
 exec --no-startup-id lxsession
+exec --no-startup-id killall spice-vdagent; spice-vdagent
 
 bindsym $mod+h split h
 bindsym $mod+v split v
