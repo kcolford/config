@@ -25,3 +25,6 @@
 	pushInsteadof = "aur:"
 [merge]
 	tool = emerge
+[user]
+	email = kieran@kcolford.com
+	name = Kieran Colford
