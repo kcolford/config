@@ -1,6 +1,7 @@
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (package-initialize)
+(package-refresh-contents)
 (require 'use-package)
 (add-to-list 'safe-local-eval-forms
 	     '(add-hook 'after-save-hook 'emacs-lisp-byte-compile nil t))
@@ -170,6 +171,8 @@
   :ensure t
   :config (yas-global-mode))
 
+(use-package go-snippets :ensure t)
+
 (use-package projectile
   :ensure t
   :config
@@ -188,6 +191,8 @@
   (add-hook 'go-mode-hook (lambda ()
 			    (add-hook 'before-save-hook
 				      'gofmt-before-save nil t))))
+
+(use-package yasnippet-snippets :ensure t)
 
 (use-package company-go
   :ensure t
@@ -336,7 +341,7 @@
  '(js-indent-level 2)
  '(package-selected-packages
    (quote
-    (js2-mode prettier-js less-css-mode flycheck use-package-ensure-system-package use-package pkgbuild-mode company-ghc yasnippet company-try-hard auctex caps-lock clang-format cmake-mode company company-auctex company-c-headers company-dict company-flx company-go company-irony company-irony-c-headers company-shell company-statistics company-web csv-mode docker-compose-mode dockerfile-mode dummy-h-mode editorconfig elpy flycheck-irony gitconfig-mode gitignore-mode go-mode google google-c-style haskell-mode hc-zenburn-theme irony irony-eldoc json-mode magit markdown-mode projectile ssh-config-mode systemd web-mode yaml-mode))))
+    (yasnippet-snippets go-snippets js2-mode prettier-js less-css-mode flycheck use-package-ensure-system-package use-package pkgbuild-mode company-ghc yasnippet company-try-hard auctex caps-lock clang-format cmake-mode company company-auctex company-c-headers company-dict company-flx company-go company-irony company-irony-c-headers company-shell company-statistics company-web csv-mode docker-compose-mode dockerfile-mode dummy-h-mode editorconfig elpy flycheck-irony gitconfig-mode gitignore-mode go-mode google google-c-style haskell-mode hc-zenburn-theme irony irony-eldoc json-mode magit markdown-mode projectile ssh-config-mode systemd web-mode yaml-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

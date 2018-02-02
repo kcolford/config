@@ -1,5 +1,5 @@
 [http]
-	cookiefile = /home/kieran/.gitcookies
+	cookiefile = ~/.gitcookies
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
