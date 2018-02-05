@@ -235,8 +235,11 @@
 (use-package web-mode
   :ensure t
   :mode "\\.jsx\\'"
+  :mode "\\.phtml\\'"
   :mode "\\.php\\'"
-  :mode "\\.xml\\'")
+  :mode "\\.erb\\'"
+  :mode "\\.mustache\\'"
+  :mode "\\.djhtml\\'")
 
 (use-package company-web
   :ensure t
