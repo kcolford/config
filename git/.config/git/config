@@ -11,6 +11,8 @@
 [alias]
 	pushu = push -u origin HEAD
 	up = fetch --all
+[url "git://git.kernel.org/pub/scm/linux/kernel/git/"]
+	insteadOf = "kern:"
 [url "https://github.com/"]
 	insteadOf = "gh:"
 [url "git@github.com:"]
