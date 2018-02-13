@@ -9,5 +9,6 @@ XTerm*reverseVideo: false
 XTerm*faceName: xos4 Terminus:pixelsize=14
 XTerm*scrollKey: true
 XTerm*scrollTtyOutput: false
+XTerm*selectToClipboard: true
 XTerm*translations: #override \n\
 	Shift Ctrl <Key>T: spawn-new-terminal()

@@ -24,11 +24,19 @@ alias gpg='gpg --armor'
 alias gpgv='gpg --verify'
 alias grep='grep --color=auto'
 alias igrep='grep --ignore-case'
-alias ls='ls --color=auto --classify --dereference-command-line'
+alias ls='ls --color=auto --classify --dereference-command-line --human-readable'
 alias qemu-system-x86_64='qemu-system-x86_64 -accel kvm -smp 2 -m 2048'
 alias systemctl='systemctl --user'
 alias tcpdump='sudo tcpdump --relinquish-privileges $USER'
 alias xclip='xclip -selection clipboard'
+
+git() {
+    if command -v hub > /dev/null 2>&1; then
+	hub "$@"
+    else
+	command git "$@"
+    fi
+}
 
 for file in /{etc,usr{,/local}/share/bash-completion}/bash_completion; do
     if [[ -f "$file" ]]; then
