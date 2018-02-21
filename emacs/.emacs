@@ -153,9 +153,9 @@
   :bind (:map flyspell-mode-map
 	      ("C-M-i" . nil)))
 
-(use-package simple
-  :defer t
-  :hook (text-mode . auto-fill-mode))
+;; (use-package simple
+;;   :defer t
+;;   :hook (text-mode . auto-fill-mode))
 
 (use-package elisp-mode
   :defer t

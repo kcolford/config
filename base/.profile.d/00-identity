@@ -1,4 +1,6 @@
 #!/bin/sh
 
+export NAME="$(git config user.name)"
+export EMAIL="$(git config user.email)"
 export NAME="${NAME:-$(getent passwd "$USER" | cut -d : -f 5 | cut -d , -f 1)}"
 export EMAIL="${EMAIL:-${USER}@$(hostname --domain)}"

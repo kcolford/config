@@ -1,6 +1,0 @@
-#!/bin/sh
-
-if which vagrant > /dev/null 2>&1; then
-    vagrant plugin install vagrant-libvirt > /dev/null 2>&1 &
-fi
-
