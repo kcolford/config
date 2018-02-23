@@ -29,7 +29,7 @@ bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -3
 exec --no-startup-id dex -a
 exec --no-startup-id ~/.fehbg
 exec --no-startup-id compton
-exec --no-startup-id sleep 3 && xrandr --output Virtual-1 --auto
+exec --no-startup-id systemd-run --user --on-active=0 --on-unit-active=30 xrandr --output Virtual-1 --auto
 exec --no-startup-id lxsession
 exec --no-startup-id sleep 2 && killall spice-vdagent; spice-vdagent
 

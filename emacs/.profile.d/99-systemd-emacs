@@ -1,4 +1,0 @@
-#!/bin/sh
-
-systemctl --user import-environment
-systemctl --user restart emacs
