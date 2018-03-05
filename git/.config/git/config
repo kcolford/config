@@ -25,6 +25,10 @@
 [url "aur@aur.archlinux.org:"]
 	pushInsteadOf = "https://aur.archlinux.org/"
 	pushInsteadof = "aur:"
+[url "git://git.sv.gnu.org/"]
+	insteadOf = "gnu:"
+[url "git://anongit.freedesktop.org/"]
+	insteadOf = "freedesktop:"
 [merge]
 	tool = emerge
 [user]
