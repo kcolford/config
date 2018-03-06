@@ -26,7 +26,6 @@ alias grep='grep --color=auto'
 alias igrep='grep --ignore-case'
 alias ls='ls --color=auto --classify --dereference-command-line --human-readable'
 alias qemu-system-x86_64='qemu-system-x86_64 -accel kvm -smp 2 -m 2048'
-alias systemctl='systemctl --user'
 alias tcpdump='sudo tcpdump --relinquish-privileges $USER'
 alias xclip='xclip -selection clipboard'
 
