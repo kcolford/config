@@ -22,8 +22,7 @@
   (fset 'y-or-n-p '(lambda (&rest args) t))
   (package-install-selected-packages)
   (fset 'y-or-n-p oldfunc))
-(eval-when-compile
-  (require 'use-package))
+(require 'use-package)
 (auto-package-update-maybe)
 (add-to-list 'safe-local-eval-forms
 	     '(add-hook 'after-save-hook 'emacs-lisp-byte-compile nil t))
