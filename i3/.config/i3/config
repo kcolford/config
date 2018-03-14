@@ -14,7 +14,7 @@ bindsym $mod+Shift+q kill
 bindsym $mod+Shift+c reload
 bindsym $mod+Shift+r restart
 bindsym $mod+Shift+e exit
-bindsym $mod+i exec --no-startup-id i3lock -c 0f0f0f && systemctl suspend
+bindsym $mod+i exec --no-startup-id loginctl lock-session
 
 bindsym $mod+Return exec xterm
 bindsym $mod+b exec chromium
@@ -29,6 +29,7 @@ bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -3
 exec --no-startup-id dex -a
 exec --no-startup-id ~/.fehbg
 exec --no-startup-id compton
+exec --no-startup-id xss-lock i3lock -n -c 202020
 
 bindsym $mod+h split h
 bindsym $mod+v split v
