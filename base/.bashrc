@@ -30,6 +30,13 @@ alias qemu-system-x86_64='qemu-system-x86_64 -accel kvm -smp 2 -m 2048'
 alias tcpdump='sudo tcpdump --relinquish-privileges $USER'
 alias xclip='xclip -selection clipboard'
 
+alias la='ls -a'
+alias ll='ls -l'
+alias l='ls -la'
+
+alias sl='ls'
+alias LS='ls'
+
 git() {
     if command -v hub > /dev/null 2>&1; then
 	hub "$@"
