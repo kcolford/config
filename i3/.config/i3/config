@@ -19,9 +19,10 @@ bindsym $mod+i exec --no-startup-id loginctl lock-session
 bindsym $mod+Return exec xterm
 bindsym $mod+b exec chromium
 bindsym $mod+u exec emacs
-bindsym $mod+n exec dmenu_run
+bindsym $mod+d exec i3-dmenu-desktop || dmenu_run
 bindsym $mod+m exec transset-df -a -t
 bindsym $mod+p exec passmenu
+bindsym $mod+o exec nautilus
 bindsym $mod+comma exec transset-df -a --dec 0.1
 bindsym $mod+period exec transset-df -a --inc 0.1
 bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight +3
@@ -40,7 +41,7 @@ bindsym $mod+e layout toggle split
 bindsym $mod+Shift+space floating toggle
 bindsym $mod+space focus mode_toggle
 bindsym $mod+a focus parent
-bindsym $mod+d focus child
+bindsym $mod+n focus child
 
 bindsym $mod+$left focus left
 bindsym $mod+$down focus down
