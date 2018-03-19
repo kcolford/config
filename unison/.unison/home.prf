@@ -1,0 +1,5 @@
+fat = true
+auto = true
+path = config
+path = docs
+ignore = Name .homelink
