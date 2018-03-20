@@ -1,5 +1,5 @@
 #!/bin/sh
-set -e
+set -euo pipefail
 cd "$(dirname "$0")"
 git pull
 ln -sfn ~ .homelink

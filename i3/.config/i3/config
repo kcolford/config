@@ -32,6 +32,10 @@ exec --no-startup-id ~/.fehbg
 exec --no-startup-id systemd-run --user compton
 exec --no-startup-id systemd-run --user xss-lock i3lock -n -c 202020
 exec --no-startup-id systemd-run --user udiskie
+exec qbittorrent
+exec dropbox
+exec redshift-gtk
+exec syncthing-gtk
 
 bindsym $mod+h split h
 bindsym $mod+v split v
