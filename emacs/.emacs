@@ -106,9 +106,6 @@
 (use-package ffap
   :bind ("M-]" . ffap))
 
-(use-package caps-lock
-  :bind ("C-=" . caps-lock-mode))
-
 (use-package org
   :bind (("C-c a" . org-agenda)
 	 ("C-c b" . org-iswitchb)
