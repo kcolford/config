@@ -1,6 +1,0 @@
-include default
-root =
-path = config
-path = docs
-ignore = Name .homelink
-ignore = Name *.wants
