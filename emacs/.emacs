@@ -44,6 +44,7 @@
 (setq TeX-auto-save t)
 (setq TeX-parse-self t)
 (setq-default TeX-master 'dwim)
+(setq confirm-kill-emacs 'yes-or-no-p)
 
 (add-hook 'emacs-lisp-mode-hook 'whitespace-cleanup-mode)
 

@@ -1,5 +1,5 @@
-fat = true
-auto = true
+include default
 path = config
 path = docs
 ignore = Name .homelink
+root =

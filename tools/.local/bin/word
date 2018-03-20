@@ -1,0 +1,6 @@
+#!/usr/bin/env python3
+
+import random
+
+with open('/usr/share/dict/words') as f:
+    print(random.choice(f.read().split()).lower().split("'")[0])
