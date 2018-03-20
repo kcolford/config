@@ -1,5 +1,6 @@
 include default
+root =
 path = config
 path = docs
 ignore = Name .homelink
-root =
+ignore = Name *.wants

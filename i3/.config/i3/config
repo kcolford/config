@@ -28,14 +28,15 @@ bindsym $mod+period exec transset-df -a --inc 0.1
 bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight +3
 bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -3
 bindsym Control+equal exec xdotool key Caps_Lock
-exec --no-startup-id systemd-run --user dex -a
+exec --no-startup-id systemctl --user restart emacs
+exec --no-startup-id systemctl --user restart dropbox
 exec --no-startup-id ~/.fehbg
+exec --no-startup-id systemd-run --user dex -a
 exec --no-startup-id systemd-run --user compton
 exec --no-startup-id systemd-run --user xss-lock i3lock -n -c 202020
 exec --no-startup-id systemd-run --user udiskie
+exec --no-startup-id systemd-run --user unison dropbox -repeat watch
 exec qbittorrent
-exec dropbox
-exec redshift-gtk
 exec syncthing-gtk
 
 bindsym $mod+h split h
