@@ -27,13 +27,14 @@ bindsym $mod+comma exec transset-df -a --dec 0.1
 bindsym $mod+period exec transset-df -a --inc 0.1
 bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight +3
 bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -3
-bindsym Control+equal exec xdotool key Caps_Lock
+bindsym $mod+equal exec xdotool key Caps_Lock
 exec --no-startup-id systemctl --user restart emacs
-exec --no-startup-id ~/.fehbg
 exec --no-startup-id systemd-run --user dex -a
 exec --no-startup-id systemd-run --user compton
 exec --no-startup-id systemd-run --user xss-lock i3lock -n -c 202020
 exec --no-startup-id systemd-run --user udiskie
+# exec feh --bg-max "$(xdg-user-dir PICTURES)"/linux_archlinux_os_blue_black_logo_30861_2560x1600.jpg
+exec ~/.fehbg
 exec qbittorrent
 exec syncthing-gtk
 
