@@ -37,7 +37,6 @@
 (save-place-mode)
 (show-paren-mode)
 (setq warning-minimum-log-level :error)
-(setq make-backup-files nil)
 (setq vc-follow-symlinks t)
 (defalias 'yes-or-no-p 'y-or-n-p)
 (require 'generic-x)
