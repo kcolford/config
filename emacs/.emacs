@@ -4,9 +4,14 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(js-indent-level 2)
+ '(package-archives
+   (quote
+    (("melpa-stable" . "https://stable.melpa.org/packages/")
+     ("melpa" . "https://melpa.org/packages/")
+     ("gnu" . "http://elpa.gnu.org/packages/"))))
  '(package-selected-packages
    (quote
-    (edit-server lorem-ipsum auto-package-update yasnippet-snippets go-snippets js2-mode prettier-js less-css-mode flycheck use-package-ensure-system-package use-package pkgbuild-mode company-ghc yasnippet company-try-hard auctex caps-lock clang-format cmake-mode company company-auctex company-c-headers company-dict company-flx company-go company-irony company-irony-c-headers company-shell company-statistics company-web csv-mode docker-compose-mode dockerfile-mode editorconfig elpy flycheck-irony gitconfig-mode gitignore-mode go-mode google google-c-style haskell-mode hc-zenburn-theme irony irony-eldoc json-mode magit markdown-mode projectile ssh-config-mode systemd web-mode yaml-mode))))
+    (use-package-chords diminish edit-server lorem-ipsum auto-package-update yasnippet-snippets go-snippets js2-mode prettier-js less-css-mode flycheck use-package-ensure-system-package use-package pkgbuild-mode company-ghc yasnippet company-try-hard caps-lock clang-format cmake-mode company company-auctex auctex company-c-headers company-dict company-flx company-go company-irony company-irony-c-headers company-shell company-statistics company-web csv-mode docker-compose-mode dockerfile-mode editorconfig elpy flycheck-irony gitconfig-mode gitignore-mode go-mode google google-c-style haskell-mode hc-zenburn-theme irony irony-eldoc json-mode magit markdown-mode projectile ssh-config-mode systemd web-mode yaml-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -14,48 +19,65 @@
  ;; If there is more than one, they won't work right.
  )
 
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (package-initialize)
-(package-refresh-contents)
-(let ((oldfunc (symbol-function 'y-or-n-p)))
-  (fset 'y-or-n-p '(lambda (&rest args) t))
-  (package-install-selected-packages)
-  (fset 'y-or-n-p oldfunc))
-(require 'use-package)
-(auto-package-update-maybe)
-(add-to-list 'safe-local-eval-forms
-	     '(add-hook 'after-save-hook 'emacs-lisp-byte-compile nil t))
-(menu-bar-mode 0)
+(let ((firstrun (concat user-emacs-directory "firstrun")))
+  (unless (file-readable-p firstrun)
+    (package-refresh-contents)
+    (let ((oldfunc (symbol-function 'y-or-n-p)))
+      (fset 'y-or-n-p '(lambda (&rest args) t))
+      ;; (package-install-selected-packages)
+      (package-install 'use-package)
+      (fset 'y-or-n-p oldfunc))
+    (with-temp-buffer (write-file firstrun))))
+(eval-when-compile
+  (require 'use-package))
+(use-package auto-package-update
+  :ensure t
+  :if (daemonp)
+  :config (auto-package-update-maybe))
+(use-package bind-key
+  :ensure t)
+(use-package diminish
+  :ensure t)
+;; (add-hook 'after-save-hook		;compile the init file
+;;	  (lambda () (when (equal buffer-file-name user-init-file)
+;;		       (emacs-lisp-byte-compile))))
+;; (menu-bar-mode 0)
 (scroll-bar-mode 0)
 (tool-bar-mode 0)
 (ignore-errors (set-frame-font "Terminus:pixelsize=14"))
 (ignore-errors (set-frame-font "xos4 Terminus:pixelsize=14"))
 (setq inhibit-startup-screen t)
-(global-set-key (kbd "C-\\") 'bury-buffer)
 (icomplete-mode)
 (save-place-mode)
+(global-auto-revert-mode)
 (show-paren-mode)
 (setq warning-minimum-log-level :error)
 (setq vc-follow-symlinks t)
 (defalias 'yes-or-no-p 'y-or-n-p)
-(require 'generic-x)
-(setq TeX-auto-save t)
-(setq TeX-parse-self t)
-(setq-default TeX-master 'dwim)
+(setq sentence-end-double-space nil)
 (setq confirm-kill-emacs 'yes-or-no-p)
 (setq browse-url-browser-function 'browse-url-xdg-open)
-
+(setq tramp-default-method "ssh")
+(setq auto-revert-remote-files t)
+(setq enable-remote-dir-locals t)
 (add-hook 'emacs-lisp-mode-hook 'whitespace-cleanup-mode)
+(bind-key "C-\\" 'bury-buffer)
+(bind-key "C-x C-b" 'ibuffer)
+(bind-key "M-]" 'ffap)
+(use-package generic-x)
 
-(defun toggle-transparent ()
-  "Toggle the transparancy of the current frame."
+(use-package use-package-chords
+  :ensure t
+  :config (key-chord-mode 1))
+
+(use-package system-packages
+  :ensure t)
+
+(defun dired-mark-dotfiles ()
+  "Hide all dotfiles in dired."
   (interactive)
-  (let ((alpha (frame-parameter nil 'alpha)))
-    (if (and alpha (not (eq 100 alpha)))
-	(set-frame-parameter nil 'alpha 100)
-      (set-frame-parameter nil 'alpha 60))))
-(global-set-key (kbd "C-`") 'toggle-transparent)
+  (dired-mark-files-regexp "^\\."))
 
 (defmacro define-save-minor-mode (fn &optional doc)
   "Define a minor mode `fn-mode' that triggers FN every time a file is saved."
@@ -70,6 +92,7 @@
 (define-save-minor-mode whitespace-cleanup)
 
 (use-package prettier-js
+  :ensure-system-package prettier
   :hook ((js2-mode . prettier-js-mode)
 	 (js-mode . prettier-js-mode)
 	 (web-mode . prettier-js-mode)
@@ -82,13 +105,13 @@
   :init (load-theme 'hc-zenburn t))
 
 (use-package edit-server
-  :config (when (daemonp)
-	    (edit-server-start)))
+  :if (daemonp)
+  :config (edit-server-start))
 
 (use-package server
-  :bind ("C-x C-z" . server-edit)
-  :demand t
   :config
+  ;; every emacs is an emacs server so that local shells use the
+  ;; current editor to edit
   (unless (daemonp)
     (setq server-name (format "server-%s" (emacs-pid)))
     (server-start))
@@ -100,24 +123,18 @@
   :hook (LaTeX-mode . reftex-mode)
   :hook (latex-mode . reftex-mode))
 
-(use-package ibuffer
-  :bind ("C-x C-b" . ibuffer))
-
-(use-package ffap
-  :bind ("M-]" . ffap))
-
 (use-package org
   :bind (("C-c a" . org-agenda)
 	 ("C-c b" . org-iswitchb)
 	 ("C-c c" . org-capture)
 	 ("C-c l" . org-store-link)))
 
-(use-package tramp
-  :defer t
-  :init
-  (setq tramp-default-method "ssh")
-  (setq auto-revert-remote-files t)
-  (setq enable-remote-dir-locals t))
+(use-package tex
+  :ensure auctex
+  :config
+  (setq TeX-auto-save t)
+  (setq TeX-parse-self t)
+  (setq-default TeX-master 'dwim))
 
 (use-package zone
   :disabled
@@ -129,26 +146,23 @@
 
 (use-package dired
   :bind (:map dired-mode-map
-	      ("b" . browse-url-of-dired-file)))
+	      ("b" . browse-url-of-dired-file)
+	      ("," . dired-mark-dotfiles)))
+
+
 
 (use-package dired-x
+  :disabled
   :after dired
   :hook (dired-mode . dired-omit-mode))
 
 (use-package text-mode
-  :defer t
-  :init
-  (setq sentence-end-double-space nil)
-  (add-to-list 'auto-mode-alist '("README" . text-mode) t))
+  :mode "README")
 
 (use-package flyspell
   :hook (text-mode . flyspell-mode)
   :bind (:map flyspell-mode-map
 	      ("C-M-i" . nil)))
-
-;; (use-package simple
-;;   :defer t
-;;   :hook (text-mode . auto-fill-mode))
 
 (use-package elisp-mode
   :defer t
@@ -195,8 +209,7 @@
 				      'gofmt-before-save nil t))))
 
 (use-package company-go
-  :after go-mode
-  :after company
+  :requires (go-mode company)
   :config (add-to-list 'company-backends 'company-go))
 
 (use-package python
@@ -216,13 +229,12 @@
   (elpy-enable))
 
 (use-package company-auctex
-  :after tex
-  :after company
+  :requires (tex company)
   :config (company-auctex-init))
 
 (use-package company-shell
   :after sh-script
-  :after company
+  :requires company
   :config (add-to-list 'company-backends 'company-shell))
 
 (use-package web-mode
@@ -234,8 +246,7 @@
   :mode "\\.djhtml\\'")
 
 (use-package company-web
-  :after company
-  :after web-mode
+  :requires (company web-mode)
   :config
   (add-to-list 'company-backends 'company-web-html)
   (add-to-list 'company-backends 'company-web-jade)
@@ -245,8 +256,12 @@
   :hook (c-mode-common . google-set-c-style))
 
 (use-package irony
+  :ensure-system-package (cmake clang)
   :hook (c-mode-common . irony-mode)
-  :init (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
+  :init
+  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+  :config
+  (execute-kbd-macro "\M-xirony-install-server\n\n"))
 
 (defun irony-mode-setup-cmake ()
   "Have cmake export compile commands for irony."
@@ -268,14 +283,12 @@
   :hook irony-mode)
 
 (use-package company-irony
-  :after irony
-  :after company
+  :requires (irony company)
   :init (setq company-irony-ignore-case t)
   :config (add-to-list 'company-backends 'company-irony))
 
 (use-package company-irony-c-headers
-  :after irony
-  :after company
+  :requires (irony company)
   :config (add-to-list 'company-backends 'company-irony-c-headers))
 
 (use-package cmake-mode
@@ -287,8 +300,7 @@
   (add-hook 'cmake-mode-hook 'cmake-unscreamify-buffer-mode))
 
 (use-package company-ghc
-  :after haskell
-  :after company
+  :requires (haskell-mode company)
   :config (add-to-list 'company-backends 'company-haskell))
 
 (define-save-minor-mode clang-format-buffer)
@@ -296,6 +308,17 @@
 
 (use-package js2-mode :mode "\\.js\\'")
 
-;; Local Variables:
-;; eval: (add-hook 'after-save-hook 'emacs-lisp-byte-compile nil t)
-;; End:
+;; use xclip to copy/paste in emacs-nox
+(unless window-system
+  (when (getenv "DISPLAY")
+    (system-packages-install "xclip")
+    (defun xclip-cut-function (text &optional push)
+      (with-temp-buffer
+	(insert text)
+	(call-process-region (point-min) (point-max) "xclip" nil 0 nil "-i" "-selection" "clipboard")))
+    (defun xclip-paste-function()
+      (let ((xclip-output (shell-command-to-string "xclip -o -selection clipboard")))
+	(unless (string= (car kill-ring) xclip-output)
+	  xclip-output )))
+    (setq interprogram-cut-function 'xclip-cut-function)
+    (setq interprogram-paste-function 'xclip-paste-function)))
