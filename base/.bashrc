@@ -21,13 +21,12 @@ shopt -s mailwarn
 shopt -s no_empty_cmd_completion
 HISTCONTROL=ignoreboth
 
-# modify prompt
+# colourize prompt according to command status
 PS1="\\[$RED\\]\${?/#0/\\[$GREEN\\]}$PS1\\[$RESET\\]"
 
-# aliases
+# default options
 alias curl='curl --location --cookie ~/.cookies.txt --cookie-jar ~/.cookies.txt'
 alias diff='diff --text --unified --recursive'
-alias e='${VISUAL:-${EDITOR:-nano}}'
 alias ghc='ghc -dynamic'
 alias gpg='gpg --armor'
 alias gpgv='gpg --verify'
@@ -37,6 +36,8 @@ alias ls='ls --hide="*~" --color=auto --classify --dereference-command-line --hu
 alias qemu-system-x86_64='qemu-system-x86_64 -accel kvm -smp 2 -m 2048'
 alias tcpdump='sudo tcpdump --relinquish-privileges $USER'
 
+alias e='${VISUAL:-${EDITOR:-nano}}'
+
 alias la='ls -a'
 alias ll='ls -l'
 alias l='ls -la'
@@ -44,11 +45,21 @@ alias l='ls -la'
 alias sl='ls'
 alias LS='ls'
 
+# github integration for git
 git() {
     if command -v hub > /dev/null 2>&1; then
 	hub "$@"
     else
 	command git "$@"
+    fi
+}
+
+# wrapper to enable relative paths for encfs
+encfs() {
+    if [[ $# != 2 ]] || [[ "$1" = -* ]] || [[ "$2" = -* ]]; then
+	command encfs "$@"
+    else
+	command encfs "$(realpath "$1")" "$(realpath "$2")"
     fi
 }
 
