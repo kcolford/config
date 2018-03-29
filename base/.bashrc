@@ -41,6 +41,7 @@ alias e='${VISUAL:-${EDITOR:-nano}}'
 alias la='ls -a'
 alias ll='ls -l'
 alias l='ls -la'
+alias lar='ls -AR'
 
 alias sl='ls'
 alias LS='ls'

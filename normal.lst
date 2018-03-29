@@ -9,7 +9,7 @@ git
 gnupg
 gpg-ssh-agent
 ssh
-xterm
+x11
 
 plasma
 synergy

@@ -65,8 +65,6 @@ The minor mode's documentation is specified in DOC."
 ;;		       (emacs-lisp-byte-compile))))
 
 ;; some generic settings for emacs as a whole
-(ignore-errors (set-frame-font "Terminus:pixelsize=14"))
-(ignore-errors (set-frame-font "xos4 Terminus:pixelsize=14"))
 ;; (menu-bar-mode 0)
 (scroll-bar-mode 0)
 (tool-bar-mode 0)

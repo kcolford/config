@@ -5,4 +5,4 @@ git pull
 ln -sfn ~ .homelink
 xargs stow < normal.lst
 systemctl --user daemon-reload
-systemctl --user enable redshift-gtk psd
+systemctl --user enable emacs redshift-gtk psd

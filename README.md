@@ -7,8 +7,7 @@ your home folder and run
 
 	git clone https://github.com/kcolford/config
 	cd config
-	ln -s ~ .homelink
-	xargs stow < normal.lst
+	./setup.sh
 
 Installing Stow
 ---------------

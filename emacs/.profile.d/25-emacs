@@ -2,4 +2,3 @@
 
 export ALTERNATE_EDITOR="$EDITOR"
 export VISUAL="emacsclient -nw"
-export TEXEDIT="${VISUAL:-$EDITOR} +%d %s"

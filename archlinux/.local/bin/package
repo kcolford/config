@@ -8,18 +8,20 @@ case "$1" in
 	done
 	echo "$groups"
 	echo
+	# shellcheck disable=SC2086
 	comm -3 <(pacman -Qqe | sort -u) <(pacman -Qqge $groups | sort -u)
 	;;
     -R)
 	shift
 	sudo pacman -D --asdeps "$@"
+	# shellcheck disable=SC2046
 	while sudo pacman -R --noconfirm $(pacman -Qqdt); do
 	    :
 	done
 	;;
     *)
-	if command -v pacaur > /dev/null 2>&1; then
-	    pacaur "$@"
+	if command -v trizen > /dev/null 2>&1; then
+	    trizen "$@"
 	else
 	    sudo pacman "$@"
 	fi

@@ -3,5 +3,3 @@ for i in ~/.profile.d/*; do
 	. "$i"
     fi
 done
-
-

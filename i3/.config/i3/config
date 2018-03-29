@@ -4,40 +4,48 @@ set $down k
 set $up l
 set $right semicolon
 
-#font "pango:xos4 Terminus"
+shmlog on
+shmlog 52428800
+workspace_auto_back_and_forth yes
 floating_modifier $mod
+# font -*-terminus-medium-*-*-*-14-*-*-*-*-*-iso10646-1
 bar {
         status_command i3status
 }
+
+exec --no-startup-id xset +dpms
+exec --no-startup-id ~/.fehbg
+exec --no-startup-id xss-lock i3lock -n -c 202020
+exec --no-startup-id systemctl --user restart emacs
+exec --no-startup-id systemd-run --user dex -a
+exec --no-startup-id systemd-run --user compton
+exec --no-startup-id systemd-run --user udiskie
+exec qbittorrent
+exec dropbox
+exec syncthing-gtk
 
 bindsym $mod+Shift+q kill
 bindsym $mod+Shift+c reload
 bindsym $mod+Shift+r restart
 bindsym $mod+Shift+e exit
-bindsym $mod+i exec --no-startup-id loginctl lock-session
+bindsym $mod+Shift+i exec --no-startup-id loginctl lock-session
 
 bindsym $mod+Return exec xterm
 bindsym $mod+b exec chromium
 bindsym $mod+u exec emacs
 bindsym $mod+d exec i3-dmenu-desktop || dmenu_run
+
 bindsym $mod+m exec transset-df -a -t
-bindsym $mod+p exec passmenu
-bindsym $mod+o exec nautilus
 bindsym $mod+comma exec transset-df -a --dec 0.1
 bindsym $mod+period exec transset-df -a --inc 0.1
+
 bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight +3
 bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -3
+
 bindsym $mod+equal exec xdotool key Caps_Lock
-exec --no-startup-id xset +dpms
-exec --no-startup-id ~/.fehbg
-exec --no-startup-id systemctl --user restart emacs
-exec --no-startup-id systemd-run --user dex -a
-exec --no-startup-id systemd-run --user compton
-exec --no-startup-id systemd-run --user udiskie
-exec --no-startup-id xss-lock i3lock -n -c 202020
-exec qbittorrent
-exec dropbox
-exec syncthing-gtk
+
+bindsym $mod+minus scratchpad show
+bindsym $mod+Shift+minus move scratchpad
 
 bindsym $mod+h split h
 bindsym $mod+v split v
@@ -45,8 +53,8 @@ bindsym $mod+f fullscreen toggle
 bindsym $mod+s layout stacking
 bindsym $mod+w layout tabbed
 bindsym $mod+e layout toggle split
-bindsym $mod+Shift+space floating toggle
 bindsym $mod+space focus mode_toggle
+bindsym $mod+Shift+space floating toggle
 bindsym $mod+a focus parent
 bindsym $mod+n focus child
 
