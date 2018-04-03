@@ -41,8 +41,8 @@ alias e='${VISUAL:-${EDITOR:-nano}}'
 alias la='ls -a'
 alias ll='ls -l'
 alias l='ls -la'
+alias lr='ls -R'
 alias lar='ls -AR'
-
 alias sl='ls'
 alias LS='ls'
 
@@ -73,4 +73,8 @@ done
 
 if [[ -r /usr/share/doc/pkgfile/command-not-found.bash ]]; then
     . /usr/share/doc/pkgfile/command-not-found.bash
+fi
+
+if command -v direnv > /dev/null 2>&1; then
+    eval "$(direnv hook bash)"
 fi

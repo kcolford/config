@@ -42,7 +42,7 @@ bindsym $mod+period exec transset-df -a --inc 0.1
 bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight +3
 bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -3
 
-bindsym $mod+equal exec xdotool key Caps_Lock
+bindsym $mod+equal exec xdotool key Caps_Lock #for chromebooks
 
 bindsym $mod+minus scratchpad show
 bindsym $mod+Shift+minus move scratchpad

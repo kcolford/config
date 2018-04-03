@@ -12,7 +12,7 @@
      ("gnu" . "http://elpa.gnu.org/packages/"))))
  '(package-selected-packages
    (quote
-    (ggtags use-package-chords diminish edit-server lorem-ipsum auto-package-update yasnippet-snippets go-snippets js2-mode prettier-js less-css-mode flycheck use-package-ensure-system-package use-package pkgbuild-mode company-ghc yasnippet company-try-hard caps-lock clang-format cmake-mode company company-auctex auctex company-c-headers company-dict company-flx company-go company-irony company-irony-c-headers company-shell company-statistics company-web csv-mode docker-compose-mode dockerfile-mode editorconfig elpy flycheck-irony gitconfig-mode gitignore-mode go-mode google google-c-style haskell-mode hc-zenburn-theme irony irony-eldoc json-mode magit markdown-mode projectile ssh-config-mode systemd web-mode yaml-mode))))
+    (ecb semi direnv ggtags use-package-chords diminish edit-server lorem-ipsum auto-package-update yasnippet-snippets go-snippets js2-mode prettier-js less-css-mode flycheck use-package-ensure-system-package use-package pkgbuild-mode company-ghc yasnippet company-try-hard caps-lock clang-format cmake-mode company company-auctex auctex company-c-headers company-dict company-flx company-go company-irony company-irony-c-headers company-shell company-statistics company-web csv-mode docker-compose-mode dockerfile-mode editorconfig elpy flycheck-irony gitconfig-mode gitignore-mode go-mode google google-c-style haskell-mode hc-zenburn-theme irony irony-eldoc json-mode magit markdown-mode projectile ssh-config-mode systemd web-mode yaml-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -65,7 +65,6 @@ The minor mode's documentation is specified in DOC."
 ;;		       (emacs-lisp-byte-compile))))
 
 ;; some generic settings for emacs as a whole
-;; (menu-bar-mode 0)
 (scroll-bar-mode 0)
 (tool-bar-mode 0)
 (icomplete-mode)
@@ -132,10 +131,14 @@ The minor mode's documentation is specified in DOC."
   :diminish editorconfig-mode
   :config (editorconfig-mode))
 (use-package yasnippet
+  :after (elisp-mode cc-mode go-mode)
   :config (yas-global-mode))
 (use-package projectile
   :diminish projectile-mode
   :config (projectile-mode))
+(use-package direnv
+  :ensure-system-package direnv
+  :config (direnv-mode))
 
 (use-package company
   :config (global-company-mode))
