@@ -12,6 +12,7 @@
 	pushu = push -u origin HEAD
 	up = fetch --all
 	easy-commit = !git commit -m \"$(curl whatthecommit.com/index.txt)\"
+	git = !git
 [url "git://git.kernel.org/pub/scm/linux/kernel/git/"]
 	insteadOf = "kern:"
 [url "https://github.com/"]
