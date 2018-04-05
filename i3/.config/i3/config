@@ -4,8 +4,6 @@ set $down k
 set $up l
 set $right semicolon
 
-shmlog on
-shmlog 52428800
 workspace_auto_back_and_forth yes
 floating_modifier $mod
 # font -*-terminus-medium-*-*-*-14-*-*-*-*-*-iso10646-1
@@ -16,7 +14,7 @@ bar {
 exec --no-startup-id xset +dpms
 exec --no-startup-id ~/.fehbg
 exec --no-startup-id ~/.screenlayout/default.sh
-exec --no-startup-id xss-lock i3lock -n -c 202020
+exec --no-startup-id xss-lock -- i3lock -n -c 202020
 exec --no-startup-id systemctl --user restart emacs
 exec --no-startup-id systemd-run --user dex -a
 exec --no-startup-id systemd-run --user compton
@@ -30,6 +28,7 @@ bindsym $mod+Shift+c reload
 bindsym $mod+Shift+r restart
 bindsym $mod+Shift+e exit
 bindsym $mod+Shift+i exec --no-startup-id loginctl lock-session
+bindsym $mod+i exec --no-startup-id loginctl lock-session
 
 bindsym $mod+Return exec xterm
 bindsym $mod+b exec chromium
@@ -96,6 +95,15 @@ bindsym $mod+Shift+7 move container to workspace 7
 bindsym $mod+Shift+8 move container to workspace 8
 bindsym $mod+Shift+9 move container to workspace 9
 bindsym $mod+Shift+0 move container to workspace 10
+
+bindsym $mod+control+$left move workspace to output left
+bindsym $mod+control+$down move workspace to output down
+bindsym $mod+control+$up move workspace to output up
+bindsym $mod+control+$right move workspace to output right
+bindsym $mod+control+Left move workspace to output left
+bindsym $mod+control+Down move workspace to output down
+bindsym $mod+control+Up move workspace to output up
+bindsym $mod+control+Right move workspace to output right
 
 bindsym $mod+r mode "resize"
 mode "resize" {
