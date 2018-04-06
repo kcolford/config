@@ -1,7 +1,7 @@
 #!/bin/sh
 set -euo pipefail
 dir="$(dirname "$0")"
-category="$1"
+category="$(realpath -s --relative-to "$dir" "$1")"
 shift
 for file; do
     rel="$(realpath -s --relative-to ~ "$file")"
@@ -13,4 +13,5 @@ for file; do
 	mv "$file" "$dir"/"$category"/"$rel"
     fi
 done
-sh "$dir"/setup.sh
+cd "$dir" || exit
+stow "$category"
