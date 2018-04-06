@@ -38,3 +38,5 @@
 	name = Kieran Colford
 [core]
 	fsmonitor = /usr/share/git-core/templates/hooks/fsmonitor-watchman.sample
+[diff]
+	colorMoved = plain

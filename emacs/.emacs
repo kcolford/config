@@ -3,14 +3,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(graphviz-dot-view-command "xdot %s")
- '(js-indent-level 2)
- '(package-archive-priorities (quote (("melpa-stable" . 10) ("gnu" . 5) ("melpa" . 0))))
- '(package-archives
-   (quote
-    (("melpa-stable" . "https://stable.melpa.org/packages/")
-     ("melpa" . "https://melpa.org/packages/")
-     ("gnu" . "http://elpa.gnu.org/packages/"))))
  '(package-selected-packages
    (quote
     (graphviz-dot-mode ecb semi direnv ggtags use-package-chords diminish edit-server lorem-ipsum auto-package-update yasnippet-snippets go-snippets js2-mode prettier-js less-css-mode flycheck use-package-ensure-system-package use-package pkgbuild-mode company-ghc yasnippet company-try-hard caps-lock clang-format cmake-mode company company-auctex auctex company-c-headers company-dict company-flx company-go company-irony company-irony-c-headers company-shell company-statistics company-web csv-mode docker-compose-mode dockerfile-mode editorconfig elpy flycheck-irony gitconfig-mode gitignore-mode go-mode google google-c-style haskell-mode hc-zenburn-theme irony irony-eldoc json-mode magit markdown-mode projectile ssh-config-mode systemd web-mode yaml-mode))))
@@ -32,6 +24,12 @@ The minor mode's documentation is specified in DOC."
 	   (remove-hook 'before-save-hook (quote ,fn) t)))
        (add-to-list 'safe-local-eval-forms '(,mode 0)))))
 
+(setq package-archives '(("melpa-stable" . "https://stable.melpa.org/packages/")
+			 ("melpa" . "https://melpa.org/packages/")
+			 ("gnu" . "http://elpa.gnu.org/packages/"))
+      package-archive-priorities '(("melpa-stable" . 10)
+				   ("gnu" . 5)
+				   ("melpa" . 0)))
 (package-initialize)
 (let ((firstrun (concat user-emacs-directory "firstrun")))
   (unless (file-readable-p firstrun)
@@ -83,14 +81,15 @@ The minor mode's documentation is specified in DOC."
 (bind-key "C-\\" 'bury-buffer)
 (bind-key "C-x C-b" 'ibuffer)
 (bind-key "M-]" 'ffap)
+(bind-key "C-=" 'start-xterm)
 (define-save-minor-mode whitespace-cleanup)
+(add-to-list 'safe-local-variable-values '(buffer-file-coding-system . dos))
 
-;; start xterm when needed
+;; some generic helpers
 (defun start-xterm ()
   "Start xterm in local directory."
   (interactive)
   (start-process "xterm" nil "xterm"))
-(bind-key "C-=" 'start-xterm)
 
 ;; tramp integration
 (setq-default tramp-default-method "ssh")
