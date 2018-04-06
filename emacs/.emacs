@@ -304,7 +304,7 @@ The minor mode's documentation is specified in DOC."
     (server-start))
   ;; (setenv "PAGER" "cat")
   (setenv "EDITOR" (format "emacsclient -nw -s %s" server-name))
-  (setenv "VISUAL" (format "emacsclient -nw -s %s" server-name))
+  (setenv "VISUAL" (format "emacsclient -c -s %s" server-name))
   (setenv "TEXEDIT" (format "emacsclient -s %s +%%d %%s" server-name)))
 (use-package edit-server
   :if (daemonp)

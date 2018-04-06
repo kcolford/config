@@ -2,5 +2,5 @@
 
 export PAGER=less
 export LESS=FRSXi
-export EDITOR=nano
+export EDITOR="${EDITOR:-nano}"
 export TEXEDIT="${VISUAL:-$EDITOR} +%d %s"
