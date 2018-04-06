@@ -1,4 +1,0 @@
-#!/bin/sh
-
-killall spice-vdagent
-exec /usr/bin/spice-vdagent
