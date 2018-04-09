@@ -27,7 +27,7 @@ bindsym $mod+Shift+q kill
 bindsym $mod+Shift+c reload
 bindsym $mod+Shift+r restart
 bindsym $mod+Shift+e exit
-bindsym $mod+Shift+i exec --no-startup-id loginctl lock-session
+bindsym $mod+Shift+i exec --no-startup-id loginctl lock-session && systemctl hibernate
 bindsym $mod+i exec --no-startup-id loginctl lock-session
 
 bindsym $mod+Return exec xterm
