@@ -74,6 +74,8 @@ The minor mode's documentation is specified in DOC."
 (defalias 'yes-or-no-p 'y-or-n-p)
 (setq inhibit-startup-screen t)
 (setq-default warning-minimum-log-level :error)
+(setq completion-ignore-case t)
+(setq read-file-name-completion-ignore-case t)
 (setq vc-follow-symlinks t)
 (setq sentence-end-double-space nil)
 (setq confirm-kill-emacs 'yes-or-no-p)
@@ -210,10 +212,11 @@ The minor mode's documentation is specified in DOC."
 (define-save-minor-mode elpy-format-code)
 (define-save-minor-mode elpy-importmagic-fixup)
 (use-package elpy
+  :ensure-system-package (flake8 autopep8 yapf ipython (true . "python-jedi") (true . "python-rope") (virtualenv . "python-virtualenv"))
   :init
   (setq elpy-rpc-timeout 10)
-  (add-hook 'elpy-mode-hook 'elpy-format-code-mode)
-  (add-hook 'elpy-mode-hook 'elpy-importmagic-fixup-mode)
+  ;; (add-hook 'elpy-mode-hook 'elpy-format-code-mode)
+  ;; (add-hook 'elpy-mode-hook 'elpy-importmagic-fixup-mode)
   :config
   (elpy-enable))
 
