@@ -41,12 +41,12 @@ ln -sf "/usr/share/zoneinfo/$timezone" /etc/localtime
 
 # setup localization
 cat > /etc/locale.gen <<EOF
-en_$country.UTF-8 UTF-8
+en_CA.UTF-8 UTF-8
 en_US.UTF-8 UTF-8
 EOF
 locale-gen
 cat > /etc/locale.conf <<EOF
-LANG=en_$country.UTF-8
+LANG=en_CA.UTF-8
 EOF
 
 # setup the linux console
@@ -55,8 +55,7 @@ KEYMAP=us
 FONT=Lat2-Terminus16
 EOF
 
-# I don't like vi so make nano the global minimal default since it's
-# also installed
+# I don't like vi so make nano or emacs the global default.
 if check_runable emacs; then
     cat > /etc/environment <<EOF
 EDITOR=emacs
