@@ -40,3 +40,5 @@
 	fsmonitor = /usr/share/git-core/templates/hooks/fsmonitor-watchman.sample
 [diff]
 	colorMoved = plain
+[help]
+	autocorrect = 1

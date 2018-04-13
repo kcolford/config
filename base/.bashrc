@@ -33,6 +33,9 @@ import() {
 try_eval() {
     if command -v "$1" > /dev/null 2>&1; then
 	eval "$("$@")"
+    else
+	printf "%s" "$1 is in "
+	pkgfile "$1"
     fi
 }
 
@@ -63,6 +66,7 @@ alias lr='ls -R'
 alias lar='ls -AR'
 alias sl='ls'
 alias LS='ls'
+alias fu='fuck'
 
 # wrapper to enable relative paths for encfs
 encfs() {
@@ -77,3 +81,4 @@ import /{etc,usr{,/local}/share/bash-completion}/bash_completion
 import /usr/share/doc/pkgfile/command-not-found.bash 
 try_eval direnv hook bash
 try_eval hub alias -s
+try_eval thefuck --alias
