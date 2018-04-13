@@ -1,6 +1,7 @@
 *font: -*-terminus-medium-*-*-*-14-*-*-*-*-*-iso10646-1
 
 *customization: -color
+XTerm*eightBitInput: true
 XTerm.termName: xterm-256color
 XTerm*metaSendsEscape: true
 XTerm*backarrowKey: false
