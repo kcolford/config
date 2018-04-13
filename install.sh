@@ -1,6 +1,12 @@
 #!/bin/sh
 set -euo pipefail
 
+. /etc/os-release
+if [ "$ID" != arch ]; then
+    echo "Only run this script on Arch Linux" >&2
+    exit 1
+fi
+
 cat <<EOF
 
 Install emacs for a workstation, emacs-nox for a headless workstation,
@@ -8,9 +14,9 @@ and base-devel for AUR support.
 
 EOF
 
-# configuration variables
-country=CA
-timezone=America/Toronto
+country="$(curl -s https://ipinfo.io/country)" || true
+country="${country:-CA}"
+echo "Your country is $country"
 
 check_installed() {
     pacman -Q "$@" > /dev/null 2>&1
@@ -27,14 +33,11 @@ systemctl_activate() {
     systemctl start "$@"
 }
 
-. /etc/os-release
-if [ "$ID" != arch ]; then
-    echo "Only run this script on Arch Linux" >&2
-    exit 1
-fi
-
 # setup timezone
-ln -sf /usr/share/zoneinfo/$timezone /etc/localtime
+timezone="$(curl -s ipinfo.io/loc | sed 's/,/ /' | awk '{print "api.geonames.org/timezoneJSON?lat=" $1 "&lng=" $2 "&username=kcolford";}' | xargs curl -s | jq -r .timezoneId)" || true
+timezone="${timezone:-America/Toronto}"
+echo "Your timezone is $timezone"
+ln -sf "/usr/share/zoneinfo/$timezone" /etc/localtime
 
 # setup localization
 cat > /etc/locale.gen <<EOF
@@ -66,7 +69,7 @@ fi
 
 # update mirror list
 if check_runable reflector; then
-    reflector -c $country --sort rate > /etc/pacman.d/mirrorlist.tmp
+    reflector -c "$country" --sort rate > /etc/pacman.d/mirrorlist.tmp
 else
     curl "https://www.archlinux.org/mirrorlist/?country=$country" | sed 's/#//' | rankmirrors - > /etc/pacman.d/mirrorlist.tmp
 fi
