@@ -397,5 +397,5 @@ fi
 
 # for my chromebook
 if $laptop; then
-    installer lenovo-thinkpad-yoga-11e-chromebook-git
+    installer lenovo-thinkpad-yoga-11e-chromebook-git || true
 fi
