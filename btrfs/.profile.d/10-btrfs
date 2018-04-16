@@ -1,5 +1,0 @@
-#!/bin/bash
-for dir in ~/{torrents,.local/share/libvirt/images,.config/chromium}; do
-    mkdir -p "$dir"
-    chattr -R +C "$dir"
-done

@@ -41,6 +41,9 @@ country="$(curl -s https://ipinfo.io/country)" || true
 country="${country:-CA}"
 echo "Your country is $country"
 
+# need this for adding pacman hooks
+mkdir -p /etc/pacman.d/hooks
+
 # update mirror list
 if check_runable reflector; then
     reflector -c "$country" --sort rate > /etc/pacman.d/mirrorlist.tmp
@@ -67,7 +70,7 @@ installer() {
 
 # install these packages to optimize this script and provide better
 # integration later on
-installer pacmatic jq reflector sudo 
+installer pacmatic jq reflector sudo
 
 # improve the installer used
 # if check_installed pacmatic; then
@@ -267,9 +270,19 @@ else
     mkinitcpio -P > /dev/null
 fi
 
+linuxcmdline='zswap.enabled=1 nvidia-drm.modeset=1'
+
 if check_installed grub; then
-    sed -i '/^GRUB_CMDLINE_LINUX=/s/=.*/="zswap.enabled=1"/' /etc/default/grub
-    sed -i 's/^#\? \?GRUB_ENABLE_CRYPTODISK=.*/GRUB_ENABLE_CRYPTODISK=y/' /etc/default/grub
+    # add linux command line
+    sed -i "s/^#\\? *\\(GRUB_CMDLINE_LINUX_DEFAULT\\)=.*/\\1=\"quiet $linuxcmdline\"/" /etc/default/grub
+    # enable encrypted /boot support
+    sed -i 's/^#\? *GRUB_ENABLE_CRYPTODISK=.*/GRUB_ENABLE_CRYPTODISK=y/' /etc/default/grub
+
+    # save last booted kernel
+    sed -i '/^#\? *\(GRUB_DEFAULT\)=.*/\1=saved/' /etc/default/grub
+    sed -i '/^#\? *\(GRUB_SAFEDEFAULT\)=.*/\1="true"/' /etc/default/grub
+
+    # install grub
     grub-mkconfig -o /boot/grub/grub.cfg
     if [ -d /sys/firmware/efi/efivars ]; then
 	installer efibootmgr
@@ -288,6 +301,7 @@ fi
 
 if check_installed libvirt; then
     chattr +C -R /var/lib/libvirt/images/
+    installer
 fi
 
 if [ "$(findmnt -no FSTYPE /)" = btrfs ]; then
@@ -331,12 +345,39 @@ EOF
 fi
 
 if $laptop; then
-    sed -i 's/#\? *\(HandleLidSwitch=\).*/\1=hybrid-sleep/' /etc/systemd/logind.conf
+    sed -i 's/#\? *\(HandleLidSwitch\)=.*/\1=sleep/' /etc/systemd/logind.conf
 fi
 
-if $graphical && [ -d /sys/module/i915/ ]; then
+if $graphical && [ -d /sys/module/i915 ]; then
     installer xf86-video-intel
 fi
+
+# if [ -d /sys/module/nouveau ]; then
+#     installer nvidia-dkms
+# fi
+
+if $graphical && [ -d /sys/module/nouveau ]; then
+    installer xf86-video-nouveau
+fi
+
+if check_installed nvidia || check_installed nvidia-dkms; then
+    installer nvidia-utils
+fi
+
+if check_installed nvidia; then
+    cat > /etc/pacman.d/hooks/nvidia.hook <<EOF
+[Trigger]
+Operation=Install
+Operation=Upgrade
+Operation=Remove
+Type=Package
+Target=nvidia
+
+[Action]
+Depends=mkinitcpio
+When=PostTransaction
+Exec=/usr/bin/mkinitcpio -P
+EOF
 
 if $graphical; then
     cat > /etc/X11/xorg.conf.d/30-touchpad.conf <<EOF
