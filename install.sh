@@ -394,3 +394,8 @@ fi
 if check_installed etckeeper; then
     git config --global user.name root
 fi
+
+# for my chromebook
+if $laptop; then
+    installer lenovo-thinkpad-yoga-11e-chromebook-git
+fi
