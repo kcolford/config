@@ -11,3 +11,4 @@ complete_dir="${BASH_COMPLETION_USER_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/b
 set +e
 npm completion > "$complete_dir"/npm
 pip completion --bash > "$complete_dir"/pip
+true
