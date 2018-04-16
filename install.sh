@@ -276,7 +276,7 @@ if check_installed grub; then
     # add linux command line
     sed -i "s/^#\\? *\\(GRUB_CMDLINE_LINUX_DEFAULT\\)=.*/\\1=\"quiet $linuxcmdline\"/" /etc/default/grub
     # enable encrypted /boot support
-    sed -i 's/^#\? *GRUB_ENABLE_CRYPTODISK=.*/GRUB_ENABLE_CRYPTODISK=y/' /etc/default/grub
+    sed -i 's/^#\? *\(GRUB_ENABLE_CRYPTODISK\)=.*/\1=y/' /etc/default/grub
 
     # save last booted kernel
     sed -i '/^#\? *\(GRUB_DEFAULT\)=.*/\1=saved/' /etc/default/grub
@@ -305,7 +305,7 @@ if check_installed libvirt; then
 fi
 
 if [ "$(findmnt -no FSTYPE /)" = btrfs ]; then
-    sed -i '/autodefrag/n;s=\([^[:space:]]\+\) */ *\(auto\|btrfs\) \(.*\)=\1 / \2 \3,autodefrag=' /etc/fstab
+    sed -i '/autodefrag/n;s=\([^[:space:]]\+\) */ *\(auto\|btrfs\) *\(.*\)=\1 / \2 \3,autodefrag=' /etc/fstab
     mount -o remount /
 fi
 
