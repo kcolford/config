@@ -1,0 +1,16 @@
+#!/bin/sh
+case $# in
+    2)
+	exec emacsclient -t -e "(emerge-files \"$1\" \"$2\" \"$2\")"
+	;;
+    3)
+	exec emacsclient -t -e "(emerge-files \"$1\" \"$2\" \"$3\")"
+	;;
+    4)
+	exec emacsclient -t -e "(emerge-files-with-ancestor \"$1\" \"$2\" \"$3\" \"$4\")"
+	;;
+    *)
+	echo "Invalid number of arguments." >&2
+	exit 2
+	;;
+esac

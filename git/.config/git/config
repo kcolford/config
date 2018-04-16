@@ -33,6 +33,8 @@
 	insteadOf = "freedesktop:"
 [merge]
 	tool = emerge
+[mergetool.ediff]
+	cmd = ediff "$LOCAL" "$REMOTE" "$BASE" "$MERGED"
 [user]
 	email = kieran@kcolford.com
 	name = Kieran Colford

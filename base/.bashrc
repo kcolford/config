@@ -31,11 +31,10 @@ import() {
 }
 
 try_eval() {
-    if command -v "$1" > /dev/null 2>&1; then
+    if command -v "$1" > /dev/null; then
 	eval "$("$@")"
     else
-	printf "%s" "$1 is in "
-	pkgfile "$1"
+	pkgfile -bv "$1"
     fi
 }
 
@@ -52,13 +51,11 @@ alias ghc='ghc -dynamic'
 alias gpg='gpg --armour'
 alias gpgv='gpg --verify'
 alias grep='grep --color=auto'
-alias igrep='grep --ignore-case'
 alias ls='ls --hide="*~" --color=auto --classify --dereference-command-line --human-readable'
 alias qemu-system-x86_64='qemu-system-x86_64 -accel kvm -smp 2 -m 2048'
 alias tcpdump='sudo tcpdump --relinquish-privileges $USER'
 
 alias e='${EDITOR:-nano}'
-
 alias la='ls -a'
 alias ll='ls -l'
 alias l='ls -la'
@@ -66,6 +63,7 @@ alias lr='ls -R'
 alias lar='ls -AR'
 alias sl='ls'
 alias LS='ls'
+alias igrep='grep --ignore-case'
 alias fu='fuck'
 
 # wrapper to enable relative paths for encfs
@@ -78,7 +76,8 @@ encfs() {
 }
 
 import /{etc,usr{,/local}/share/bash-completion}/bash_completion
-import /usr/share/doc/pkgfile/command-not-found.bash 
-try_eval direnv hook bash
+import /usr/share/doc/pkgfile/command-not-found.bash
+try_eval direnv hook bash &
 try_eval hub alias -s
-try_eval thefuck --alias
+try_eval thefuck --alias &
+disown -a

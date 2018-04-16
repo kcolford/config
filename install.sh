@@ -1,23 +1,6 @@
 #!/bin/sh
 set -euo pipefail
 
-. /etc/os-release
-if [ "$ID" != arch ]; then
-    echo "Only run this script on Arch Linux" >&2
-    exit 1
-fi
-
-cat <<EOF
-
-Install emacs for a workstation, emacs-nox for a headless workstation,
-and base-devel for AUR support.
-
-EOF
-
-country="$(curl -s https://ipinfo.io/country)" || true
-country="${country:-CA}"
-echo "Your country is $country"
-
 check_installed() {
     pacman -Q "$@" > /dev/null 2>&1
 }
@@ -33,20 +16,141 @@ systemctl_activate() {
     systemctl start "$@"
 }
 
+systemctl_deactivate() {
+    systemctl disable "$@" || true
+    systemctl stop "$@" || true
+}
+
+check_file() {
+    for file; do
+	if [ -e "$file" ]; then
+	    return 0
+	fi
+    done
+    return 1
+}
+
+. /etc/os-release
+if [ "$ID" != arch ]; then
+    echo "Only run this script on Arch Linux" >&2
+    exit 1
+fi
+
+# determine country
+country="$(curl -s https://ipinfo.io/country)" || true
+country="${country:-CA}"
+echo "Your country is $country"
+
+# update mirror list
+if check_runable reflector; then
+    reflector -c "$country" --sort rate > /etc/pacman.d/mirrorlist.tmp
+else
+    curl -s "https://www.archlinux.org/mirrorlist/?country=$country" | sed 's/#//' | rankmirrors - > /etc/pacman.d/mirrorlist.tmp
+fi
+mv /etc/pacman.d/mirrorlist.tmp /etc/pacman.d/mirrorlist
+
+# enable multilib repos
+sed -i '/\[multilib]/{s/#//;n;s/#//}' /etc/pacman.conf
+
+# update the system
+if check_installed pacmatic; then
+    env DIFFPROG=diff pacmatic -Syyu
+else
+    pacman -Syyu
+fi
+
+# setup package installer
+pacman='pacman'
+installer() {
+    $pacman -S --quiet --noconfirm --needed "$@"
+}
+
+# install these packages to optimize this script and provide better
+# integration later on
+installer pacmatic jq reflector sudo 
+
+# improve the installer used
+# if check_installed pacmatic; then
+#     export DIFFPROG=diff
+#     pacman='pacmatic'
+# fi
+
+if systemd-detect-virt -q; then
+    virtualized=true
+else
+    virtualized=false
+fi
+
+if check_file /sys/class/power_supply/BAT*; then
+    laptop=true
+else
+    laptop=false
+fi
+
+if check_file /sys/class/net/wl*; then
+    wireless=true
+else
+    wireless=false
+fi
+
+# chrony is more reliable than ntpd or systemd-timesyncd with an
+# unreliable connection
+if $laptop; then
+    installer chrony
+fi
+
+if $wireless; then
+    installer crda networkmanager
+fi
+
+if ! $virtualized; then
+    installer grub
+fi
+
+cat <<EOF
+Install emacs for a workstation, emacs-nox for a headless workstation,
+and base-devel for AUR support.
+EOF
+if check_runable emacs; then
+    userinstall=true
+else
+    userinstall=false
+fi
+if [ "$SUDO_USER" ] && check_installed $(pacman -Sqg base-devel); then
+    aursupport=true
+else
+    aursupport=false
+fi
+if check_installed chromium || check_installed emacs && ! check_installed emacs-nox; then
+    graphical=true
+else
+    graphical=false
+fi
+
+# add aur support
+if $aursupport; then
+    if ! check_installed trizen; then
+	sudo -u "$SUDO_USER" git clone https://aur.archlinux.org/trizen /tmp/trizen
+	( cd /tmp/trizen && sudo -u "$SUDO_USER" makepkg -si )
+    fi
+    pacman="sudo -u $SUDO_USER trizen"
+fi
+
 # setup timezone
-timezone="$(curl -s ipinfo.io/loc | sed 's/,/ /' | awk '{print "api.geonames.org/timezoneJSON?lat=" $1 "&lng=" $2 "&username=kcolford";}' | xargs curl -s | jq -r .timezoneId)" || true
+timezone="$(curl -s 'ipinfo.io/loc' | sed 's/,/ /' | awk '{print "api.geonames.org/timezoneJSON?lat=" $1 "&lng=" $2 "&username=kcolford";}' | xargs curl -s | jq -r .timezoneId)" || true
 timezone="${timezone:-America/Toronto}"
 echo "Your timezone is $timezone"
 ln -sf "/usr/share/zoneinfo/$timezone" /etc/localtime
 
 # setup localization
+locale=en_CA
 cat > /etc/locale.gen <<EOF
-en_CA.UTF-8 UTF-8
+$locale.UTF-8 UTF-8
 en_US.UTF-8 UTF-8
 EOF
 locale-gen
 cat > /etc/locale.conf <<EOF
-LANG=en_CA.UTF-8
+LANG=$locale.UTF-8
 EOF
 
 # setup the linux console
@@ -66,26 +170,7 @@ EDITOR=nano
 EOF
 fi
 
-# update mirror list
-if check_runable reflector; then
-    reflector -c "$country" --sort rate > /etc/pacman.d/mirrorlist.tmp
-else
-    curl "https://www.archlinux.org/mirrorlist/?country=$country" | sed 's/#//' | rankmirrors - > /etc/pacman.d/mirrorlist.tmp
-fi
-mv /etc/pacman.d/mirrorlist.tmp /etc/pacman.d/mirrorlist
-
-# setup package installer
-pacman='pacman'
-installer() {
-    $pacman -S --quiet --noconfirm --needed "$@" > /dev/null
-}
-
-# cleaner package installs
-installer pacmatic
-pacman='pacmatic'
-
 # setup sudo
-installer sudo
 add_sudo_policy() {
     if ! check_installed sudo; then
 	return 0
@@ -115,70 +200,73 @@ add_sudo_policy /etc/sudoers.d/wheel <<EOF
 #%wheel ALL=(ALL:ALL) NOPASSWD: ALL
 EOF
 
-# configure networking
-installer networkmanager
-systemctl_activate NetworkManager
+if check_installed networkmanager; then
+    systemctl_deactivate dhcpcd
+    systemctl_activate NetworkManager
+fi
 
-# wireless regulation conformance
-installer crda
 if [ -f /etc/conf.d/wireless-regdom ]; then
     sed -i "/$country/s/#//" /etc/conf.d/wireless-regdom
 fi
 
 # sync time
-installer chrony
-systemctl_activate chronyd
-
-# crontab support, not essential but often useful
-installer cronie
-systemctl_activate cronie
+if check_installed chrony; then
+    timedatectl set-ntp false
+    systemctl_deactivate ntpd
+    systemctl_activate chronyd
+fi
 
 # lock the root account if we have a sudo user
-if [ "$SUDO_USER" ]; then
+if [ "$SUDO_USER" ] && [ "$SUDO_USER" != root ]; then
     passwd -l root
 fi
 
-# if we're run with sudo then that means there's an unprivileged user
-# to run AUR builds with trizen, but only add AUR support if
-# base-devel is installed
-if [ "$SUDO_USER" ] && check_installed $(pacman -Sqg base-devel); then
-    if ! check_installed trizen; then
-	sudo -u "$SUDO_USER" git clone https://aur.archlinux.org/trizen /tmp/trizen
-	( cd /tmp/trizen && sudo -u "$SUDO_USER" makepkg -si )
-    fi
-    pacman="sudo -u $SUDO_USER trizen"
-    if check_installed pacmatic; then
-	pacman="$pacman --pacman_command=/usr/bin/pacmatic"
-    fi
-fi
-
-# update system
-installer -yu
-
-# if a version of Emacs is installed then we must be a user
-# installation
-if check_runable emacs; then
-    installer ccid cups ghostscript foomatic-db sane pkgfile pkgstats aspell aspell-en
+if $userinstall; then
+    installer ccid cups ghostscript foomatic-db sane pkgfile pkgstats
+    installer watchman || true
     systemctl_activate pcscd org.cups.cupsd pkgfile-update.timer
 fi
 
-# if the plain emacs package is installed rather than emacs-nox then
-# it means we're working with a graphical environment
-if check_installed emacs && ! check_installed emacs-nox; then
+if $graphical; then
     installer i3 || true	# the i3 group is weird
-    installer xorg xterm terminus-font compton xss-lock udiskie feh redshift python-xdg dunst xdotool dex dmenu linux-zen linux-zen-headers lightdm lightdm-gtk-greeter syncthing-gtk qbittorrent chromium ttf-liberation noto-fonts libu2f-host
-    systemctl enable lightdm
-    # these are from the AUR and don't have to be installed
-    installer dropbox chromium-widevine profile-sync-daemon || true
+    installer linux-zen lightdm syncthing-gtk qbittorrent chromium
+    installer dropbox || true
 fi
 
-# set the initcpio hooks
-sed -i '/^HOOKS=/s/=(.*)/=(base systemd autodetect modconf pcmcia block mdadm_udev keyboard sd-vconsole sd-encrypt sd-lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
-echo "Generating initcpio..."
-mkinitcpio -P > /dev/null
+if check_installed linux-zen; then
+    installer linux-zen-headers
+fi
 
-# if grub is installed then use it
-installer grub
+if check_installed linux; then
+    installer linux-headers
+fi
+
+if check_installed lightdm; then
+    installer lightdm-gtk-greeter
+    systemctl enable lightdm
+fi
+
+if check_runable i3; then
+    installer xorg xterm compton xss-lock udiskie feh redshift dunst xdotool dex dmenu
+fi
+
+if check_installed redshift; then
+    installer python-xdg
+fi
+
+if check_runable xterm; then
+    installer terminus-font
+fi
+
+sed '/^HOOKS=/s/=(.*)/=(base systemd autodetect modconf pcmcia block mdadm_udev keyboard sd-vconsole sd-encrypt sd-lvm2 filesystems fsck)/' /etc/mkinitcpio.conf > /etc/mkinitcpio.conf.tmp
+if cmp -s /etc/mkinitcpio.conf /etc/mkinitcpio.conf.tmp; then
+    rm /etc/mkinitcpio.conf.tmp
+else
+    mv /etc/mkinitcpio.conf.tmp /etc/mkinitcpio.conf
+    echo "Generating initcpio..."
+    mkinitcpio -P > /dev/null
+fi
+
 if check_installed grub; then
     sed -i '/^GRUB_CMDLINE_LINUX=/s/=.*/="zswap.enabled=1"/' /etc/default/grub
     sed -i 's/^#\? \?GRUB_ENABLE_CRYPTODISK=.*/GRUB_ENABLE_CRYPTODISK=y/' /etc/default/grub
@@ -187,21 +275,76 @@ if check_installed grub; then
 	installer efibootmgr
 	grub-install
     else
-	grub-install "$(lsblk -psno NAME "$(findmnt -no SOURCE /)" | tail -n 1)"
+	grub-install "$(lsblk -lpsno NAME "$(findmnt -no SOURCE /)" | tail -n 1)"
     fi
 fi
 
-# setup profile sync daemon if it's installed
+if check_installed postgresql; then
+    chattr +C -R /var/lib/postgres/data/
+    if ! [ -f /var/lib/postgres/data/postgresql.conf ]; then
+	sudo -u postgres initdb -D /var/lib/postgres/data --auth-host=pam --auth-local=peer --data-checksums
+    fi
+fi
+
+if check_installed libvirt; then
+    chattr +C -R /var/lib/libvirt/images/
+fi
+
+if [ "$(findmnt -no FSTYPE /)" = btrfs ]; then
+    sed -i '/autodefrag/n;s=\([^[:space:]]\+\) */ *\(auto\|btrfs\) \(.*\)=\1 / \2 \3,autodefrag=' /etc/fstab
+    mount -o remount /
+fi
+
+if check_installed cronie; then
+    systemctl_activate cronie
+fi
+
+# install helper applications for the shell in a user installation
+if $userinstall; then
+    installer hub thefuck
+fi
+
+if $userinstall && ( check_installed chromium || check_installed google_chrome ); then
+    installer ttf-liberation noto-fonts libu2f-host
+    installer profile-sync-daemon || true
+fi
+
+if $userinstall && check_installed chromium; then
+    installer chromium-widevine || true
+fi
+
+# if emacs is installed then we need to install the helper
+# applications for it
+if $userinstall && check_runable emacs; then
+    installer xclip shellcheck aspell aspell-en
+    installer go-tools
+    installer gocode-git || true
+    installer flake8 autopep8 yapf ipython python-jedi python-rope python-virtualenv
+    installer prettier
+    installer cmake clang
+fi
+
 if [ "$SUDO_USER" ] && check_installed profile-sync-daemon; then
     add_sudo_policy /etc/sudoers.d/psd <<EOF
 $SUDO_USER ALL=(ALL) NOPASSWD: /usr/bin/psd-overlay-helper
 EOF
 fi
 
-# setup postgres
-if check_installed postgresql; then
-    if ! [ -f /var/lib/postgres/data/postgresql.conf ]; then
-	sudo -u postgres initdb -D /var/lib/postgres/data --auth-host=pam --auth-local=ident
-    fi
+if $laptop; then
+    sed -i 's/#\? *\(HandleLidSwitch=\).*/\1=hybrid-sleep/' /etc/systemd/logind.conf
 fi
 
+if $graphical && [ -d /sys/module/i915/ ]; then
+    installer xf86-video-intel
+fi
+
+if $graphical; then
+    cat > /etc/X11/xorg.conf.d/30-touchpad.conf <<EOF
+Section "InputClass"
+	Identifier "devname"
+	Driver "libinput"
+	MatchIsTouchpad "on"
+	Option "NaturalScrolling" "true"
+EndSection
+EOF
+fi

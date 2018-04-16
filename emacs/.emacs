@@ -123,9 +123,11 @@ The minor mode's documentation is specified in DOC."
 (use-package hc-zenburn-theme
   :init (load-theme 'hc-zenburn t))
 (use-package flycheck
+  :ensure-system-package (shellcheck)
   :diminish flycheck-mode
   :config (global-flycheck-mode))
 (use-package flyspell
+  :ensure-system-package (aspell (true . "aspell-en"))
   :diminish (flyspell-mode flyspell-prog-mode)
   :hook ((text-mode . flyspell-mode)
 	 (prog-mode . flyspell-prog-mode))
