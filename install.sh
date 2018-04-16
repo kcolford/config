@@ -279,8 +279,8 @@ if check_installed grub; then
     sed -i 's/^#\? *\(GRUB_ENABLE_CRYPTODISK\)=.*/\1=y/' /etc/default/grub
 
     # save last booted kernel
-    sed -i '/^#\? *\(GRUB_DEFAULT\)=.*/\1=saved/' /etc/default/grub
-    sed -i '/^#\? *\(GRUB_SAFEDEFAULT\)=.*/\1="true"/' /etc/default/grub
+    sed -i 's/^#\? *\(GRUB_DEFAULT\)=.*/\1=saved/' /etc/default/grub
+    sed -i 's/^#\? *\(GRUB_SAFEDEFAULT\)=.*/\1="true"/' /etc/default/grub
 
     # install grub
     grub-mkconfig -o /boot/grub/grub.cfg
@@ -378,6 +378,7 @@ Depends=mkinitcpio
 When=PostTransaction
 Exec=/usr/bin/mkinitcpio -P
 EOF
+fi
 
 if $graphical; then
     cat > /etc/X11/xorg.conf.d/30-touchpad.conf <<EOF
@@ -388,4 +389,8 @@ Section "InputClass"
 	Option "NaturalScrolling" "true"
 EndSection
 EOF
+fi
+
+if check_installed etckeeper; then
+    git config --global user.name root
 fi
