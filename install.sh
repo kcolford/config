@@ -36,6 +36,13 @@ if [ "$ID" != arch ]; then
     exit 1
 fi
 
+# instructions
+cat <<EOF
+Install emacs for a workstation, emacs-nox for a headless workstation,
+and base-devel for AUR support.
+
+EOF
+
 # determine country
 country="$(curl -s https://ipinfo.io/country)" || true
 country="${country:-CA}"
@@ -60,6 +67,7 @@ if check_installed pacmatic; then
     env DIFFPROG=diff pacmatic -Syyu
 else
     pacman -Syyu
+    env DIFFPROG=diff pacdiff
 fi
 
 # setup package installer
@@ -70,13 +78,7 @@ installer() {
 
 # install these packages to optimize this script and provide better
 # integration later on
-installer pacmatic jq reflector sudo
-
-# improve the installer used
-# if check_installed pacmatic; then
-#     export DIFFPROG=diff
-#     pacman='pacmatic'
-# fi
+installer jq reflector sudo
 
 if systemd-detect-virt -q; then
     virtualized=true
@@ -96,10 +98,17 @@ else
     wireless=false
 fi
 
-# chrony is more reliable than ntpd or systemd-timesyncd with an
-# unreliable connection
+# choose the method of time synchronization, we can disable all forms
+# temporarily while we choose which one to setup
+timedatectl set-ntp false
+systemctl_deactivate ntpd chronyd
 if $laptop; then
     installer chrony
+    systemctl_activate chronyd
+elif check_installed ntp; then
+    systemctl_activate ntpd
+else
+    timedatectl set-ntp true
 fi
 
 if $wireless; then
@@ -110,10 +119,6 @@ if ! $virtualized; then
     installer grub
 fi
 
-cat <<EOF
-Install emacs for a workstation, emacs-nox for a headless workstation,
-and base-devel for AUR support.
-EOF
 if check_runable emacs; then
     userinstall=true
 else
@@ -212,13 +217,6 @@ if [ -f /etc/conf.d/wireless-regdom ]; then
     sed -i "/$country/s/#//" /etc/conf.d/wireless-regdom
 fi
 
-# sync time
-if check_installed chrony; then
-    timedatectl set-ntp false
-    systemctl_deactivate ntpd
-    systemctl_activate chronyd
-fi
-
 # lock the root account if we have a sudo user
 if [ "$SUDO_USER" ] && [ "$SUDO_USER" != root ]; then
     passwd -l root
@@ -249,16 +247,13 @@ if check_installed lightdm; then
     systemctl enable lightdm
 fi
 
+# for my local configuration files
 if check_runable i3; then
-    installer xorg xterm compton xss-lock udiskie feh redshift dunst xdotool dex dmenu
+    installer xorg xterm compton xss-lock udiskie feh redshift dunst xdotool dex dmenu terminus-font
 fi
 
 if check_installed redshift; then
     installer python-xdg
-fi
-
-if check_runable xterm; then
-    installer terminus-font
 fi
 
 sed '/^HOOKS=/s/=(.*)/=(base systemd autodetect modconf pcmcia block mdadm_udev keyboard sd-vconsole sd-encrypt sd-lvm2 filesystems fsck)/' /etc/mkinitcpio.conf > /etc/mkinitcpio.conf.tmp
