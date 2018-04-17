@@ -336,6 +336,7 @@ if $userinstall && check_runable emacs; then
     installer flake8 autopep8 yapf ipython python-jedi python-rope python-virtualenv
     installer prettier
     installer cmake clang
+    installer bear || true
 fi
 
 if [ "$SUDO_USER" ] && check_installed profile-sync-daemon; then
