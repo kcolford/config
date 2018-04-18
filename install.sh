@@ -43,6 +43,20 @@ and base-devel for AUR support.
 
 EOF
 
+# keep the package cache trimmed
+cat > /etc/pacman.d/hooks/paccache.hook <<EOF
+[Trigger]
+Operation=Install
+Operation=Upgrade
+Operation=Remove
+Type=Package
+Target=*
+
+[Action]
+When=PostTransaction
+Exec=/usr/bin/paccache -ru
+EOF
+
 # determine country
 country="$(curl -s https://ipinfo.io/country)" || true
 country="${country:-CA}"
@@ -61,6 +75,33 @@ mv /etc/pacman.d/mirrorlist.tmp /etc/pacman.d/mirrorlist
 
 # enable multilib repos
 sed -i '/\[multilib]/{s/#//;n;s/#//}' /etc/pacman.conf
+
+# add xyne's repositories to improve package selection
+# shellcheck disable=SC2016
+if sed '/^\[xyne-.*]$/q0;d;$q1' /etc/pacman.conf; then
+    # he only publishes certain architectures
+    case "$(uname -m)" in
+	x86_64)
+	    arch="$(uname -m)"
+	    ;;
+	*)
+	    arch="any"
+	    ;;
+    esac
+    cat >> /etc/pacman.conf <<EOF
+[xyne-$arch]
+Server = https://xyne.archlinux.ca/repos/xyne
+EOF
+fi
+
+if check_installed pacserve; then
+    systemctl_activate pacserve
+    sed -i '/^\[.*]$/N;s|^\(\[.*]\n\)Include = /etc/pacman.d/pacserve\n|\1|;s|\(\[.*]\n\)|\1Include = /etc/pacman.d/pacserve\n|' /etc/pacman.conf
+    sed -i '/^\[options]$/N;s|^\(\[options]\n\)Include = /etc/pacman.d/pacserve\n|\1|' /etc/pacman.conf
+else
+    systemctl_deactivate pacserve
+    sed -i '\|^Include = /etc/pacman.d/pacserve$|d' /etc/pacman.conf
+fi
 
 # update the system
 if check_installed pacmatic; then
@@ -395,3 +436,9 @@ fi
 if $laptop; then
     installer lenovo-thinkpad-yoga-11e-chromebook-git || true
 fi
+
+# clean up unneeded packages
+pacman -Qqttd | xargs pacman -Rs --noconfirm || true
+
+# optimize the pacman database
+pacman-optimize
