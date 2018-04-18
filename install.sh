@@ -78,7 +78,7 @@ sed -i '/\[multilib]/{s/#//;n;s/#//}' /etc/pacman.conf
 
 # add xyne's repositories to improve package selection
 # shellcheck disable=SC2016
-if sed '/^\[xyne-.*]$/q0;d;$q1' /etc/pacman.conf; then
+if ! grep -q '^\[xyne-.*]$' /etc/pacman.conf; then
     # he only publishes certain architectures
     case "$(uname -m)" in
 	x86_64)
@@ -96,8 +96,12 @@ fi
 
 if check_installed pacserve; then
     systemctl_activate pacserve
-    sed -i '/^\[.*]$/N;s|^\(\[.*]\n\)Include = /etc/pacman.d/pacserve\n|\1|;s|\(\[.*]\n\)|\1Include = /etc/pacman.d/pacserve\n|' /etc/pacman.conf
-    sed -i '/^\[options]$/N;s|^\(\[options]\n\)Include = /etc/pacman.d/pacserve\n|\1|' /etc/pacman.conf
+    sed -i -f - /etc/pacman.conf <<EOF
+/^\\[.*]$/N
+s|^\\(\\[.*]\\)\\nInclude = /etc/pacman.d/pacserve$|\\1|
+s|^\\(\\[.*]\\)|\\1\\nInclude = /etc/pacman.d/pacserve|
+s|^\\(\\[options]\\)\\nInclude = /etc/pacman.d/pacserve|\\1|
+EOF
 else
     systemctl_deactivate pacserve
     sed -i '\|^Include = /etc/pacman.d/pacserve$|d' /etc/pacman.conf
