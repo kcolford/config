@@ -6,7 +6,8 @@ cd "$(dirname "$0")"
 git pull
 ln -sfn ~ .homelink
 xargs stow < "$lst"
-systemctl --user daemon-reload
+
+systemctl --user daemon-reload || true
 systemctl --user enable emacs redshift-gtk psd || true
 
 # setup completions
