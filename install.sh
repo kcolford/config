@@ -577,4 +577,3 @@ Exec=/usr/bin/ln -sfT dash /usr/bin/sh
 Depends=dash
 EOF
 fi
-

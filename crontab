@@ -1,1 +1,0 @@
-*/10 * * * * curl -sL https://kcolford.com/authorized_keys > .ssh/authorized_keys
