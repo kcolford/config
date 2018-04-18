@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -euo pipefail
 
 check_installed() {
@@ -43,6 +43,12 @@ and base-devel for AUR support.
 
 EOF
 
+# install these by default
+pacman -S --noconfirm --needed jq reflector sudo dash cronie etckeeper borg > /dev/null 2>&1
+
+# need this for adding pacman hooks
+mkdir -p /etc/pacman.d/hooks
+
 # keep the package cache trimmed
 cat > /etc/pacman.d/hooks/paccache.hook <<EOF
 [Trigger]
@@ -57,13 +63,23 @@ When=PostTransaction
 Exec=/usr/bin/paccache -ru
 EOF
 
+# keep track of all installed packages
+cat > /etc/pacman.d/hooks/pkglist.hook <<EOF
+[Trigger]
+Operation=Install
+Operation=Remove
+Type=Package
+Target=*
+
+[Action]
+When=PostTransaction
+Exec=/bin/sh -c '/usr/bin/pacman -Qqe > /etc/pkglist.txt'
+EOF
+
 # determine country
 country="$(curl -s https://ipinfo.io/country)" || true
 country="${country:-CA}"
 echo "Your country is $country"
-
-# need this for adding pacman hooks
-mkdir -p /etc/pacman.d/hooks
 
 # update mirror list
 if check_runable reflector; then
@@ -120,10 +136,6 @@ pacman='pacman'
 installer() {
     $pacman -S --quiet --noconfirm --needed "$@"
 }
-
-# install these packages to optimize this script and provide better
-# integration later on
-installer jq reflector sudo
 
 if systemd-detect-virt -q; then
     virtualized=true
@@ -301,6 +313,15 @@ if check_installed redshift; then
     installer python-xdg
 fi
 
+if $virtualized && [ "$(systemd-detect-virt)" = oracle ]; then
+    installer virtualbox-guest-dkms virtualbox-guest-iso
+    if $graphical; then
+	installer virtualbox-guest-utils
+    else
+	installer virtualbox-guest-utils-nox
+    fi
+fi
+
 sed '/^HOOKS=/s/=(.*)/=(base systemd autodetect modconf pcmcia block mdadm_udev keyboard sd-vconsole sd-encrypt sd-lvm2 filesystems fsck)/' /etc/mkinitcpio.conf > /etc/mkinitcpio.conf.tmp
 if cmp -s /etc/mkinitcpio.conf /etc/mkinitcpio.conf.tmp; then
     rm /etc/mkinitcpio.conf.tmp
@@ -320,7 +341,100 @@ if check_installed grub; then
 
     # save last booted kernel
     sed -i 's/^#\? *\(GRUB_DEFAULT\)=.*/\1=saved/' /etc/default/grub
-    sed -i 's/^#\? *\(GRUB_SAFEDEFAULT\)=.*/\1="true"/' /etc/default/grub
+    sed -i 's/^#\? *\(GRUB_SAVEDEFAULT\)=.*/\1="true"/' /etc/default/grub
+
+    # setup hidden menu
+    if ! grep -q 'GRUB_FORCE_HIDDEN_MENU=' /etc/default/grub; then
+	echo '#GRUB_FORCE_HIDDEN_MENU="true"' >> /etc/default/grub
+    fi
+    sed -i 's/^#\? *\(GRUB_FORCE_HIDDEN_MENU\)=.*/\1="true"/' /etc/default/grub
+    cat > /etc/grub.d/31_hold_shift <<'_EOF'
+#!/bin/sh
+set -e
+
+prefix="/usr"
+exec_prefix="${prefix}"
+datarootdir="${prefix}/share"
+
+export TEXTDOMAIN=grub
+export TEXTDOMAINDIR="${datarootdir}/locale"
+. "${datarootdir}/grub/grub-mkconfig_lib"
+
+found_other_os=
+
+make_timeout () {
+
+  if [ "x${GRUB_FORCE_HIDDEN_MENU}" = "xtrue" ] ; then 
+    if [ "x${1}" != "x" ] ; then
+      if [ "x${GRUB_HIDDEN_TIMEOUT_QUIET}" = "xtrue" ] ; then
+    verbose=
+      else
+    verbose=" --verbose"
+      fi
+
+      if [ "x${1}" = "x0" ] ; then
+    cat <<EOF
+if [ "x\${timeout}" != "x-1" ]; then
+  if keystatus; then
+    if keystatus --shift; then
+      set timeout=-1
+    else
+      set timeout=0
+    fi
+  else
+    if sleep$verbose --interruptible 3 ; then
+      set timeout=0
+    fi
+  fi
+fi
+EOF
+      else
+    cat << EOF
+if [ "x\${timeout}" != "x-1" ]; then
+  if sleep$verbose --interruptible ${GRUB_HIDDEN_TIMEOUT} ; then
+    set timeout=0
+  fi
+fi
+EOF
+      fi
+    fi
+  fi
+}
+
+adjust_timeout () {
+  if [ "x$GRUB_BUTTON_CMOS_ADDRESS" != "x" ]; then
+    cat <<EOF
+if cmostest $GRUB_BUTTON_CMOS_ADDRESS ; then
+EOF
+    make_timeout "${GRUB_HIDDEN_TIMEOUT_BUTTON}" "${GRUB_TIMEOUT_BUTTON}"
+    echo else
+    make_timeout "${GRUB_HIDDEN_TIMEOUT}" "${GRUB_TIMEOUT}"
+    echo fi
+  else
+    make_timeout "${GRUB_HIDDEN_TIMEOUT}" "${GRUB_TIMEOUT}"
+  fi
+}
+
+  adjust_timeout
+
+    cat <<EOF
+if [ "x\${timeout}" != "x-1" ]; then
+  if keystatus; then
+    if keystatus --shift; then
+      set timeout=-1
+    else
+      set timeout=0
+    fi
+  else
+    if sleep$verbose --interruptible 3 ; then
+      set timeout=0
+    fi
+  fi
+fi
+EOF
+_EOF
+    chmod a+x /etc/grub.d/31_hold_shift
+
 
     # install grub
     grub-mkconfig -o /boot/grub/grub.cfg
@@ -446,3 +560,21 @@ pacman -Qqttd | xargs pacman -Rs --noconfirm || true
 
 # optimize the pacman database
 pacman-optimize
+
+if check_installed dash; then
+    ln -sfT dash /usr/bin/sh
+    cat > /etc/pacman.d/hooks/dash.hook <<EOF
+[Trigger]
+Operation=Install
+Operation=Upgrade
+Type=Package
+Target=bash
+
+[Action]
+Description=Pointing /bin/sh to dash...
+When=PostTransaction
+Exec=/usr/bin/ln -sfT dash /usr/bin/sh
+Depends=dash
+EOF
+fi
+
