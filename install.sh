@@ -580,6 +580,10 @@ if check_installed docker; then
     systemctl_activate docker.socket
 fi
 
+if check_installed tesseract; then
+    installer tesseract-data-eng
+fi
+
 # keep track of all installed packages
 cat > /etc/pacman.d/hooks/pkglist.hook <<EOF
 [Trigger]
