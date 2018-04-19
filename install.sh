@@ -123,14 +123,6 @@ else
     sed -i '\|^Include = /etc/pacman.d/pacserve$|d' /etc/pacman.conf
 fi
 
-# update the system
-if check_installed pacmatic; then
-    env DIFFPROG=diff pacmatic -Syyu
-else
-    pacman -Syyu
-    env DIFFPROG=diff pacdiff
-fi
-
 # setup package installer
 pacman='pacman'
 installer() {
@@ -577,3 +569,7 @@ Exec=/usr/bin/ln -sfT dash /usr/bin/sh
 Depends=dash
 EOF
 fi
+
+echo
+echo "The following packages need to be updated"
+checkupdates
