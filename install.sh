@@ -30,6 +30,10 @@ check_file() {
     return 1
 }
 
+check_fstype() {
+    [ "$(findmnt -lno FSTYPE "$(df -P "$1" | awk 'END{print $NF}')")" = "$2" ]
+}
+
 . /etc/os-release
 if [ "$ID" != arch ]; then
     echo "Only run this script on Arch Linux" >&2
@@ -43,38 +47,17 @@ and base-devel for AUR support.
 
 EOF
 
+pacman=pacman
+installer() {
+    $pacman -S --quiet --noconfirm --needed "$@"
+}
+
+if check_runable powerpill; then
+    pacman=powerpill
+fi
+
 # install these by default
-pacman -S --noconfirm --needed jq reflector sudo dash cronie etckeeper borg > /dev/null 2>&1
-
-# need this for adding pacman hooks
-mkdir -p /etc/pacman.d/hooks
-
-# keep the package cache trimmed
-cat > /etc/pacman.d/hooks/paccache.hook <<EOF
-[Trigger]
-Operation=Install
-Operation=Upgrade
-Operation=Remove
-Type=Package
-Target=*
-
-[Action]
-When=PostTransaction
-Exec=/usr/bin/paccache -ru
-EOF
-
-# keep track of all installed packages
-cat > /etc/pacman.d/hooks/pkglist.hook <<EOF
-[Trigger]
-Operation=Install
-Operation=Remove
-Type=Package
-Target=*
-
-[Action]
-When=PostTransaction
-Exec=/bin/sh -c '/usr/bin/pacman -Qqe > /etc/pkglist.txt'
-EOF
+installer jq reflector sudo dash cronie etckeeper borg
 
 # determine country
 country="$(curl -s https://ipinfo.io/country)" || true
@@ -112,22 +95,57 @@ fi
 
 if check_installed pacserve; then
     systemctl_activate pacserve
-    sed -i -f - /etc/pacman.conf <<EOF
-/^\\[.*]$/N
-s|^\\(\\[.*]\\)\\nInclude = /etc/pacman.d/pacserve$|\\1|
-s|^\\(\\[.*]\\)|\\1\\nInclude = /etc/pacman.d/pacserve|
-s|^\\(\\[options]\\)\\nInclude = /etc/pacman.d/pacserve|\\1|
+    sed -i -f - /etc/pacman.conf <<'EOF'
+/^\[.*]$/N
+s|^\(\[.*]\)\nInclude = /etc/pacman.d/pacserve$|\1|
+s|^\(\[.*]\)|\1\nInclude = /etc/pacman.d/pacserve|
+s|^\(\[options]\)\nInclude = /etc/pacman.d/pacserve|\1|
 EOF
 else
     systemctl_deactivate pacserve
     sed -i '\|^Include = /etc/pacman.d/pacserve$|d' /etc/pacman.conf
 fi
 
-# setup package installer
-pacman='pacman'
-installer() {
-    $pacman -S --quiet --noconfirm --needed "$@"
-}
+if [ "$SUDO_USER" ] && check_installed $(pacman -Sqg base-devel); then
+    aursupport=true
+else
+    aursupport=false
+fi
+
+if $aursupport; then
+    # if bauerbill can be easily used then use it, otherwise install
+    # and use trizen
+    if check_installed bauerbill || grep -q '^\[xyne-.*]$' /etc/pacman.conf; then
+	installer bauerbill
+	pacman="bb-wrapper --build-dir /tmp/build --aur"
+    else
+	if ! check_installed trizen; then
+	    sudo -u "$SUDO_USER" git clone https://aur.archlinux.org/trizen /tmp/trizen
+	    ( cd /tmp/trizen && sudo -u "$SUDO_USER" makepkg -si )
+	fi
+	pacman="sudo -u $SUDO_USER trizen"
+    fi
+fi
+
+# update the system
+installer -yyu
+
+# need this for adding pacman hooks
+mkdir -p /etc/pacman.d/hooks
+
+# keep the package cache trimmed
+cat > /etc/pacman.d/hooks/paccache.hook <<EOF
+[Trigger]
+Operation=Install
+Operation=Upgrade
+Operation=Remove
+Type=Package
+Target=*
+
+[Action]
+When=PostTransaction
+Exec=/usr/bin/paccache -ru
+EOF
 
 if systemd-detect-virt -q; then
     virtualized=true
@@ -173,24 +191,10 @@ if check_runable emacs; then
 else
     userinstall=false
 fi
-if [ "$SUDO_USER" ] && check_installed $(pacman -Sqg base-devel); then
-    aursupport=true
-else
-    aursupport=false
-fi
 if check_installed chromium || check_installed emacs && ! check_installed emacs-nox; then
     graphical=true
 else
     graphical=false
-fi
-
-# add aur support
-if $aursupport; then
-    if ! check_installed trizen; then
-	sudo -u "$SUDO_USER" git clone https://aur.archlinux.org/trizen /tmp/trizen
-	( cd /tmp/trizen && sudo -u "$SUDO_USER" makepkg -si )
-    fi
-    pacman="sudo -u $SUDO_USER trizen"
 fi
 
 # setup timezone
@@ -427,7 +431,6 @@ EOF
 _EOF
     chmod a+x /etc/grub.d/31_hold_shift
 
-
     # install grub
     grub-mkconfig -o /boot/grub/grub.cfg
     if [ -d /sys/firmware/efi/efivars ]; then
@@ -447,11 +450,20 @@ fi
 
 if check_installed libvirt; then
     chattr +C -R /var/lib/libvirt/images/
-    installer
+    installer ebtables dnsmasq bridge-utils qemu radvd dmidecode
+    if $graphical; then
+	installer virt-viewer
+    fi
+    installer libguestfs || true
+    systemctl_activate libvirtd
 fi
 
-if [ "$(findmnt -no FSTYPE /)" = btrfs ]; then
-    sed -i '/autodefrag/n;s=\([^[:space:]]\+\) */ *\(auto\|btrfs\) *\(.*\)=\1 / \2 \3,autodefrag=' /etc/fstab
+if check_fstype / btrfs; then
+    installer btrfs-progs
+    sed -i -f - /etc/fstab <<'EOF'
+/autodefrag/n
+s=\([^[:space:]]\+\) */ *\(auto\|btrfs\) *\(.*\)=\1 / \2 \3,autodefrag=
+EOF
     mount -o remount /
 fi
 
@@ -507,26 +519,6 @@ if $graphical && [ -d /sys/module/nouveau ]; then
     installer xf86-video-nouveau
 fi
 
-if check_installed nvidia || check_installed nvidia-dkms; then
-    installer nvidia-utils
-fi
-
-if check_installed nvidia; then
-    cat > /etc/pacman.d/hooks/nvidia.hook <<EOF
-[Trigger]
-Operation=Install
-Operation=Upgrade
-Operation=Remove
-Type=Package
-Target=nvidia
-
-[Action]
-Depends=mkinitcpio
-When=PostTransaction
-Exec=/usr/bin/mkinitcpio -P
-EOF
-fi
-
 if $graphical; then
     cat > /etc/X11/xorg.conf.d/30-touchpad.conf <<EOF
 Section "InputClass"
@@ -548,7 +540,7 @@ if $laptop; then
 fi
 
 # clean up unneeded packages
-pacman -Qqttd | xargs pacman -Rs --noconfirm || true
+pacman -Qqtd | xargs pacman -Rs --noconfirm || true
 
 # optimize the pacman database
 pacman-optimize
@@ -569,7 +561,34 @@ Exec=/usr/bin/ln -sfT dash /usr/bin/sh
 Depends=dash
 EOF
 fi
+cat > /etc/pacman.d/hooks/dash-remove.hook <<EOF
+[Trigger]
+Operation=Remove
+Type=Package
+Target=dash
 
-echo
-echo "The following packages need to be updated"
-checkupdates
+[Action]
+Description=Pointing /bin/sh to bash...
+When=PostTransaction
+Exec=/usr/bin/ln -sfT bash /usr/bin/sh
+EOF
+
+if check_installed docker; then
+    if check_fstype /var/lib/docker btrfs; then
+	installer btrfs-progs
+    fi
+    systemctl_activate docker.socket
+fi
+
+# keep track of all installed packages
+cat > /etc/pacman.d/hooks/pkglist.hook <<EOF
+[Trigger]
+Operation=Install
+Operation=Remove
+Type=Package
+Target=*
+
+[Action]
+When=PostTransaction
+Exec=/bin/sh -c '/usr/bin/pacman -Qqe > /etc/pkglist.txt'
+EOF
