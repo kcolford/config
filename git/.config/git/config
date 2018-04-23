@@ -44,3 +44,5 @@
 	colorMoved = plain
 [help]
 	autocorrect = 1
+[rerere]
+	autoupdate = true
