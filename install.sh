@@ -323,6 +323,7 @@ add_sudo_policy() {
     if ! check_installed sudo; then
 	return 0
     fi
+    q visudo -c
     if [ -f "$1" ]; then
 	cp -a "$1" /etc/sudoers.d.tmp
     fi
