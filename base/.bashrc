@@ -39,6 +39,9 @@ try_eval() {
 }
 
 import /usr/share/git/git-prompt.sh
+export GIT_PS1_SHOWDIRTYSTATE=y
+export GIT_PS1_SHOWSTASHSTATE=y
+export GIT_PS1_SHOWUNTRACKEDFILES=y
 PS1="\$(__git_ps1 \"(%s) \")$PS1"
 
 # colourize prompt according to command status
