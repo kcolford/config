@@ -13,38 +13,21 @@ check_runable() {
 
 c="^ *#\\? *"
 shellvar_edit() {
-    first="$1"
-    second="$2"
-    if [ "$#" = 2 ]; then
-	if grep -q "$c$2" "$1"; then
-	    echo "# $2" >> "$1"
-	fi
-	sed "s/^/#/;s/^#$//;s|$c$2|$2|" "$1" > "$1".tmp
-    elif [ "$#" = 3 ]; then
-	if grep -q "$c$2=.*" "$1"; then
-	    echo "# $2=''" >> "$1"
-	fi
-	if [ "$(grep -c "$c$2=" "$1")" != 1 ]; then
-	    sed "s|$c\\($2=\"\\?$(printf %q "$3")\"\\?\\)|\\1|" "$1" > "$1".tmp
-	else
-	    sed "s|$c$2=.*|$2=$(printf %q "$3")|" "$1" > "$1".tmp
-	fi
-    else
-	if grep -q "$c$2=(.*)" "$1"; then
-	    echo "# $2=()" >> "$1"
-	fi
-	third="$3"
-	shift 3
-	sed "s|$c$second=(.*)|$second=($(printf %q "$third")$(printf ' %q' "$@"))|" "$first" > "$first".tmp
-    fi
-    if cmp -s "$first" "$first".tmp; then
-	rm "$first".tmp
-	changed=true
-    else
-	cat "$first".tmp > "$first"
-	rm "$first".tmp
-	changed=false
-    fi
+    case "$#" in
+	3)
+	    if grep -q "$c$2=.*" "$1"; then
+		echo "# $2=''" >> "$1"
+	    fi
+	    if [ "$(grep -c "$c$2=" "$1")" != 1 ]; then
+		sed "s|$c\\($2=\"\\?$(printf %q "$3")\"\\?\\)|\\1|" "$1" > "$1".tmp
+	    else
+		sed "s|$c$2=.*|$2=$(printf %q "$3")|" "$1" > "$1".tmp
+	    fi
+	    ;;
+	*)
+	    return 2
+	    ;;
+    esac
 }
 
 systemctl_activate() {
@@ -371,7 +354,7 @@ if $wireless && check_installed networkmanager; then
 fi
 
 if [ -f /etc/conf.d/wireless-regdom ]; then
-    shellvar_edit /etc/conf.d/wireless-regdom WIRELESS_REGDOM "$country"
+    sed -i "/$country/s/#//" /etc/conf.d/wireless-regdom 
 fi
 
 # lock the root account if we have a sudo user
@@ -585,13 +568,16 @@ fi
 if check_installed openssh; then
     # TODO
     :
+    if [ -s /root/.ssh/authorized_keys ] || ( $has_admin && [ -s /home/"$admin_user"/.ssh/authorized_keys ] ); then
+	sed -i 's/ *#\? *\(PasswordAuthentication\) .*/\1 no/' /etc/ssh/sshd_config
+    else
+	installer fail2ban
+    fi
 fi
 
-shellvar_edit /etc/mkinitcpio.conf HOOKS base systemd autodetect modconf pcmcia block mdadm_udev keyboard sd-vconsole sd-encrypt sd-lvm2 filesystems fsck
-if $changed; then
-    echo "Generating initcpio..."
-    q mkinitcpio -P > /dev/null
-fi
+sed -i 's/ *#\? *\(HOOKS\)=(.*)/\1=(base systemd autodetect modconf pcmcia block mdadm_udev keyboard sd-vconsole sd-encrypt sd-lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
+echo "Generating initcpio..."
+q mkinitcpio -P > /dev/null
 
 if check_installed grub; then
     shellvar_edit /etc/default/grub GRUB_CMDLINE_LINUX_DEFAULT quiet
