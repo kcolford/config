@@ -389,7 +389,7 @@ fi
 
 # for my local configuration files
 if check_runable i3; then
-    installer xorg xterm compton xss-lock udiskie feh redshift dunst xdotool dex dmenu terminus-font
+    installer xorg xterm compton xss-lock udiskie feh redshift dunst xdotool dex dmenu terminus-font arandr
 fi
 
 if check_installed redshift; then
@@ -555,6 +555,23 @@ if check_installed docker; then
 	installer btrfs-progs
     fi
     systemctl_activate docker.socket
+fi
+
+if $laptop; then
+    installer laptop-mode-tools || true
+fi
+
+if $laptop; then
+    installer tlp
+    if check_fstype / btrfs; then
+	shellvar_edit /etc/default/tlp SATA_LINKPWR_ON_BAT max_performance
+    fi
+    if ! systemctl is-enabled NetworkManager; then
+	systemctl mask NetworkManager
+    fi
+    systemctl mask systemd-rfkill systemd-rfkill.socket
+    systemctl_activate tlp
+    systemctl enable tlp-sleep
 fi
 
 if check_installed tesseract; then
