@@ -468,7 +468,7 @@ if $userinstall && check_runable emacs; then
 fi
 
 if $has_admin && check_installed profile-sync-daemon; then
-    add_sudo_policy /etc/sudoers.d/psd <<EOF
+    add_sudo_policy /etc/sudoers.d/zz-psd <<EOF
 $admin_user ALL=(ALL) NOPASSWD: /usr/bin/psd-overlay-helper
 EOF
 fi
