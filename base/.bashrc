@@ -71,6 +71,7 @@ alias LS='ls'
 alias igrep='grep --ignore-case'
 alias fu='fuck'
 alias magit='emacsclient -t --eval "(magit-status)"'
+alias etags='etags **.[ch]*'
 
 # wrapper to enable relative paths for encfs
 encfs() {
