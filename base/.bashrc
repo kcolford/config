@@ -14,7 +14,7 @@ shopt -s checkhash
 shopt -s checkwinsize
 shopt -s cmdhist
 shopt -s direxpand
-shopt -s dirspell
+#shopt -s dirspell
 shopt -s globstar
 shopt -s histappend
 shopt -s mailwarn
