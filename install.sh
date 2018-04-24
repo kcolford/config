@@ -1,8 +1,13 @@
 #!/bin/bash
 set -euo pipefail
+trap 'kill -$$' EXIT
 
 check_installed() {
-    pacman -Q "$@" > /dev/null 2>&1
+    for pkg in "$@"; do
+	# shellcheck disable=SC2046
+	# shellcheck disable=SC2086
+	qq pacman -Q "$pkg" || { qq pacman -Sg "$pkg" && qq pacman -Q $(qq pacman -Sqg "$pkg"); }
+    done
 }
 
 check_runable() {
@@ -15,13 +20,13 @@ c="^ *#\\? *"
 shellvar_edit() {
     case "$#" in
 	3)
-	    if grep -q "$c$2=.*" "$1"; then
+	    if ! grep -q "$c$2=.*" "$1"; then
 		echo "# $2=''" >> "$1"
 	    fi
-	    if [ "$(grep -c "$c$2=" "$1")" != 1 ]; then
-		sed "s|$c\\($2=\"\\?$(printf %q "$3")\"\\?\\)|\\1|" "$1" > "$1".tmp
+	    if printf '%s' "$3" | grep -q "[[:space:]]"; then
+		sed -i "s|$c$2=.*|$2=\"$3\"|" "$1"
 	    else
-		sed "s|$c$2=.*|$2=$(printf %q "$3")|" "$1" > "$1".tmp
+		sed -i "s|$c$2=.*|$2=$3|" "$1"
 	    fi
 	    ;;
 	*)
@@ -32,12 +37,12 @@ shellvar_edit() {
 
 systemctl_activate() {
     q systemctl enable "$@"
-    q systemctl start "$@"
+    q systemctl start "$@" &
 }
 
 systemctl_deactivate() {
-    systemctl disable "$@" > /dev/null 2>&1 || true
-    systemctl stop "$@" > /dev/null 2>&1 || true
+    qq systemctl disable "$@" || true
+    qq systemctl stop "$@" || true
 }
 
 check_file() {
@@ -54,15 +59,7 @@ check_fstype() {
 }
 
 qq() {
-    t="$(mktemp)"
-    if "$@" 2> "$t"; then
-	rm "$t"
-	return 0
-    else
-	cat "$t"
-	rm "$t"
-	return 1
-    fi
+    "$@" > /dev/null 2>&1
 }
 
 prompt() {
@@ -96,7 +93,9 @@ uninstaller() {
 
 pacman='q pacman'
 installer() {
-    $pacman -S --noconfirm --needed "$@"
+    if ! check_installed "$@"; then
+	$pacman -S --noconfirm --needed "$@"
+    fi
 }
 
 . /etc/os-release
@@ -114,9 +113,9 @@ fi
 if [ "$#" = 0 ]; then
     if [ -f /etc/installopts ]; then
 	# shellcheck disable=SC2046
-	exec bash "$0" $(cat /etc/installopts)
+	set -- $(cat /etc/installopts)
     else
-	exec bash "$0" --
+	set -- --
     fi
 fi
 printf '%s\n' "$@" > /etc/installopts
@@ -138,14 +137,13 @@ update=false
 router=false
 freeonly=false
 server=false
-hibernate=false
 full=true
 if check_runable emacs; then
     userinstall=true
 else
     userinstall=false
 fi
-if check_installed chromium || check_installed emacs && ! check_installed emacs-nox; then
+if check_installed xorg || check_installed i3 || check_installed chromium || check_installed emacs; then
     graphical=true
 else
     graphical=false
@@ -156,11 +154,15 @@ if [ "$SUDO_USER" ] && [ "$SUDO_USER" != root ]; then
 else
     has_admin=false
 fi
-# shellcheck disable=SC2046
-if $has_admin && check_installed $(pacman -Sqg base-devel); then
+if $has_admin && check_installed base-devel; then
     aursupport=true
 else
     aursupport=false
+fi
+if [ "$(lscpu | awk '$1=="Vendor"{print $NF}')" = GenuineIntel ]; then
+    intelcpu=true
+else
+    intelcpu=false
 fi
 
 for cfg in "$@"; do
@@ -171,7 +173,6 @@ for cfg in "$@"; do
 	headless) graphical=false ;;
 	nographical) graphical=false ;;
 	graphics|graphical) graphical=true ;;
-	hibernate|hibernation) hibernate=true ;;
 	aur) aursupport=true ;;
 	user) userinstall=true ;;
 	nouser) userinstall=false ;;
@@ -287,7 +288,9 @@ if $full && $aursupport; then
 	if ! check_installed trizen; then
 	    installer base-devel
 	    sudo -u "$admin_user" git clone https://aur.archlinux.org/trizen /tmp/trizen
-	    ( cd /tmp/trizen && q sudo -u "$admin_user" makepkg -si )
+	    q pushd /tmp/trizen
+	    q sudo -u "$admin_user" makepkg -si
+	    q popd
 	fi
 	pacman="q sudo -u $admin_user trizen"
     fi
@@ -308,6 +311,12 @@ fi
 if $full; then
     installer jq reflector sudo dash cronie etckeeper borg rsync
 fi
+
+# setup timezone
+timezone="$(curl -s 'ipinfo.io/loc' | sed 's/,/ /' | awk '{print "api.geonames.org/timezoneJSON?lat=" $1 "&lng=" $2 "&username=kcolford";}' | xargs curl -s | jq -r .timezoneId)" || true
+timezone="${timezone:-America/Toronto}"
+echo "Your timezone is $timezone"
+ln -sf "/usr/share/zoneinfo/$timezone" /etc/localtime
 
 # need this for adding pacman hooks
 mkdir -p /etc/pacman.d/hooks
@@ -375,20 +384,13 @@ if ! $contained; then
     installer grub
 fi
 
-# setup timezone
-timezone="$(curl -s 'ipinfo.io/loc' | sed 's/,/ /' | awk '{print "api.geonames.org/timezoneJSON?lat=" $1 "&lng=" $2 "&username=kcolford";}' | xargs curl -s | jq -r .timezoneId)" || true
-timezone="${timezone:-America/Toronto}"
-echo "Your timezone is $timezone"
-ln -sf "/usr/share/zoneinfo/$timezone" /etc/localtime
-
 # setup localization
 cat > /etc/locale.gen <<EOF
 $locale.UTF-8 UTF-8
 en_US.UTF-8 UTF-8
 EOF
 shellvar_edit /etc/locale.conf LANG "$locale.UTF-8"
-echo "Generating locales.."
-q locale-gen
+q locale-gen && echo "Done generating locales." &
 
 # setup the linux console
 shellvar_edit /etc/vconsole.conf KEYMAP us
@@ -536,7 +538,7 @@ EOF
 /user_subvol_rm_allowed/n
 s=\([^[:space:]]\+\) */ *\(auto\|btrfs\) *\(.*\)=\1 / \2 \3,user_subvol_rm_allowed=
 EOF
-    mount -o remount /
+    mount -o remount / &
 fi
 
 if check_installed cronie; then
@@ -548,7 +550,7 @@ if $userinstall; then
     installer hub thefuck
 fi
 
-if $userinstall && ( check_installed chromium || check_installed google-chrome ); then
+if $userinstall && { check_installed chromium || check_installed google-chrome; }; then
     installer ttf-liberation noto-fonts libu2f-host
     installer profile-sync-daemon || true
 fi
@@ -560,13 +562,8 @@ fi
 # if emacs is installed then we need to install the helper
 # applications for it
 if $userinstall && check_runable emacs; then
-    installer xclip shellcheck aspell aspell-en
-    installer go-tools
-    installer gocode-git || true
-    installer flake8 autopep8 yapf ipython python-jedi python-rope python-virtualenv
-    installer prettier
-    installer cmake clang
-    installer bear || true
+    installer xclip shellcheck aspell aspell-en go-tools flake8 autopep8 yapf ipython python-jedi python-rope python-virtualenv prettier cmake clang
+    installer bear gocode-git || true
 fi
 
 # for eduroam configuration
@@ -580,15 +577,7 @@ $admin_user ALL=(ALL) NOPASSWD: /usr/bin/psd-overlay-helper
 EOF
 fi
 
-if $laptop; then
-    if $server; then
-	shellvar_edit /etc/systemd/logind.conf HandleLidSwitch ignore
-    elif $hibernate; then
-	shellvar_edit /etc/systemd/logind.conf HandleLidSwitch hybrid-sleep
-    else
-	shellvar_edit /etc/systemd/logind.conf HandleLidSwitch sleep
-    fi
-fi
+shellvar_edit /etc/systemd/logind.conf HandleLidSwitch hybrid-sleep
 
 if $graphical && [ -d /sys/module/i915 ]; then
     installer xf86-video-intel
@@ -632,9 +621,6 @@ fi
 # shellcheck disable=SC2046
 uninstaller $(pacman -Qqdtt)
 
-# optimize the pacman database
-q pacman-optimize
-
 if check_installed dash; then
     ln -sfT dash /usr/bin/sh
     cat > /etc/pacman.d/hooks/dash.hook <<EOF
@@ -661,6 +647,16 @@ Description=Pointing /bin/sh to bash...
 When=PostTransaction
 Exec=/bin/bash -c 'ln -sfT bash /usr/bin/sh && rm /etc/pacman.d/hooks/dash.hook && rm /etc/pacman.d/hooks/dash-remove.hook'
 EOF
+fi
+
+# add iommu support
+if [ "$(uname -m)" = x86_64 ]; then
+    if $intelcpu; then
+	linuxcmdline="$linuxcmdline intel_iommu=on"
+    else
+	linuxcmdline="$linuxcmdline amd_iommu=on"
+    fi
+    linuxcmdline="$linuxcmdline iommu=pt"
 fi
 
 if $server; then
@@ -706,7 +702,7 @@ fi
 if check_installed openssh; then
     systemctl_activate sshd.socket
     systemctl start sshdgenkeys
-    if [ -s /root/.ssh/authorized_keys ] || ( $has_admin && [ -s /home/"$admin_user"/.ssh/authorized_keys ] ); then
+    if [ -s /root/.ssh/authorized_keys ] || { $has_admin && [ -s /home/"$admin_user"/.ssh/authorized_keys ]; }; then
 	sed -i 's/ *#\? *\(PasswordAuthentication\) .*/\1 no/' /etc/ssh/sshd_config
     else
 	installer fail2ban
@@ -714,12 +710,9 @@ if check_installed openssh; then
 fi
 
 sed -i 's/ *#\? *\(HOOKS\)=(.*)/\1=(base systemd autodetect modconf pcmcia block mdadm_udev keyboard sd-vconsole sd-encrypt sd-lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
-echo "Generating initcpio..."
-q mkinitcpio -P > /dev/null
-echo "Done."
+q mkinitcpio -P && echo "Done generating initcpio." &
 
 if check_installed grub; then
-    echo "Configuring grub..."
     shellvar_edit /etc/default/grub GRUB_CMDLINE_LINUX_DEFAULT quiet
     shellvar_edit /etc/default/grub GRUB_CMDLINE_LINUX "$linuxcmdline"
     shellvar_edit /etc/default/grub GRUB_ENABLE_CRYPTODISK y
@@ -814,12 +807,18 @@ _EOF
     chmod a+x /etc/grub.d/31_hold_shift
 
     # install grub
-    q grub-mkconfig -o /boot/grub/grub.cfg
+    q grub-mkconfig -o /boot/grub/grub.cfg &
     if [ -d /sys/firmware/efi/efivars ]; then
 	installer efibootmgr
-	q grub-install
+	q grub-install && echo "Done installing grub to ESP." &
     else
-	q grub-install "$(lsblk -lpsno NAME "$(findmnt -no SOURCE /)" | tail -n 1)"
+	q grub-install "$(lsblk -lpsno NAME "$(findmnt -no SOURCE /)" | tail -n 1)" && echo "Done installing grub to MBR." &
     fi
-    echo "Done."
 fi
+
+q pacman-optimize && echo "Done optimizing the pacman database." &
+
+while true; do
+    wait -n || { [ $? = 127 ] && break; } || exit
+done
+trap '' EXIT
