@@ -95,6 +95,10 @@ The minor mode's documentation is specified in DOC."
   (interactive)
   (start-process "xterm" nil "xterm"))
 
+(defun emacsclient-mergetool (local remote base output)
+  "Run emacsclient as a mergetool in git."
+  (emerge-files-with-ancestor nil local remote base output nil (lambda () (delete-frame (select-frame)))))
+
 ;; tramp integration
 (setq-default tramp-default-method "ssh")
 (setq-default auto-revert-remote-files t)

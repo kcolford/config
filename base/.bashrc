@@ -14,7 +14,7 @@ shopt -s checkhash
 shopt -s checkwinsize
 shopt -s cmdhist
 shopt -s direxpand
-shopt -s dirspell
+#shopt -s dirspell
 shopt -s globstar
 shopt -s histappend
 shopt -s mailwarn
@@ -39,6 +39,10 @@ try_eval() {
 }
 
 import /usr/share/git/git-prompt.sh
+export GIT_PS1_SHOWDIRTYSTATE=y
+export GIT_PS1_SHOWSTASHSTATE=y
+export GIT_PS1_SHOWUNTRACKEDFILES=y
+export GIT_PS1_SHOWUPSTREAM=y
 PS1="\$(__git_ps1 \"(%s) \")$PS1"
 
 # colourize prompt according to command status
@@ -50,7 +54,7 @@ alias diff='diff --text --unified --recursive'
 alias ghc='ghc -dynamic'
 alias gpg='gpg --armour'
 alias gpgv='gpg --verify'
-alias grep='grep --color=auto'
+alias grep='grep --color=auto -C 3'
 alias ls='ls --hide="*~" --color=auto --classify --dereference-command-line --human-readable'
 alias qemu-system-x86_64='qemu-system-x86_64 -accel kvm -smp 2 -m 2048'
 alias tcpdump='sudo tcpdump --relinquish-privileges $USER'
@@ -66,6 +70,8 @@ alias sl='ls'
 alias LS='ls'
 alias igrep='grep --ignore-case'
 alias fu='fuck'
+alias magit='emacsclient -t --eval "(magit-status)"'
+alias etags='etags **.[ch]*'
 
 # wrapper to enable relative paths for encfs
 encfs() {
