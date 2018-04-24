@@ -1,5 +1,5 @@
 #!/bin/sh
-set -euo pipefail
+set -eu
 dir="$(dirname "$0")"
 category="$(realpath -s --relative-to "$dir" "$1")"
 shift

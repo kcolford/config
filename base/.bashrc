@@ -39,10 +39,19 @@ try_eval() {
 }
 
 import /usr/share/git/git-prompt.sh
-export GIT_PS1_SHOWDIRTYSTATE=y
-export GIT_PS1_SHOWSTASHSTATE=y
-export GIT_PS1_SHOWUNTRACKEDFILES=y
-export GIT_PS1_SHOWUPSTREAM=y
+if [ -x "$(command -v watchman)" ]; then
+    # shellcheck disable=SC2034
+    GIT_PS1_SHOWDIRTYSTATE=y
+    # shellcheck disable=SC2034
+    GIT_PS1_SHOWUNTRACKEDFILES=y
+fi
+slow_repo() {
+    git config bash.showDirtyState false && git config bash.showUntrackedFiles false
+}
+# shellcheck disable=SC2034
+GIT_PS1_SHOWSTASHSTATE=y
+# shellcheck disable=SC2034
+GIT_PS1_SHOWUPSTREAM=y
 PS1="\$(__git_ps1 \"(%s) \")$PS1"
 
 # colourize prompt according to command status

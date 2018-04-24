@@ -1,0 +1,9 @@
+AUR/ddns * kcolford
+AUR/hello * leo
+AUR/hivex * bidulock
+AUR/libguestfs * skalkoto
+AUR/linux-sgx-driver-dkms-git * robertfoster
+AUR/lostfiles * graysky
+AUR/opensgx-git * Jonhoo
+AUR/perl-sys-virt * bidulock
+AUR/tor-browser * grufo

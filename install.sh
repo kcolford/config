@@ -65,6 +65,17 @@ qq() {
     fi
 }
 
+prompt() {
+    while true; do
+	read -r -p "$1 [yn] " yn
+	case "$yn" in
+	    [Yy]*) return 0 ;;
+	    [Nn]*) return 1 ;;
+	    *) echo "Please answer yes or no." >&2 ;;
+	esac
+    done
+}
+
 q() {
     t="$(mktemp)"
     if "$@" > "$t" 2>&1 < /dev/null; then
@@ -94,6 +105,22 @@ if [ "$ID" != arch ]; then
     exit 1
 fi
 
+# ensure we are run as root
+if [ "$(id -u)" != 0 ]; then
+    exec sudo bash "$0" "$@"
+fi
+
+# auto load install options
+if [ "$#" = 0 ]; then
+    if [ -f /etc/installopts ]; then
+	# shellcheck disable=SC2046
+	exec bash "$0" $(cat /etc/installopts)
+    else
+	exec bash "$0" --
+    fi
+fi
+printf '%s\n' "$@" > /etc/installopts
+
 # instructions
 cat <<EOF
 Install emacs for a workstation, emacs-nox for a headless workstation,
@@ -106,6 +133,8 @@ EOF
 
 linuxcmdline=''
 locale=en_CA
+
+update=false
 router=false
 freeonly=false
 server=false
@@ -147,9 +176,15 @@ for cfg in "$@"; do
 	user) userinstall=true ;;
 	nouser) userinstall=false ;;
 	nofull|min|minimal) full=false ;;
+	up|update) update=true ;;
+	--) ;;
 	*) echo "Invalid configuration '$cfg'." >&2; exit 2 ;;
     esac
 done
+
+if $router; then
+    full=false
+fi
 
 if check_runable powerpill; then
     pacman='q powerpill'
@@ -241,7 +276,7 @@ else
     sed -i '\|^Include = /etc/pacman.d/pacserve$|d' /etc/pacman.conf
 fi
 
-if $aursupport; then
+if $full && $aursupport; then
     # if bauerbill can be easily used then use it, otherwise install
     # and use trizen
     if check_installed bauerbill || grep -q '^\[xyne-.*]$' /etc/pacman.conf; then
@@ -250,7 +285,7 @@ if $aursupport; then
 	pacman="bb-wrapper --bb-quiet --build-dir /tmp/build --aur"
     else
 	if ! check_installed trizen; then
-	    installer base-devel # just to make sure it's available
+	    installer base-devel
 	    sudo -u "$admin_user" git clone https://aur.archlinux.org/trizen /tmp/trizen
 	    ( cd /tmp/trizen && q sudo -u "$admin_user" makepkg -si )
 	fi
@@ -259,8 +294,12 @@ if $aursupport; then
 fi
 
 # update the system
-installer -yu
-env DIFFPROG='diff -aur' pacdiff
+if $full && $update; then
+    installer -yu
+    env DIFFPROG='diff -aur' pacdiff
+else
+    checkupdates
+fi
 
 # From here on out we can start installing and configuring whatever we
 # want.
@@ -677,8 +716,10 @@ fi
 sed -i 's/ *#\? *\(HOOKS\)=(.*)/\1=(base systemd autodetect modconf pcmcia block mdadm_udev keyboard sd-vconsole sd-encrypt sd-lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
 echo "Generating initcpio..."
 q mkinitcpio -P > /dev/null
+echo "Done."
 
 if check_installed grub; then
+    echo "Configuring grub..."
     shellvar_edit /etc/default/grub GRUB_CMDLINE_LINUX_DEFAULT quiet
     shellvar_edit /etc/default/grub GRUB_CMDLINE_LINUX "$linuxcmdline"
     shellvar_edit /etc/default/grub GRUB_ENABLE_CRYPTODISK y
@@ -780,4 +821,5 @@ _EOF
     else
 	q grub-install "$(lsblk -lpsno NAME "$(findmnt -no SOURCE /)" | tail -n 1)"
     fi
+    echo "Done."
 fi
