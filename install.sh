@@ -520,12 +520,29 @@ fi
 
 if check_installed libvirt; then
     chattr +C -R /var/lib/libvirt/images/
-    installer ebtables dnsmasq bridge-utils qemu radvd dmidecode
+    installer ebtables dnsmasq bridge-utils qemu radvd dmidecode ovmf
     if $graphical; then
 	installer virt-viewer
     fi
     installer libguestfs || true
     systemctl_activate libvirtd
+fi
+
+if check_installed ovmf libvirt; then
+    qq patch -t -N /etc/libvirt/qemu.conf - <<EOF || true
+--- /etc/libvirt/qemu.conf
++++ /etc/libvirt/qemu.conf
+@@ -728,6 +728,9 @@
+ #   "/usr/share/AAVMF/AAVMF_CODE.fd:/usr/share/AAVMF/AAVMF_VARS.fd",
+ #   "/usr/share/AAVMF/AAVMF32_CODE.fd:/usr/share/AAVMF/AAVMF32_VARS.fd"
+ #]
++nvram = [
++	"/usr/share/ovmf/x64/OVMF_CODE.fd:/usr/share/ovmf/x64/OVMF_VARS.fd"
++]
+ 
+ # The backend to use for handling stdout/stderr output from
+ # QEMU processes.
+EOF
 fi
 
 if check_fstype / btrfs; then
