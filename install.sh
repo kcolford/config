@@ -70,6 +70,18 @@ check_fstype() {
     [ "$(findmnt -lno FSTYPE "$(df -P "$1" | awk 'END{print $NF}')")" = "$2" ]
 }
 
+qq() {
+    t="$(mktemp)"
+    if "$@" 2> "$t"; then
+	rm "$t"
+	return 0
+    else
+	cat "$t"
+	rm "$t"
+	return 1
+    fi
+}
+
 q() {
     t="$(mktemp)"
     if "$@" > "$t" 2>&1 < /dev/null; then
@@ -88,9 +100,9 @@ uninstaller() {
     fi
 }
 
-pacman=pacman
+pacman='q pacman'
 installer() {
-    q $pacman -S --noconfirm --needed "$@"
+    $pacman -S --noconfirm --needed "$@"
 }
 
 . /etc/os-release
@@ -104,14 +116,60 @@ cat <<EOF
 Install emacs for a workstation, emacs-nox for a headless workstation,
 and base-devel for AUR support.
 
+Also include configuration options on the command line to decide how
+to configure the server.
+
 EOF
 
 linuxcmdline=''
+locale=en_CA
 router=false
 freeonly=false
+server=false
+hibernate=false
+full=true
+if check_runable emacs; then
+    userinstall=true
+else
+    userinstall=false
+fi
+if check_installed chromium || check_installed emacs && ! check_installed emacs-nox; then
+    graphical=true
+else
+    graphical=false
+fi
+if [ "$SUDO_USER" ] && [ "$SUDO_USER" != root ]; then
+    has_admin=true
+    admin_user="$SUDO_USER"
+else
+    has_admin=false
+fi
+# shellcheck disable=SC2046
+if $has_admin && check_installed $(pacman -Sqg base-devel); then
+    aursupport=true
+else
+    aursupport=false
+fi
+
+for cfg in "$@"; do
+    case "$cfg" in
+	server) server=true ;;
+	router) router=true ;;
+	freeonly) freeonly=true ;;
+	headless) graphical=false ;;
+	nographical) graphical=false ;;
+	graphics|graphical) graphical=true ;;
+	hibernate|hibernation) hibernate=true ;;
+	aur) aursupport=true ;;
+	user) userinstall=true ;;
+	nouser) userinstall=false ;;
+	nofull|min|minimal) full=false ;;
+	*) echo "Invalid configuration '$cfg'." >&2; exit 2 ;;
+    esac
+done
 
 if check_runable powerpill; then
-    pacman=powerpill
+    pacman='q powerpill'
 fi
 
 if check_file /sys/class/power_supply/BAT*; then
@@ -165,10 +223,12 @@ fi
 mv /etc/pacman.d/mirrorlist.tmp /etc/pacman.d/mirrorlist
 
 # enable multilib repos
-sed -i '/\[multilib]/{s/#//;n;s/#//}' /etc/pacman.conf
+if $full; then
+    sed -i '/\[multilib]/{s/#//;n;s/#//}' /etc/pacman.conf
+fi
 
 # add xyne's repositories to improve package selection
-if ! grep -q '^\[xyne-.*]' /etc/pacman.conf; then
+if $full && ! grep -q '^\[xyne-.*]' /etc/pacman.conf; then
     # he only publishes certain architectures
     case "$(uname -m)" in
 	x86_64)
@@ -182,9 +242,10 @@ if ! grep -q '^\[xyne-.*]' /etc/pacman.conf; then
 [xyne-$arch]
 Server = https://xyne.archlinux.ca/repos/xyne
 EOF
+    q pacman -Sy
 fi
 
-if ! $router && check_installed pacserve; then
+if $full && check_installed pacserve; then
     systemctl_activate pacserve
     sed -i -f - /etc/pacman.conf <<'EOF'
 /^\[.*]$/N
@@ -197,32 +258,20 @@ else
     sed -i '\|^Include = /etc/pacman.d/pacserve$|d' /etc/pacman.conf
 fi
 
-if [ "$SUDO_USER" ] && [ "$SUDO_USER" != root ]; then
-    has_admin=true
-    admin_user="$SUDO_USER"
-else
-    has_admin=false
-fi
-
-# shellcheck disable=SC2046
-if $has_admin && check_installed $(pacman -Sqg base-devel); then
-    aursupport=true
-else
-    aursupport=false
-fi
-
 if $aursupport; then
     # if bauerbill can be easily used then use it, otherwise install
     # and use trizen
     if check_installed bauerbill || grep -q '^\[xyne-.*]$' /etc/pacman.conf; then
+	installer base-devel
 	installer bauerbill
-	pacman="bb-wrapper --build-dir /tmp/build --aur"
+	pacman="bb-wrapper --bb-quiet --build-dir /tmp/build --aur"
     else
 	if ! check_installed trizen; then
+	    installer base-devel # just to make sure it's available
 	    sudo -u "$admin_user" git clone https://aur.archlinux.org/trizen /tmp/trizen
-	    ( cd /tmp/trizen && sudo -u "$admin_user" makepkg -si )
+	    ( cd /tmp/trizen && q sudo -u "$admin_user" makepkg -si )
 	fi
-	pacman="sudo -u $admin_user trizen"
+	pacman="q sudo -u $admin_user trizen"
     fi
 fi
 
@@ -230,8 +279,13 @@ fi
 installer -yu
 env DIFFPROG='diff -aur' pacdiff
 
+# From here on out we can start installing and configuring whatever we
+# want.
+
 # install these by default
-installer jq reflector sudo dash cronie etckeeper borg
+if $full; then
+    installer jq reflector sudo dash cronie etckeeper borg rsync
+fi
 
 # need this for adding pacman hooks
 mkdir -p /etc/pacman.d/hooks
@@ -283,26 +337,20 @@ else
     timedatectl set-ntp true
 fi
 
-# choose network configuration software
-if $router; then
-    :
-elif $wireless; then
-    installer crda networkmanager
+if $wireless; then
+    installer crda wpa_supplicant iw
+fi
+
+if ! $router && $wireless; then
+    installer networkmanager
+fi
+
+if $router && $wireless; then
+    installer hostapd
 fi
 
 if ! $contained; then
     installer grub
-fi
-
-if check_runable emacs; then
-    userinstall=true
-else
-    userinstall=false
-fi
-if check_installed chromium || check_installed emacs && ! check_installed emacs-nox; then
-    graphical=true
-else
-    graphical=false
 fi
 
 # setup timezone
@@ -312,7 +360,6 @@ echo "Your timezone is $timezone"
 ln -sf "/usr/share/zoneinfo/$timezone" /etc/localtime
 
 # setup localization
-locale=en_CA
 cat > /etc/locale.gen <<EOF
 $locale.UTF-8 UTF-8
 en_US.UTF-8 UTF-8
@@ -326,6 +373,14 @@ shellvar_edit /etc/vconsole.conf KEYMAP us
 shellvar_edit /etc/vconsole.conf FONT Lat2-Terminus16
 if [ "$TERM" = linux ]; then
     setfont Lat2-Terminus16
+fi
+
+if $userinstall; then
+    if $graphical; then
+	installer emacs
+    else
+	installer emacs-nox
+    fi
 fi
 
 # I don't like vi so make nano or emacs the global default.
@@ -355,7 +410,8 @@ add_sudo_policy() {
 	if visudo -c; then
 	    return 1
 	else
-	    # TODO: manually intervene to fix things
+	    echo "A huge error happened. Starting shell so you can fix sudo."
+	    bash
 	    exit 2
 	fi
     fi
@@ -365,7 +421,7 @@ add_sudo_policy /etc/sudoers.d/wheel <<EOF
 #%wheel ALL=(ALL:ALL) NOPASSWD: ALL
 EOF
 
-if $wireless && check_installed networkmanager; then
+if $wireless && ! $router && check_installed networkmanager; then
     systemctl_deactivate dhcpcd
     systemctl_activate NetworkManager
 fi
@@ -422,6 +478,12 @@ if $virtualized && [ "$virtualization" = oracle ]; then
     fi
 fi
 
+if $virtualized && [ "$virtualization" = kvm ]; then
+    if $graphical; then
+	installer xf86-video-qxl
+    fi
+fi
+
 linuxcmdline="$linuxcmdline zswap.enabled=1"
 
 if check_installed postgresql; then
@@ -463,7 +525,7 @@ if $userinstall; then
     installer hub thefuck
 fi
 
-if $userinstall && ( check_installed chromium || check_installed google_chrome ); then
+if $userinstall && ( check_installed chromium || check_installed google-chrome ); then
     installer ttf-liberation noto-fonts libu2f-host
     installer profile-sync-daemon || true
 fi
@@ -484,21 +546,33 @@ if $userinstall && check_runable emacs; then
     installer bear || true
 fi
 
+# for eduroam configuration
+if $laptop && $graphical && check_installed networkmanager; then
+    installer network-manager-applet
+fi
+
 if $has_admin && check_installed profile-sync-daemon; then
     add_sudo_policy /etc/sudoers.d/psd <<EOF
 $admin_user ALL=(ALL) NOPASSWD: /usr/bin/psd-overlay-helper
 EOF
 fi
 
-# TODO: decide on how I should handle laptop lid closure
 if $laptop; then
-    shellvar_edit /etc/systemd/logind.conf HandleLidSwitch sleep
+    if $server; then
+	shellvar_edit /etc/systemd/logind.conf HandleLidSwitch ignore
+    elif $hibernate; then
+	shellvar_edit /etc/systemd/logind.conf HandleLidSwitch hybrid-sleep
+    else
+	shellvar_edit /etc/systemd/logind.conf HandleLidSwitch sleep
+    fi
 fi
 
 if $graphical && [ -d /sys/module/i915 ]; then
     installer xf86-video-intel
 fi
 
+# the proprietary module is faster but doesn't always work with other
+# features
 if ! $freeonly && [ -d /sys/module/nouveau ]; then
     installer nvidia-dkms
 fi
@@ -527,8 +601,7 @@ EndSection
 EOF
 fi
 
-# for my chromebook
-if $laptop; then
+if [ "$(cat /sys/devices/virtual/dmi/id/product_name)" = Glimmer ]; then
     installer lenovo-thinkpad-yoga-11e-chromebook-git || true
 fi
 
@@ -567,6 +640,14 @@ Exec=/bin/bash -c 'ln -sfT bash /usr/bin/sh && rm /etc/pacman.d/hooks/dash.hook 
 EOF
 fi
 
+if $server; then
+    installer haveged
+fi
+
+if check_installed haveged; then
+    systemctl_activate haveged
+fi
+
 if check_installed docker; then
     if check_fstype /var/lib/docker btrfs; then
 	installer btrfs-progs
@@ -583,8 +664,8 @@ if check_installed tesseract; then
 fi
 
 if check_installed openssh; then
-    # TODO
-    :
+    systemctl_activate sshd.socket
+    systemctl start sshdgenkeys
 fi
 
 shellvar_edit /etc/mkinitcpio.conf HOOKS base systemd autodetect modconf pcmcia block mdadm_udev keyboard sd-vconsole sd-encrypt sd-lvm2 filesystems fsck
