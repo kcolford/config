@@ -99,7 +99,7 @@ installer() {
 }
 
 . /etc/os-release
-if [ "$ID" != arch ]; then
+if check_runable pacman && [ "$ID" != arch ]; then
     echo "Only run this script on Arch Linux" >&2
     exit 1
 fi
@@ -134,9 +134,7 @@ linuxcmdline=''
 locale=en_CA
 
 update=false
-router=false
 freeonly=false
-server=false
 full=true
 if check_runable emacs; then
     userinstall=true
@@ -167,8 +165,6 @@ fi
 
 for cfg in "$@"; do
     case "$cfg" in
-	server) server=true ;;
-	router) router=true ;;
 	freeonly) freeonly=true ;;
 	headless) graphical=false ;;
 	nographical) graphical=false ;;
@@ -182,10 +178,6 @@ for cfg in "$@"; do
 	*) echo "Invalid configuration '$cfg'." >&2; exit 2 ;;
     esac
 done
-
-if $router; then
-    full=false
-fi
 
 if check_runable powerpill; then
     pacman='q powerpill'
@@ -356,9 +348,6 @@ EOF
 # temporarily while we choose which one to setup
 timedatectl set-ntp false
 systemctl_deactivate ntpd chronyd
-if $router; then
-    installer ntp
-fi
 if $laptop; then
     installer chrony
     systemctl_activate chronyd
@@ -370,14 +359,6 @@ fi
 
 if $wireless; then
     installer crda wpa_supplicant iw
-fi
-
-if ! $router && $wireless; then
-    installer networkmanager
-fi
-
-if $router && $wireless; then
-    installer hostapd
 fi
 
 if ! $contained; then
@@ -446,7 +427,7 @@ add_sudo_policy /etc/sudoers.d/wheel <<EOF
 #%wheel ALL=(ALL:ALL) NOPASSWD: ALL
 EOF
 
-if $wireless && ! $router && check_installed networkmanager; then
+if $wireless && check_installed networkmanager; then
     systemctl_deactivate dhcpcd
     systemctl_activate NetworkManager
 fi
@@ -666,22 +647,13 @@ Exec=/bin/bash -c 'ln -sfT bash /usr/bin/sh && rm /etc/pacman.d/hooks/dash.hook 
 EOF
 fi
 
-# add iommu support
-if [ "$(uname -m)" = x86_64 ]; then
+if [ "$(uname -m)" = x86_64 ] && grep -q 'svm\|vmx' /proc/cpuinfo; then
     if $intelcpu; then
 	linuxcmdline="$linuxcmdline intel_iommu=on"
     else
 	linuxcmdline="$linuxcmdline amd_iommu=on"
-    fi
+	fi
     linuxcmdline="$linuxcmdline iommu=pt"
-fi
-
-if $server; then
-    installer haveged
-fi
-
-if check_installed haveged; then
-    systemctl_activate haveged
 fi
 
 if check_installed docker; then
