@@ -305,7 +305,7 @@ if $full; then
 fi
 
 # setup timezone
-timezone="$(curl -s 'ipinfo.io/loc' | sed 's/,/ /' | awk '{print "api.geonames.org/timezoneJSON?lat=" $1 "&lng=" $2 "&username=kcolford";}' | xargs curl -s | jq -r .timezoneId)" || true
+timezone="$(curl -s 'https://ipinfo.io/loc' | sed 's/,/ /' | awk '{print "api.geonames.org/timezoneJSON?lat=" $1 "&lng=" $2 "&username=kcolford";}' | xargs curl -s | jq -r .timezoneId)" || true
 timezone="${timezone:-America/Toronto}"
 echo "Your timezone is $timezone"
 ln -sf "/usr/share/zoneinfo/$timezone" /etc/localtime
