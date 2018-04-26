@@ -77,12 +77,16 @@ alias lr='ls -R'
 alias lar='ls -AR'
 alias sl='ls'
 alias LS='ls'
+
 alias igrep='grep --ignore-case'
 alias fu='fuck'
+alias tags='etags **.[ch]*'
 alias magit='emacsclient -t --eval "(magit-status)"'
-alias etags='etags **.[ch]*'
+alias rot13='tr "A-Za-z" "N-ZA-Mn-za-m"'
+pb() { curl -F "c=@${1:--}" "https://ptpb.pw/?u=1" }
+rfc() { curl -s "https://ietf.org/rfc/rfc${1:--index}.txt" | less }
+sshfp() { { ssh-keygen -F "$1" || ssh-keyscan "$1"; } | sed '/^#/d' | cut -d ' ' -f 2- | ssh-keygen -r "$1" -f /dev/stdin }
 
-# wrapper to enable relative paths for encfs
 encfs() {
     if [[ $# != 2 ]] || [[ "$1" = -* ]] || [[ "$2" = -* ]]; then
 	command encfs "$@"

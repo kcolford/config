@@ -1,4 +1,0 @@
-#!/bin/sh
-set -euo pipefail
-
-find -xtype l -print -delete

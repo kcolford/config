@@ -652,7 +652,7 @@ if [ "$(uname -m)" = x86_64 ] && grep -q 'svm\|vmx' /proc/cpuinfo; then
 	linuxcmdline="$linuxcmdline intel_iommu=on"
     else
 	linuxcmdline="$linuxcmdline amd_iommu=on"
-	fi
+    fi
     linuxcmdline="$linuxcmdline iommu=pt"
 fi
 
@@ -661,6 +661,19 @@ if check_installed docker; then
 	installer btrfs-progs
     fi
     systemctl_activate docker.socket
+fi
+
+if [ "$(hostname)" != "$(hostname -f)" ]; then
+    hostname -f > /etc/hostname
+    hostname -F /etc/hostname
+fi
+
+if check_installed postfix; then
+    postconf -e inet_protocols=any
+    postconf -e mynetworks_style=host
+    if $has_admin; then
+	echo "$admin_user" > /root/.forward
+    fi
 fi
 
 if $laptop; then

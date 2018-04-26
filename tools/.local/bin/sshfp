@@ -1,2 +1,0 @@
-#!/bin/bash
-{ ssh-keygen -F "$1" || ssh-keyscan "$1"; } | sed '/^#/d' | cut -d ' ' -f 2- | ssh-keygen -r "$1" -f /dev/stdin

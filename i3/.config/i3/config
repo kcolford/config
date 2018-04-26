@@ -14,7 +14,7 @@ bar {
 exec --no-startup-id xset +dpms
 exec --no-startup-id ~/.fehbg
 exec --no-startup-id ~/.screenlayout/default.sh
-exec --no-startup-id xss-lock -- i3lock -n -c 202020
+exec --no-startup-id xss-lock -- i3lock -n -c 404040
 exec --no-startup-id systemd-run --user systemctl --user restart emacs
 exec --no-startup-id systemd-run --user dex -a
 exec --no-startup-id systemd-run --user compton
