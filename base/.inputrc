@@ -1,2 +1,4 @@
 set completion-ignore-case on
+set completion-map-case on
 set enable-bracketed-paste on
+set visible-stats on
