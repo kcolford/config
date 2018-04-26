@@ -37,7 +37,7 @@ shellvar_edit() {
 
 systemctl_activate() {
     q systemctl enable "$@"
-    q systemctl start "$@" &
+    qq systemctl start "$@" || true &
 }
 
 systemctl_deactivate() {
@@ -153,7 +153,7 @@ if check_installed xorg || check_installed i3 || check_installed chromium || che
 else
     graphical=false
 fi
-if [ "$SUDO_USER" ] && [ "$SUDO_USER" != root ]; then
+if [ "${SUDO_USER+x}" ] && [ "$SUDO_USER" != root ]; then
     has_admin=true
     admin_user="$SUDO_USER"
 else
@@ -355,15 +355,14 @@ EOF
 
 # choose the method of time synchronization, we can disable all forms
 # temporarily while we choose which one to setup
-timedatectl set-ntp false
-systemctl_deactivate ntpd chronyd
+systemctl_deactivate ntpd chronyd systemd-timesyncd
 if $laptop; then
     installer chrony
     systemctl_activate chronyd
 elif check_installed ntp; then
     systemctl_activate ntpd
 else
-    timedatectl set-ntp true
+    systemctl_activate systemd-timesyncd
 fi
 
 if $wireless; then
@@ -732,7 +731,7 @@ fi
 
 if check_installed openssh; then
     systemctl_activate sshd.socket
-    systemctl start sshdgenkeys
+    qq systemctl start sshdgenkeys || true
     if [ -s /root/.ssh/authorized_keys ] || { $has_admin && [ -s /home/"$admin_user"/.ssh/authorized_keys ]; }; then
 	sed -i 's/ *#\? *\(PasswordAuthentication\) .*/\1 no/' /etc/ssh/sshd_config
     else
@@ -745,7 +744,7 @@ fi
 uninstaller $(pacman -Qqdtt)
 
 # generate initcpio
-sed -i 's/^ .*\(HOOKS\)=(.*)/\1=(base systemd autodetect modconf pcmcia block mdadm_udev keyboard sd-vconsole sd-encrypt sd-lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
+sed -i 's/^ *\(HOOKS\)=(.*)/\1=(base systemd autodetect modconf pcmcia block mdadm_udev keyboard sd-vconsole sd-encrypt sd-lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
 q mkinitcpio -P && echo "Done generating initcpio." &
 
 if check_installed grub; then
