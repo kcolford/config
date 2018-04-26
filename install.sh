@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euo pipefail
-trap 'kill -$$' EXIT
+trap 'pkill -P $$' EXIT
 
 check_installed() {
     for pkg in "$@"; do
@@ -60,6 +60,13 @@ check_fstype() {
 
 qq() {
     "$@" > /dev/null 2>&1
+}
+
+modify() {
+    file="$1"
+    shift
+    "$@" < "$file" > "$file"-t
+    mv "$file"-t "$file"
 }
 
 prompt() {
@@ -326,6 +333,8 @@ When=PostTransaction
 Exec=/bin/sh -c '/usr/bin/pacman -Qqe > /etc/pkglist.txt'
 EOF
 
+# for some reason, etckeeper doesn't play nicely with a root user that
+# doesn't have a name
 if check_installed etckeeper; then
     git config --global user.name root
 fi
@@ -441,40 +450,43 @@ if $has_admin; then
     q passwd -l root
 fi
 
+# install some basic stuff like smartcard reader, printer, scanner,
+# and usage reporting
 if $userinstall; then
     installer ccid cups ghostscript foomatic-db sane pkgfile pkgstats
     installer watchman || true
     systemctl_activate pcscd org.cups.cupsd pkgfile-update.timer
 fi
 
+# a graphical installation should come with a few utility programs
 if $graphical; then
     installer i3 2> /dev/null || true # the i3 group is weird
     installer linux-zen lightdm syncthing-gtk qbittorrent chromium
     installer dropbox || true
 fi
 
-if check_installed linux-zen; then
-    installer linux-zen-headers
-fi
+# install headers for each kernel
+for i in linux linux-ltx linux-zen linux-hardened; do
+    if check_installed $i; then
+	installer $i-headers
+    fi
+done
 
-if check_installed linux; then
-    installer linux-headers
-fi
-
+# lightdm needs a greeter, install the default gtk one just to be
+# safe, also only enable it, starting lightdm can be annoying
 if check_installed lightdm; then
     installer lightdm-gtk-greeter
-    systemctl enable lightdm
+    if $graphical; then
+	systemctl enable lightdm
+    fi
 fi
 
 # for my local configuration files
 if check_runable i3; then
-    installer xorg xterm compton xss-lock udiskie feh redshift dunst xdotool dex dmenu terminus-font arandr
+    installer xorg xterm compton xss-lock udiskie feh redshift python-xdg dunst xdotool dex dmenu terminus-font arandr
 fi
 
-if check_installed redshift; then
-    installer python-xdg
-fi
-
+# virtualbox guests need some help
 if $virtualized && [ "$virtualization" = oracle ]; then
     installer virtualbox-guest-dkms virtualbox-guest-iso
     if $graphical; then
@@ -484,18 +496,25 @@ if $virtualized && [ "$virtualization" = oracle ]; then
     fi
 fi
 
+# qxl video for kvm guests
 if $virtualized && [ "$virtualization" = kvm ]; then
     if $graphical; then
 	installer xf86-video-qxl
     fi
 fi
 
-linuxcmdline="$linuxcmdline zswap.enabled=1"
+# zswap is a good alternative when there's no regular swap space
+if [ "$(wc -l < /proc/swaps)" = 1 ]; then 
+    linuxcmdline="$linuxcmdline zswap.enabled=1"
+fi
 
+
+# better initial database set up, this allows password-less
+# authentication with
 if check_installed postgresql; then
     chattr +C -R /var/lib/postgres/data/
     if ! [ -f /var/lib/postgres/data/postgresql.conf ]; then
-	sudo -u postgres initdb -D /var/lib/postgres/data --auth-host=pam --auth-local=peer --data-checksums
+	sudo -u postgres initdb -D /var/lib/postgres/data --auth-host=pam --auth-local=peer
     fi
 fi
 
@@ -509,6 +528,7 @@ if check_installed libvirt; then
     systemctl_activate libvirtd
 fi
 
+# this adds UEFI support to libvirt virtual machines
 if check_installed ovmf libvirt; then
     qq patch -t -N /etc/libvirt/qemu.conf - <<EOF || true
 --- /etc/libvirt/qemu.conf
@@ -526,18 +546,25 @@ if check_installed ovmf libvirt; then
 EOF
 fi
 
+
+# daily atime updates are a drain on system resources, aside from a
+# select few applications (Mutt), it's better to have noatime
+if ! check_installed mutt; then
+    gawk -i inplace '$2=="/"&&$4!~/noatime/{$4=$4",noatime";print;next}{print}' /etc/fstab
+else
+    gawk -i inplace '$2=="/"&&$4~/noatime/{sub(/,noatime/,"",$4);print;next}{print}' /etc/fstab
+fi
+mount -o remount /
+
+# autodefrag greatly improves performance, while
+# user_subvol_rm_allowed is just good hygene
 if check_fstype / btrfs; then
     installer btrfs-progs
-    sed -i -f - /etc/fstab <<'EOF'
-/autodefrag/n
-s=\([^[:space:]]\+\) */ *\(auto\|btrfs\) *\(.*\)=\1 / \2 \3,autodefrag=
-EOF
-    sed -i -f - /etc/fstab <<'EOF'
-/user_subvol_rm_allowed/n
-s=\([^[:space:]]\+\) */ *\(auto\|btrfs\) *\(.*\)=\1 / \2 \3,user_subvol_rm_allowed=
-EOF
-    mount -o remount / &
+    awk -i inplace '$2=="/"&&$4!~/autodefrag/{$4=$4",autodefrag";print;next}{print}' /etc/fstab
+    awk -i inplace '$2=="/"&&$4!~/user_subvol_rm_allowed/{$4=$4",user_subvol_rm_allowed";print;next}{print}' /etc/fstab
+    mount -o remount /
 fi
+
 
 if check_installed cronie; then
     systemctl_activate cronie
@@ -570,12 +597,16 @@ if $laptop && $graphical && check_installed networkmanager; then
 fi
 
 if $has_admin && check_installed profile-sync-daemon; then
+    # this has to go at the end so that it isn't overridden by
+    # /etc/sudoers.d/wheel
     add_sudo_policy /etc/sudoers.d/zz-psd <<EOF
 $admin_user ALL=(ALL) NOPASSWD: /usr/bin/psd-overlay-helper
 EOF
 fi
 
-shellvar_edit /etc/systemd/logind.conf HandleLidSwitch hybrid-sleep
+if $laptop; then
+    shellvar_edit /etc/systemd/logind.conf HandleLidSwitch suspend
+fi
 
 if $graphical && [ -d /sys/module/i915 ]; then
     installer xf86-video-intel
@@ -614,10 +645,6 @@ fi
 if [ "$(cat /sys/devices/virtual/dmi/id/product_name)" = Glimmer ]; then
     installer lenovo-thinkpad-yoga-11e-chromebook-git || true
 fi
-
-# clean up unneeded packages
-# shellcheck disable=SC2046
-uninstaller $(pacman -Qqdtt)
 
 if check_installed dash; then
     ln -sfT dash /usr/bin/sh
@@ -669,11 +696,12 @@ if [ "$(hostname)" != "$(hostname -f)" ]; then
 fi
 
 if check_installed postfix; then
-    postconf -e inet_protocols=any
+    postconf -e inet_protocols=all
     postconf -e mynetworks_style=host
     if $has_admin; then
 	echo "$admin_user" > /root/.forward
     fi
+    newaliases
     systemctl_activate postfix
 fi
 
@@ -712,7 +740,12 @@ if check_installed openssh; then
     fi
 fi
 
-sed -i 's/ *#\? *\(HOOKS\)=(.*)/\1=(base systemd autodetect modconf pcmcia block mdadm_udev keyboard sd-vconsole sd-encrypt sd-lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
+# clean up unneeded packages
+# shellcheck disable=SC2046
+uninstaller $(pacman -Qqdtt)
+
+# generate initcpio
+sed -i 's/^ .*\(HOOKS\)=(.*)/\1=(base systemd autodetect modconf pcmcia block mdadm_udev keyboard sd-vconsole sd-encrypt sd-lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
 q mkinitcpio -P && echo "Done generating initcpio." &
 
 if check_installed grub; then
