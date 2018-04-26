@@ -674,6 +674,7 @@ if check_installed postfix; then
     if $has_admin; then
 	echo "$admin_user" > /root/.forward
     fi
+    systemctl_activate postfix
 fi
 
 if $laptop; then
