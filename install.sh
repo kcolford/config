@@ -106,7 +106,7 @@ installer() {
 }
 
 . /etc/os-release
-if check_runable pacman && [ "$ID" != arch ]; then
+if ! check_runable pacman && [ "$ID" != arch ]; then
     echo "Only run this script on Arch Linux" >&2
     exit 1
 fi
