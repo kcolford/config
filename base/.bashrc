@@ -8,6 +8,7 @@ if [ "$TERM" != "dumb" ]; then
 fi
 
 # shell features
+# 
 shopt -s autocd
 shopt -s cdspell
 shopt -s checkhash
@@ -38,21 +39,22 @@ try_eval() {
     fi
 }
 
-import /usr/share/git/git-prompt.sh
-if [ -x "$(command -v watchman)" ]; then
-    # shellcheck disable=SC2034
-    GIT_PS1_SHOWDIRTYSTATE=y
-    # shellcheck disable=SC2034
-    GIT_PS1_SHOWUNTRACKEDFILES=y
-fi
 slow_repo() {
     git config bash.showDirtyState false && git config bash.showUntrackedFiles false
 }
-# shellcheck disable=SC2034
-GIT_PS1_SHOWSTASHSTATE=y
-# shellcheck disable=SC2034
-GIT_PS1_SHOWUPSTREAM=y
-PS1="\$(__git_ps1 \"(%s) \")$PS1"
+if . /usr/share/git/git-prompt.sh > /dev/null 2>&1; then
+    if [ -x "$(command -v watchman)" ]; then
+	# shellcheck disable=SC2034
+	GIT_PS1_SHOWDIRTYSTATE=y
+	# shellcheck disable=SC2034
+	GIT_PS1_SHOWUNTRACKEDFILES=y
+    fi
+    # shellcheck disable=SC2034
+    GIT_PS1_SHOWSTASHSTATE=y
+    # shellcheck disable=SC2034
+    GIT_PS1_SHOWUPSTREAM=y
+    PS1="\$(__git_ps1 \"(%s) \")$PS1"
+fi
 
 # colourize prompt according to command status
 PS1="\\[$RED\\]\${?/#0/\\[$GREEN\\]}$PS1\\[$RESET\\]"
