@@ -704,9 +704,9 @@ if check_installed postfix; then
     systemctl_activate postfix
 fi
 
-if $laptop; then
-    installer laptop-mode-tools || true
-fi
+# if $laptop; then
+#     installer laptop-mode-tools || true
+# fi
 
 if $laptop; then
     installer tlp
