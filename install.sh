@@ -460,7 +460,7 @@ fi
 # a graphical installation should come with a few utility programs
 if $graphical; then
     installer i3 2> /dev/null || true # the i3 group is weird
-    installer linux-zen lightdm syncthing-gtk qbittorrent chromium
+    installer linux-zen lightdm syncthing-gtk qbittorrent chromium kdeconnect
     installer dropbox || true
 fi
 
