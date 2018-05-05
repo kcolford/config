@@ -19,9 +19,7 @@ exec --no-startup-id systemd-run --user systemctl --user restart emacs
 exec --no-startup-id systemd-run --user dex -a
 exec --no-startup-id systemd-run --user compton
 exec --no-startup-id systemd-run --user udiskie
-exec qbittorrent
 exec dropbox
-exec syncthing-gtk
 
 bindsym $mod+Shift+q kill
 bindsym $mod+Shift+c reload
