@@ -8,7 +8,7 @@ ln -sfn ~ .homelink
 xargs stow < "$lst"
 
 systemctl --user daemon-reload || true
-systemctl --user enable emacs redshift-gtk psd || true
+systemctl --user enable emacs redshift-gtk || true
 
 # setup completions
 complete_dir="${BASH_COMPLETION_USER_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/bash-completion}/completions"
