@@ -34,6 +34,8 @@ bindsym $mod+u exec emacs
 bindsym $mod+d exec dmenu_run
 bindsym $mod+x exec i3-dmenu-desktop
 
+bindsym $mod+p exec import ~/Downloads/screenshot-"$(date -Is)".png
+
 bindsym $mod+m exec transset-df -a -t
 bindsym $mod+comma exec transset-df -a --dec 0.1
 bindsym $mod+period exec transset-df -a --inc 0.1
