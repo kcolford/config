@@ -266,22 +266,21 @@ The minor mode's documentation is specified in DOC."
   :ensure-system-package (cmake clang)
   :hook (c-mode-common . irony-mode)
   :init
-  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-  :config
-  (defun irony-setup-cmake ()
-    "Have cmake export compile commands for irony."
-    (interactive)
-    ;; the `compile' function allows us to review the command and change
-    ;; it if it's incorrect
-    (compile "cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ./build")
-    (irony-cdb-autosetup-compile-options))
-  (defun irony-setup-make ()
-    "Have make export compile commands for irony."
-    (interactive)
-    ;; the `compile' function allows us to review the command and change
-    ;; it if it's incorrect
-    (compile "bear make -B")
-    (irony-cdb-autosetup-compile-options)))
+  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
+(defun irony-setup-cmake ()
+  "Have cmake export compile commands for irony."
+  (interactive)
+  ;; the `compile' function allows us to review the command and change
+  ;; it if it's incorrect
+  (compile "cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ./build")
+  (irony-cdb-autosetup-compile-options))
+(defun irony-setup-make ()
+  "Have make export compile commands for irony."
+  (interactive)
+  ;; the `compile' function allows us to review the command and change
+  ;; it if it's incorrect
+  (compile "bear make -B")
+  (irony-cdb-autosetup-compile-options))
 (use-package irony-eldoc
   :hook irony-mode)
 (use-package company-irony
