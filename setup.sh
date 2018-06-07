@@ -1,5 +1,5 @@
-#!/bin/sh
-set -eu
+#!/bin/bash
+set -euo pipefail
 
 lst="$(realpath "${1:-"$(dirname "$0")"/normal.lst}")"
 cd "$(dirname "$0")"

@@ -58,8 +58,7 @@ bb-wrapper --aur						\
 	   hub							\
 	   thefuck						\
 	   watchman						\
-	   linux-zen						\
-	   linux-zen-headers					\
+	   linux-zen linux-zen-headers				\
 	   lightdm						\
 	   lightdm-gtk-greeter					\
 	   syncthing-gtk					\
