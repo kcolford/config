@@ -144,8 +144,7 @@ bb-wrapper --aur				\
 	   clang				\
 	   bear					\
 	   gocode-git				\
-	   openssh				\
-	   snapper
+	   openssh
 
 # configure the package cache
 sudo btrfs-convert-to-subvolume /var/cache/pacman/pkg
