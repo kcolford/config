@@ -85,6 +85,7 @@ alias fu='fuck'
 alias tags='etags **.[ch]*'
 alias magit='emacsclient -t --eval "(magit-status)"'
 alias rot13='tr "A-Za-z" "N-ZA-Mn-za-m"'
+alias shortcuts='grep ^bind ~/.config/i3/config | grep -v -e move -e workspace -e focus'
 pb() { curl -F "c=@${1:--}" "https://ptpb.pw/?u=1"; }
 rfc() { curl -s "https://ietf.org/rfc/rfc${1:--index}.txt" | $PAGER; }
 sshfp() { { ssh-keygen -F "$1" || ssh-keyscan "$1"; } | sed '/^#/d' | cut -d ' ' -f 2- | ssh-keygen -r "$1" -f /dev/stdin; }
