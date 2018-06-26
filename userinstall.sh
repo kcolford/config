@@ -1,7 +1,24 @@
 #!/bin/bash
 set -euo pipefail
 
+# This script sets up a user system.
+#
+# It tries to make all file modifications atomic by using sponge from
+# moreutils. If it has been run as root then it sets up sudo and if
+# the script was given an argument it creates a user with a name based
+# on that argument and makes that user the administrator with sudo. It
+# also adds helper scripts that convert directories into subvolumes.
+# It installs a pacman.conf file that has access to a number of
+# repositories. It installs bauerbill as an AUR helper and configures
+# it to use the local network for speeding up downloads. It uses
+# bauerbill to install all packages that may be useful to a user. It
+# sets up the package cache to clean itself regularly and exclude it
+# from backups. It sets up a more user friendly permission system. It
+# configures locales, fonts, and timezones. It configures natural
+# scrolling on touchpads.
+
 SSH=9034@usw-s009.rsync.net
+dda='dd conv=notrunc oflag=append'
 tee=tee
 
 if [ "$UID" = 0 ]; then
@@ -207,6 +224,7 @@ Description=Run the borg backup program.
 [Service]
 Type=oneshot
 ExecStart=-/usr/bin/btrfs subvolume delete %I/.backup
+ExecStart=-/usr/bin/rmdir %I/.backup
 ExecStart=/usr/bin/btrfs subvolume snapshot -r %I %I/.backup
 ExecStart=/usr/bin/borg create ::{hostname}-%i-{now} %I/.backup
 EnvironmentFile=/etc/conf.d/borg
@@ -224,16 +242,18 @@ Persistent=true
 WantedBy=multi-user.target
 EOF
 yes '' | sudo ssh-keygen || true
-echo "restrict,command=\"borg serve --restrict-to-path $(hostname)\"" $(sudo cat /root/.ssh/id_rsa.pub) | ssh "$SSH" dd of=.ssh/authorized_keys conv=notrunc oflag=append
+authorized_key_line="restrict,command=\"borg serve --restrict-to-path $(hostname)\" $(sudo cat /root/.ssh/id_rsa.pub)"
+echo "$authorized_key_line" | ssh "$SSH" $dda of=.ssh/authorized_keys
 sudo $tee /etc/conf.d/borg <<EOF
 BORG_REPO=$SSH:$(hostname)
 BORG_PASSPHRASE=
 EOF
+sudo btrfs-convert-to-subvolume /root/.cache/borg
 sudo borg init -e repokey "$SSH:$(hostname)" || true
 
 # start a bunch of services for an interactive machine
 sudo systemctl daemon-reload
-sudo systemctl enable chronyd NetworkManager pacserve pcscd org.cups.cupsd pkgfile-update.timer cronie lightdm
+sudo systemctl enable chronyd NetworkManager pacserve pcscd org.cups.cupsd pkgfile-update.timer cronie lightdm fstrim.timer
 
 # enable root backups
 if sudo btrfs subvolume show / > /dev/null 2>&1; then
@@ -249,10 +269,15 @@ sudo sed -i '/^SystemGroup/s/sys root$/sys root wheel/' /etc/cups/cups-files.con
 # setup grub
 sudo sed -i 's/#\? *\(GRUB_ENABLE_CRYPTODISK=\).*/\1=y/' /etc/default/grub
 
+# hide the initramfses
+chmod o-r /boot/initramfs-*.img || true
+
 # initcpio
 (
     source /etc/mkinitcpio.conf
     sudo $tee /etc/mkinitcpio.conf <<EOF
+# make sure new initramfses are hidden
+umask o-r
 MODULES=(${MODULES[@]})
 BINARIES=(${BINARIES[@]})
 FILES=(${FILES[@]})

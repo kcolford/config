@@ -17,4 +17,4 @@ XTerm*fullscreen: never
 XTerm*scrollTtyOutput: false
 XTerm*selectToClipboard: true
 XTerm*translations: #override \n\
-	Shift Ctrl <Key>T: spawn-new-terminal()
+	Ctrl <Key>=: spawn-new-terminal()
