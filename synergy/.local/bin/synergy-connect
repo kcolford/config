@@ -1,2 +1,0 @@
-#!/bin/sh
-ssh -R localhost:24800:localhost:24800 "$1" DISPLAY="$DISPLAY" synergyc -f localhost

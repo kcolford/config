@@ -1,7 +1,0 @@
-# -*- shell-script -*-
-_synergy-connect() {
-    local cur prev words cword
-    _init_completion || return
-    _known_hosts_real "$cur"
-}
-complete -F _synergy-connect synergy-connect

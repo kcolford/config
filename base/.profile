@@ -1,5 +1,5 @@
 for i in ~/.profile.d/*; do
-    if [ -f "$i" ]; then
+    if [ -r "$i" ]; then
 	. "$i"
     fi
 done

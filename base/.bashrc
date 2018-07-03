@@ -98,11 +98,6 @@ encfs() {
     fi
 }
 
-for dir in ~/{Downloads,'VirtualBox VMs',.local/share/libvirt/images}; do
-    mkdir -p "$dir"
-    chattr -R +C "$dir" > /dev/null 2>&1 &
-done
-
 import /{etc,usr{,/local}/share/bash-completion}/bash_completion
 import /usr/share/doc/pkgfile/command-not-found.bash
 try_eval direnv hook bash &

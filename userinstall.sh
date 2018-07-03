@@ -213,8 +213,6 @@ EOF
 # setup virtual machine images, these should be nocow
 mkdir -p ~/.local/share/libvirt/images
 chattr +C ~/.local/share/libvirt/images
-mkdir -p ~/VirtualBox\ VMs
-chattr +C ~/VirtualBox\ VMs
 
 # setup backups
 sudo $tee /etc/systemd/system/borg@.service <<'EOF'
