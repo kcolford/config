@@ -70,6 +70,7 @@ alias ls='ls --hide="*~" --color=auto --classify --dereference-command-line --hu
 alias qemu-system-x86_64='qemu-system-x86_64 -accel kvm -smp 2 -m 2048'
 alias tcpdump='sudo tcpdump --relinquish-privileges $USER'
 alias bb-wrapper='bb-wrapper --build-dir ~/.cache/bauerbill --aur'
+alias bauerbill='bauerbill --aur'
 
 alias e='${EDITOR:-nano}'
 alias la='ls -a'

@@ -131,6 +131,7 @@ bb-wrapper --aur				\
 	   udiskie				\
 	   feh					\
 	   dunst				\
+	   scrot				\
 	   xdotool				\
 	   dex					\
 	   dmenu				\

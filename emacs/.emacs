@@ -56,6 +56,7 @@ The minor mode's documentation is specified in DOC."
   :ensure t
   :config (key-chord-mode 1))
 (use-package system-packages
+  :disabled
   :ensure t)
 
 ;; byte compile the init file
@@ -127,11 +128,11 @@ The minor mode's documentation is specified in DOC."
 (use-package hc-zenburn-theme
   :init (load-theme 'hc-zenburn t))
 (use-package flycheck
-  :ensure-system-package (shellcheck)
+  ;; :ensure-system-package (shellcheck)
   :diminish flycheck-mode
   :config (global-flycheck-mode))
 (use-package flyspell
-  :ensure-system-package (aspell (true . "aspell-en"))
+  ;; :ensure-system-package (aspell (true . "aspell-en"))
   :diminish (flyspell-mode flyspell-prog-mode)
   :hook ((text-mode . flyspell-mode)
 	 (prog-mode . flyspell-prog-mode))
@@ -148,7 +149,7 @@ The minor mode's documentation is specified in DOC."
   :config (projectile-mode))
 (use-package direnv
   :disabled
-  :ensure-system-package direnv
+  ;; :ensure-system-package direnv
   :config (direnv-mode))
 
 (use-package company
@@ -203,14 +204,14 @@ The minor mode's documentation is specified in DOC."
 (use-package go-mode
   :mode "\\.go\\'"
   :commands gofmt-before-save
-  :ensure-system-package (goimports . "go-tools")
+  ;; :ensure-system-package (goimports . "go-tools")
   :init
   (setq gofmt-show-errors nil)
   (setq gofmt-command "goimports")
   (add-hook 'go-mode-hook 'gofmt-before-save-mode))
 (use-package company-go
   :after (go-mode company)
-  :ensure-system-package (gocode . "gocode-git")
+  ;; :ensure-system-package (gocode . "gocode-git")
   :config (add-to-list 'company-backends 'company-go))
 
 (use-package python
@@ -221,7 +222,7 @@ The minor mode's documentation is specified in DOC."
 (define-save-minor-mode elpy-format-code)
 (define-save-minor-mode elpy-importmagic-fixup)
 (use-package elpy
-  :ensure-system-package (flake8 autopep8 yapf ipython (true . "python-jedi") (true . "python-rope") (virtualenv . "python-virtualenv"))
+  ;; :ensure-system-package (flake8 autopep8 yapf ipython (true . "python-jedi") (true . "python-rope") (virtualenv . "python-virtualenv"))
   :init
   (setq elpy-rpc-timeout 10)
   ;; (add-hook 'elpy-mode-hook 'elpy-format-code-mode)
@@ -248,7 +249,7 @@ The minor mode's documentation is specified in DOC."
   (add-to-list 'company-backends 'company-web-slim))
 (use-package js2-mode :mode "\\.js\\'")
 (use-package prettier-js
-  :ensure-system-package prettier
+  ;; :ensure-system-package prettier
   :hook ((js2-mode . prettier-js-mode)
 	 (js-mode . prettier-js-mode)
 	 (web-mode . prettier-js-mode)
@@ -263,7 +264,7 @@ The minor mode's documentation is specified in DOC."
 (use-package google-c-style
   :hook (c-mode-common . google-set-c-style))
 (use-package irony
-  :ensure-system-package (cmake clang)
+  ;; :ensure-system-package (cmake clang)
   :hook (c-mode-common . irony-mode)
   :init
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
