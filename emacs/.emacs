@@ -112,7 +112,7 @@ The minor mode's documentation is specified in DOC."
 ;; use xclip to copy/paste in emacs-nox
 (unless window-system
   (when (getenv "DISPLAY")
-    (system-packages-install "xclip")
+    ;; (system-packages-install "xclip")
     (defun xclip-cut-function (text &optional push)
       (with-temp-buffer
 	(insert text)
