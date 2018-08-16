@@ -85,6 +85,7 @@ Include = /etc/pacman.d/mirrorlist
 Server = https://xyne.archlinux.ca/repos/xyne
 EOF
 sudo pacman -S --needed bauerbill
+chattr +C /var/cache/pacman/pkg/
 sudo sed -i '/"server":/s|null|"http://localhost:15678"|' /etc/powerpill/powerpill.json
 bb-wrapper --aur				\
 	   --build-dir ~/.cache/bauerbill/	\
